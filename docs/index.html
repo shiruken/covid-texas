@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Texas COVID-19 Hospital Resource Usage</title>
+    <meta name="description" content="Regional COVID-19 hospital resource usage in Texas based on Department of State Health Services data.">
+    <meta name="keywords" content="COVID-19, coronavirus, SARS-CoV-2, Texas, DSHS, TSA, D3, D3.js, Cases, Outbreak, Pandemic">
+    <meta name="author" content="Colin Sullender">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:creator" content="@shiruken">
+    <meta name="twitter:title" content="Texas COVID-19 Hospital Resource Usage">
+    <meta name="twitter:description" content="Regional COVID-19 hospital resource usage in Texas based on Department of State Health Services data.">
+    <meta name="twitter:image" content="https://covid-texas.csullender.com/social.png">
+    
+    <meta property="og:title" content="Texas COVID-19 Hospital Resource Usage">
+    <meta property="og:description" content="Regional COVID-19 hospital resource usage in Texas based on Department of State Health Services data.">
+    <meta property="og:image" content="https://covid-texas.csullender.com/social.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="628">
+    <meta property="og:url" content="https://covid-texas.csullender.com/">
+    <meta property="og:type" content="website">
+
+    <meta name="viewport" content="width=1000">
+
+    <style>
+        body { 
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        
+        header {
+            text-align: center;
+        }
+
+        header h1#title {
+            margin-bottom: 5px;
+        }
+
+        h2#subtitle {
+            font-size: 1em;
+            color: #999;
+            font-weight: normal;
+            margin-top: 5px;
+            margin-bottom: 50px;
+            min-height: 22px;
+        }
+
+        div#control {
+            text-align: center;
+            font-size: 1.2em;
+        }
+
+        select#tsaSelect {
+            font-size: 1em;
+            padding: 3px;
+            width: 320px;
+        }
+
+        div.chart {
+            width: 1000px;
+            height: 500px;
+            margin: 50px auto;
+            text-align: center;
+        }
+
+        g.xAxis, g.yAxis {
+            font-size: 0.9em;
+        }
+
+        g.yAxisGrid {
+            color: #ccc;
+        }
+
+        text.chartTitle {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 20px;
+            color: #999;
+        }
+
+        a, a:visited {
+            color: #999;
+            text-decoration: none;
+        }
+
+        a:hover, a:active {
+            border-bottom: 1px dotted #999;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1 id="title">Texas COVID-19 Hospital Resource Usage</h1>
+        <h2 id="subtitle"></h2>
+    </header>
+
+    <div id="control">
+        <label for="tsa">Select Location:</label>
+        <select name="tsa" id="tsaSelect"></select>
+    </div>
+    <div id="chart-hospital-beds" class="chart"></div>
+    <div id="chart-icu-beds" class="chart"></div>
+
+    <footer>
+        <p>
+            Data from 
+            <a href="https://www.dshs.state.tx.us/coronavirus/additionaldata/" target="_blank">Texas DSHS</a> · 
+            <a href="https://github.com/shiruken/covid-texas" target="_blank">View on GitHub</a>
+        </p>
+    </footer>
+
+    <script src="https://d3js.org/d3.v5.min.js" type="text/javascript"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+        
+        const margin = {top: 30, right: 60, bottom: 60, left: 60},
+            width = 1000 - margin.left - margin.right,
+            height = 500 - margin.top - margin.bottom;
+
+        // Define redundant y-axis elements
+        var y = d3.scaleLinear()
+            .domain([0, 100])
+            .range([height, 0]);
+
+        var yAxis = d3.axisLeft(y)
+            .ticks(5)
+            .tickFormat(d => d + "%");
+
+        var yAxisGrid = d3.axisLeft(y)
+            .tickSize(-width)
+            .tickFormat('')
+            .ticks(5);
+
+        // Total Hospital Bed Occupancy Chart
+        var svg_total = d3.select('#chart-hospital-beds')
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        svg_total.append('g')
+            .attr('class', 'yAxisGrid')
+            .call(yAxisGrid);
+
+        svg_total.append("g")
+            .attr('class', 'yAxis')
+            .call(yAxis);
+
+        var legendScale_total = d3.scaleOrdinal()
+            .domain(["Hospital Beds Occupied", "Used by COVID-19 Patients"])
+            .range(["#7570B3", "#D95F02"]);
+
+        var legend_total = d3.legendColor()
+            .scale(legendScale_total)
+            .shapePadding(5);
+
+        var legend_total_container = svg_total.append("g")
+            .attr("transform", "translate(20, 20)")
+            .call(legend_total);
+
+        // ICU Bed Occupancy Chart
+        var svg_icu = d3.select('#chart-icu-beds')
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        svg_icu.append('g')
+            .attr('class', 'yAxisGrid')
+            .call(yAxisGrid);
+
+        svg_icu.append("g")
+            .attr('class', 'yAxis')
+            .call(yAxis);
+
+        var legendScale_icu = d3.scaleOrdinal()
+            .domain(["ICU Beds Occupied", "Used by COVID-19 Patients"])
+            .range(["#7570B3", "#D95F02"]);
+
+        var legend_icu = d3.legendColor()
+            .scale(legendScale_icu)
+            .shapePadding(5);
+
+        var legend_icu_container = svg_icu.append("g")
+            .attr("transform", "translate(20, 20)")
+            .call(legend_icu);
+
+
+        var parseDate = d3.timeParse("%Y-%m-%d");
+        d3.csv('data.csv', function(d) {
+            return {
+                tsa: d.tsa,
+                location: d.location,
+                date: parseDate(d['date']),
+                total_beds_available: d.total_beds_available && +d.total_beds_available,
+                total_beds_occupied: d.total_beds_occupied && +d.total_beds_occupied,
+                icu_beds_available: d.icu_beds_available && +d.icu_beds_available,
+                icu_beds_occupied: d.icu_beds_occupied && +d.icu_beds_occupied, 
+                covid_inpatients: d.covid_inpatients && +d.covid_inpatients,
+                covid_icu_inpatients: d.covid_icu_inpatients && +d.covid_icu_inpatients
+            };
+        }).then(function(data) {
+
+            const defaultTSA = "O";
+
+            // Group data by TSA
+            var data = d3.nest()
+                .key(function(d) { return d.tsa; })
+                .object(data);
+            var tsaIDs = Object.keys(data);
+
+            // Update subtitle
+            var formatDate = d3.timeFormat("%A, %B %e, %Y");
+            d3.select("#subtitle").text("Trauma Service Area (TSA) data updated on "
+                + formatDate(data[defaultTSA][data[defaultTSA].length - 1].date));
+
+            // Populate select menu and select default TSA
+            d3.select("#tsaSelect")
+                .selectAll('options')
+                .data(tsaIDs)
+                .enter()
+                .append('option')
+                .text(function (d) { 
+                    if (d === "Total")
+                        return data[d][0]['location'];
+                    else
+                        return data[d][0]['location'] + " (TSA-" + d + ")";               
+                })
+                .attr("value", function (d) { return d; })
+                .property("selected", function(d){ return d === defaultTSA; });
+
+
+            // Total Hospital Bed Occupancy Chart
+            var xExtent_total = getDateExtent(data[defaultTSA], 'total_beds_occupied', 'total_beds_available');
+            var x_total = d3.scaleTime()
+                .domain(xExtent_total)
+                .range([0, width]);
+            
+            svg_total.append("g")
+                .attr('class', 'xAxis')
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x_total));
+
+            var plot_occupancy_total = svg_total.append("path")
+                .datum(data[defaultTSA])
+                .attr("fill", "none")
+                .attr("stroke", "#7570B3")
+                .attr("stroke-width", 4)
+                .attr("d", d3.line()
+                    .x(function(d) { return x_total(d.date); })
+                    .y(function(d) { return y(100 * d.total_beds_occupied / (d.total_beds_occupied + d.total_beds_available)); })
+                    .defined(function(d) { return !(d.total_beds_occupied === "" || d.total_beds_available === ""); })
+                );
+
+            var plot_covid_total = svg_total.append("path")
+                .datum(data[defaultTSA])
+                .attr("fill", "none")
+                .attr("stroke", "#D95F02")
+                .attr("stroke-width", 4)
+                .attr("d", d3.line()
+                    .x(function(d) { return x_total(d.date); })
+                    .y(function(d) {return y(100 * d.covid_inpatients / d.total_beds_occupied); })
+                    .defined(function(d) { return !(d.covid_inpatients === "" || d.total_beds_occupied === ""); })
+                );
+
+            var title_total = svg_total.append("text")
+                    .attr("x", (width / 2))             
+                    .attr("y", 0 - (margin.top / 2))
+                    .attr("text-anchor", "middle")  
+                    .attr('class', 'chartTitle')
+                    .text("Hospital Bed Occupancy in " + data[defaultTSA][0].location 
+                          + " (TSA-" + data[defaultTSA][0].tsa + ")");
+
+
+            // ICU Bed Occupancy Chart
+            var xExtent_icu = getDateExtent(data[defaultTSA], 'icu_beds_occupied', 'icu_beds_available');
+            var x_icu = d3.scaleTime()
+                .domain(xExtent_icu)
+                .range([0, width]);
+            
+            svg_icu.append("g")
+                .attr('class', 'xAxis')
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x_icu));
+
+            var plot_occupancy_icu = svg_icu.append("path")
+                .datum(data[defaultTSA])
+                .attr("fill", "none")
+                .attr("stroke", "#7570B3")
+                .attr("stroke-width", 4)
+                .attr("d", d3.line()
+                    .x(function(d) { return x_icu(d.date); })
+                    .y(function(d) { return y(100 * d.icu_beds_occupied / (d.icu_beds_occupied + d.icu_beds_available)); })
+                    .defined(function(d) { return !(d.icu_beds_occupied === "" || d.icu_beds_available === ""); })
+                );
+
+            var plot_covid_icu = svg_icu.append("path")
+                .datum(data[defaultTSA])
+                .attr("fill", "none")
+                .attr("stroke", "#D95F02")
+                .attr("stroke-width", 4)
+                .attr("d", d3.line()
+                    .x(function(d) { return x_icu(d.date); })
+                    .y(function(d) {return y(100 * d.covid_icu_inpatients / d.icu_beds_occupied); })
+                    .defined(function(d) {
+                        return !(d.covid_icu_inpatients === "" || d.icu_beds_occupied === ""
+                                || d.covid_icu_inpatients > d.icu_beds_occupied);
+                    })
+                );
+
+            var title_icu = svg_icu.append("text")
+                .attr("x", (width / 2))             
+                .attr("y", 0 - (margin.top / 2))
+                .attr("text-anchor", "middle")  
+                .attr('class', 'chartTitle')
+                .text("ICU Bed Occupancy in " + data[defaultTSA][0].location 
+                        + " (TSA-" + data[defaultTSA][0].tsa + ")");
+
+
+            // Update charts when different TSA is selected
+            d3.select("#tsaSelect").on("change", function(d) {
+                var selectedTSA = d3.select(this).property("value");
+
+                // Update x-axis ranges
+                x_total.domain(getDateExtent(data[selectedTSA], 'total_beds_occupied', 'total_beds_available'));
+                x_icu.domain(getDateExtent(data[selectedTSA], 'icu_beds_occupied', 'icu_beds_available'));
+
+                // Draw new total hospital bed occupancy line
+                plot_occupancy_total.datum(data[selectedTSA])
+                    .transition()
+                    .duration(500)
+                    .attr("d", d3.line()
+                        .x(function(d) { return x_total(d.date); })
+                        .y(function(d) { return y(100 * d.total_beds_occupied / (d.total_beds_occupied + d.total_beds_available)); })
+                        .defined(function(d) { return !(d.total_beds_occupied === "" || d.total_beds_available === ""); })
+                    );
+
+                // Draw new total hospital bed COVID-19 occupancy line
+                plot_covid_total.datum(data[selectedTSA])
+                    .transition()
+                    .duration(500)
+                    .attr("d", d3.line()
+                        .x(function(d) { return x_total(d.date); })
+                        .y(function(d) {return y(100 * d.covid_inpatients / d.total_beds_occupied); })
+                        .defined(function(d) { return !(d.covid_inpatients === "" || d.total_beds_occupied === ""); })
+                    );
+
+                // Draw new ICU bed occupancy line
+                plot_occupancy_icu.datum(data[selectedTSA])
+                    .transition()
+                    .duration(500)
+                    .attr("d", d3.line()
+                        .x(function(d) { return x_icu(d.date); })
+                        .y(function(d) { return y(100 * d.icu_beds_occupied / (d.icu_beds_occupied + d.icu_beds_available)); })
+                        .defined(function(d) { return !(d.icu_beds_occupied === "" || d.icu_beds_available === ""); })
+                    );
+
+                // Draw new ICU bed COVID-19 occupancy line
+                plot_covid_icu.datum(data[selectedTSA])
+                    .transition()
+                    .duration(500)
+                    .attr("d", d3.line()
+                        .x(function(d) { return x_icu(d.date); })
+                        .y(function(d) {return y(100 * d.covid_icu_inpatients / d.icu_beds_occupied); })
+                        .defined(function(d) {
+                            return !(d.covid_icu_inpatients === "" || d.icu_beds_occupied === ""
+                                || d.covid_icu_inpatients > d.icu_beds_occupied);
+                        })
+                    );
+
+                // Update titles
+                if (selectedTSA === "Total") {
+                    title_total.text("Statewide Hospital Bed Occupancy");
+                    title_icu.text("Statewide ICU Bed Occupancy");
+                } else {
+                    title_total.text("Hospital Bed Occupancy in " + data[selectedTSA][0].location 
+                                 + " (TSA-" + data[selectedTSA][0].tsa + ")");
+                    title_icu.text("ICU Bed Occupancy in " + data[selectedTSA][0].location 
+                                 + " (TSA-" + data[selectedTSA][0].tsa + ")");
+                }
+
+                // Move legend for overlapping data
+                if (selectedTSA === "H")
+                    legend_icu_container
+                        .transition()
+                        .duration(500)
+                        .attr("transform", "translate(20, 190)");
+                else if (selectedTSA === "R")
+                    legend_icu_container
+                        .transition()
+                        .duration(500)
+                        .attr("transform", "translate(20, 105)");
+                else if (selectedTSA === "T")
+                    legend_icu_container
+                        .transition()
+                        .duration(500)
+                        .attr("transform", "translate(20, 190)");
+                else if (selectedTSA === "U")
+                    legend_icu_container
+                        .transition()
+                        .duration(500)
+                        .attr("transform", "translate(20, 105)");
+                        
+                // Reset legend position if previously moved
+                if (legend_icu_container.attr("transform") != "translate(20, 20)")
+                    legend_icu_container
+                        .transition()
+                        .duration(500)
+                        .attr("transform", "translate(20, 20)");
+
+            });
+
+        });
+
+        function getDateExtent(data, key1, key2) {
+            let max = d3.max(data, function(d) { return d.date; });
+            let min = d3.min(data, function(d) {
+                if (d[key1] === "" || d[key2] === "")
+                    return max;
+                else
+                    return d.date;
+            });
+            return [d3.timeDay.offset(min, -1), d3.timeDay.offset(max, 1)]
+        }
+        
+    </script>
+
+    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-26412009-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-26412009-1');
+    </script>
+
+</body>
+</html>
