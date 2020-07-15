@@ -138,7 +138,7 @@
             .tickFormat('')
             .ticks(5);
 
-        // Total Hospital Bed Occupancy Chart
+        // Total Hospital Bed Usage Chart
         var svg_total = d3.select('#chart-hospital-beds')
             .append("svg")
             .attr("width", width + margin.left + margin.right)
@@ -166,7 +166,7 @@
             .attr("transform", "translate(20, 20)")
             .call(legend_total);
 
-        // ICU Bed Occupancy Chart
+        // ICU Bed Usage Chart
         var svg_icu = d3.select('#chart-icu-beds')
             .append("svg")
             .attr("width", width + margin.left + margin.right)
@@ -201,7 +201,7 @@
                 tsa: d.tsa,
                 location: d.location,
                 date: parseDate(d['date']),
-                total_beds_available: d.total_beds_available && +d.total_beds_available,
+                total_beds_available: d.total_beds_available && +d.total_beds_available, // Janky handling of zero vs null values
                 total_beds_occupied: d.total_beds_occupied && +d.total_beds_occupied,
                 icu_beds_available: d.icu_beds_available && +d.icu_beds_available,
                 icu_beds_occupied: d.icu_beds_occupied && +d.icu_beds_occupied, 
@@ -239,7 +239,7 @@
                 .property("selected", function(d){ return d === defaultTSA; });
 
 
-            // Total Hospital Bed Occupancy Chart
+            // Total Hospital Bed Usage Chart
             var xExtent_total = getDateExtent(data[defaultTSA], 'total_beds_occupied', 'total_beds_available');
             var x_total = d3.scaleTime()
                 .domain(xExtent_total)
@@ -250,7 +250,7 @@
                 .attr("transform", "translate(0," + height + ")")
                 .call(d3.axisBottom(x_total));
 
-            var plot_occupancy_total = svg_total.append("path")
+            var plot_usage_total = svg_total.append("path")
                 .datum(data[defaultTSA])
                 .attr("fill", "none")
                 .attr("stroke", "#7570B3")
@@ -277,11 +277,11 @@
                     .attr("y", 0 - (margin.top / 2))
                     .attr("text-anchor", "middle")  
                     .attr('class', 'chartTitle')
-                    .text("Hospital Bed Occupancy in " + data[defaultTSA][0].location 
+                    .text("Hospital Bed Usage in " + data[defaultTSA][0].location 
                           + " (TSA-" + data[defaultTSA][0].tsa + ")");
 
 
-            // ICU Bed Occupancy Chart
+            // ICU Bed Usage Chart
             var xExtent_icu = getDateExtent(data[defaultTSA], 'icu_beds_occupied', 'icu_beds_available');
             var x_icu = d3.scaleTime()
                 .domain(xExtent_icu)
@@ -292,7 +292,7 @@
                 .attr("transform", "translate(0," + height + ")")
                 .call(d3.axisBottom(x_icu));
 
-            var plot_occupancy_icu = svg_icu.append("path")
+            var plot_usage_icu = svg_icu.append("path")
                 .datum(data[defaultTSA])
                 .attr("fill", "none")
                 .attr("stroke", "#7570B3")
@@ -322,7 +322,7 @@
                 .attr("y", 0 - (margin.top / 2))
                 .attr("text-anchor", "middle")  
                 .attr('class', 'chartTitle')
-                .text("ICU Bed Occupancy in " + data[defaultTSA][0].location 
+                .text("ICU Bed Usage in " + data[defaultTSA][0].location 
                         + " (TSA-" + data[defaultTSA][0].tsa + ")");
 
 
@@ -334,8 +334,8 @@
                 x_total.domain(getDateExtent(data[selectedTSA], 'total_beds_occupied', 'total_beds_available'));
                 x_icu.domain(getDateExtent(data[selectedTSA], 'icu_beds_occupied', 'icu_beds_available'));
 
-                // Draw new total hospital bed occupancy line
-                plot_occupancy_total.datum(data[selectedTSA])
+                // Draw new total hospital bed usage line
+                plot_usage_total.datum(data[selectedTSA])
                     .transition()
                     .duration(500)
                     .attr("d", d3.line()
@@ -344,7 +344,7 @@
                         .defined(function(d) { return !(d.total_beds_occupied === "" || d.total_beds_available === ""); })
                     );
 
-                // Draw new total hospital bed COVID-19 occupancy line
+                // Draw new total hospital bed COVID-19 usage line
                 plot_covid_total.datum(data[selectedTSA])
                     .transition()
                     .duration(500)
@@ -354,8 +354,8 @@
                         .defined(function(d) { return !(d.covid_inpatients === "" || d.total_beds_occupied === ""); })
                     );
 
-                // Draw new ICU bed occupancy line
-                plot_occupancy_icu.datum(data[selectedTSA])
+                // Draw new ICU bed usage line
+                plot_usage_icu.datum(data[selectedTSA])
                     .transition()
                     .duration(500)
                     .attr("d", d3.line()
@@ -364,7 +364,7 @@
                         .defined(function(d) { return !(d.icu_beds_occupied === "" || d.icu_beds_available === ""); })
                     );
 
-                // Draw new ICU bed COVID-19 occupancy line
+                // Draw new ICU bed COVID-19 usage line
                 plot_covid_icu.datum(data[selectedTSA])
                     .transition()
                     .duration(500)
@@ -379,12 +379,12 @@
 
                 // Update titles
                 if (selectedTSA === "Total") {
-                    title_total.text("Statewide Hospital Bed Occupancy");
-                    title_icu.text("Statewide ICU Bed Occupancy");
+                    title_total.text("Statewide Hospital Bed Usage");
+                    title_icu.text("Statewide ICU Bed Usage");
                 } else {
-                    title_total.text("Hospital Bed Occupancy in " + data[selectedTSA][0].location 
+                    title_total.text("Hospital Bed Usage in " + data[selectedTSA][0].location 
                                  + " (TSA-" + data[selectedTSA][0].tsa + ")");
-                    title_icu.text("ICU Bed Occupancy in " + data[selectedTSA][0].location 
+                    title_icu.text("ICU Bed Usage in " + data[selectedTSA][0].location 
                                  + " (TSA-" + data[selectedTSA][0].tsa + ")");
                 }
 
