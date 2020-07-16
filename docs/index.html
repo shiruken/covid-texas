@@ -245,7 +245,7 @@
                 .domain(xExtent_total)
                 .range([0, width]);
             
-            svg_total.append("g")
+            var xAxis_total = svg_total.append("g")
                 .attr('class', 'xAxis')
                 .attr("transform", "translate(0," + height + ")")
                 .call(d3.axisBottom(x_total));
@@ -287,7 +287,7 @@
                 .domain(xExtent_icu)
                 .range([0, width]);
             
-            svg_icu.append("g")
+            var xAxis_icu = svg_icu.append("g")
                 .attr('class', 'xAxis')
                 .attr("transform", "translate(0," + height + ")")
                 .call(d3.axisBottom(x_icu));
@@ -333,6 +333,13 @@
                 // Update x-axis ranges
                 x_total.domain(getDateExtent(data[selectedTSA], 'total_beds_occupied', 'total_beds_available'));
                 x_icu.domain(getDateExtent(data[selectedTSA], 'icu_beds_occupied', 'icu_beds_available'));
+                xExtent_total = getDateExtent(data[selectedTSA], 'total_beds_occupied', 'total_beds_available'); 
+                x_total.domain(xExtent_total);
+                xAxis_total.call(d3.axisBottom(x_total));
+
+                xExtent_icu = getDateExtent(data[selectedTSA], 'icu_beds_occupied', 'icu_beds_available');
+                x_icu.domain(xExtent_icu);
+                xAxis_icu.call(d3.axisBottom(x_icu));
 
                 // Draw new total hospital bed usage line
                 plot_usage_total.datum(data[selectedTSA])
