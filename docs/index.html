@@ -226,7 +226,7 @@
             .style("opacity", 0);
 
         var legendScale_total = d3.scaleOrdinal()
-            .domain(["Hospital Beds Used", "Used by COVID-19 Patients"])
+            .domain(["Hospital Beds Used", "Used Beds with COVID-19"])
             .range(["#7570B3", "#D95F02"]);
 
         var legend_total = d3.legendColor()
@@ -263,7 +263,7 @@
             .style("opacity", 0);
 
         var legendScale_icu = d3.scaleOrdinal()
-            .domain(["ICU Beds Used", "Used by COVID-19 Patients"])
+            .domain(["ICU Beds Used", "Used ICU Beds with COVID-19"])
             .range(["#7570B3", "#D95F02"]);
 
         var legend_icu = d3.legendColor()
@@ -689,7 +689,7 @@
                 "<h3>" + 
                     "<strong class='covid-number'>" + 
                     data.percent_total_covid.toLocaleString(undefined, options) + 
-                    "%</strong> of beds used by COVID-19 patients" +
+                    "%</strong> of used beds have COVID-19 patients" +
                 "</h3>" + 
                 "<dl>" +
                     "<dt>Staffed Hospital Beds</dt>" +
@@ -717,7 +717,7 @@
                 "<h3>" + 
                     "<strong class='covid-number'>" + 
                     (data.percent_icu_covid < 100 ? data.percent_icu_covid : 'NA').toLocaleString(undefined, options) + 
-                    "%</strong> of beds used by COVID-19 patients" +
+                    "%</strong> of used ICU beds have COVID-19 patients" +
                 "</h3>" + 
                 "<dl>" +
                     "<dt>Total ICU Beds</dt>" +
