@@ -201,12 +201,16 @@
                 tsa: d.tsa,
                 location: d.location,
                 date: parseDate(d['date']),
-                total_beds_available: d.total_beds_available && +d.total_beds_available, // Janky handling of zero vs null values
-                total_beds_occupied: d.total_beds_occupied && +d.total_beds_occupied,
-                icu_beds_available: d.icu_beds_available && +d.icu_beds_available,
-                icu_beds_occupied: d.icu_beds_occupied && +d.icu_beds_occupied, 
-                covid_inpatients: d.covid_inpatients && +d.covid_inpatients,
-                covid_icu_inpatients: d.covid_icu_inpatients && +d.covid_icu_inpatients
+                total_beds_available: parseValue(d.total_beds_available),
+                total_beds_occupied: parseValue(d.total_beds_occupied),
+                percent_total_occupied: 100 * +d.total_beds_occupied / (+d.total_beds_occupied + +d.total_beds_available),
+                icu_beds_available: parseValue(d.icu_beds_available),
+                icu_beds_occupied: parseValue(d.icu_beds_occupied),
+                percent_icu_occupied: 100 * +d.icu_beds_occupied / (+d.icu_beds_occupied + +d.icu_beds_available),
+                covid_inpatients: parseValue(d.covid_inpatients),
+                covid_icu_inpatients: parseValue(d.covid_icu_inpatients),
+                percent_total_covid: 100 * +d.covid_inpatients / +d.total_beds_occupied,
+                percent_icu_covid: 100 * +d.covid_icu_inpatients / +d.icu_beds_occupied
             };
         }).then(function(data) {
 
@@ -257,8 +261,8 @@
                 .attr("stroke-width", 4)
                 .attr("d", d3.line()
                     .x(function(d) { return x_total(d.date); })
-                    .y(function(d) { return y(100 * d.total_beds_occupied / (d.total_beds_occupied + d.total_beds_available)); })
-                    .defined(function(d) { return !(d.total_beds_occupied === "" || d.total_beds_available === ""); })
+                    .y(function(d) { return y(d.percent_total_occupied); })
+                    .defined(function(d) { return (d.total_beds_occupied != null && d.total_beds_available != null); })
                 );
 
             var plot_covid_total = svg_total.append("path")
@@ -268,8 +272,8 @@
                 .attr("stroke-width", 4)
                 .attr("d", d3.line()
                     .x(function(d) { return x_total(d.date); })
-                    .y(function(d) {return y(100 * d.covid_inpatients / d.total_beds_occupied); })
-                    .defined(function(d) { return !(d.covid_inpatients === "" || d.total_beds_occupied === ""); })
+                    .y(function(d) {return y(d.percent_total_covid); })
+                    .defined(function(d) { return (d.covid_inpatients != null && d.total_beds_occupied != null); })
                 );
 
             var title_total = svg_total.append("text")
@@ -299,8 +303,8 @@
                 .attr("stroke-width", 4)
                 .attr("d", d3.line()
                     .x(function(d) { return x_icu(d.date); })
-                    .y(function(d) { return y(100 * d.icu_beds_occupied / (d.icu_beds_occupied + d.icu_beds_available)); })
-                    .defined(function(d) { return !(d.icu_beds_occupied === "" || d.icu_beds_available === ""); })
+                    .y(function(d) { return y(d.percent_icu_occupied); })
+                    .defined(function(d) { return (d.icu_beds_occupied != null && d.icu_beds_available != null); })
                 );
 
             var plot_covid_icu = svg_icu.append("path")
@@ -310,10 +314,10 @@
                 .attr("stroke-width", 4)
                 .attr("d", d3.line()
                     .x(function(d) { return x_icu(d.date); })
-                    .y(function(d) {return y(100 * d.covid_icu_inpatients / d.icu_beds_occupied); })
+                    .y(function(d) {return y(d.percent_icu_covid); })
                     .defined(function(d) {
-                        return !(d.covid_icu_inpatients === "" || d.icu_beds_occupied === ""
-                                || d.covid_icu_inpatients > d.icu_beds_occupied);
+                        return (d.covid_icu_inpatients != null && d.icu_beds_occupied != null
+                                && d.covid_icu_inpatients < d.icu_beds_occupied);
                     })
                 );
 
@@ -331,8 +335,6 @@
                 var selectedTSA = d3.select(this).property("value");
 
                 // Update x-axis ranges
-                x_total.domain(getDateExtent(data[selectedTSA], 'total_beds_occupied', 'total_beds_available'));
-                x_icu.domain(getDateExtent(data[selectedTSA], 'icu_beds_occupied', 'icu_beds_available'));
                 xExtent_total = getDateExtent(data[selectedTSA], 'total_beds_occupied', 'total_beds_available'); 
                 x_total.domain(xExtent_total);
                 xAxis_total.call(d3.axisBottom(x_total));
@@ -347,8 +349,8 @@
                     .duration(500)
                     .attr("d", d3.line()
                         .x(function(d) { return x_total(d.date); })
-                        .y(function(d) { return y(100 * d.total_beds_occupied / (d.total_beds_occupied + d.total_beds_available)); })
-                        .defined(function(d) { return !(d.total_beds_occupied === "" || d.total_beds_available === ""); })
+                        .y(function(d) { return y(d.percent_total_occupied); })
+                        .defined(function(d) { return (d.total_beds_occupied != null && d.total_beds_available != null); })
                     );
 
                 // Draw new total hospital bed COVID-19 usage line
@@ -357,8 +359,8 @@
                     .duration(500)
                     .attr("d", d3.line()
                         .x(function(d) { return x_total(d.date); })
-                        .y(function(d) {return y(100 * d.covid_inpatients / d.total_beds_occupied); })
-                        .defined(function(d) { return !(d.covid_inpatients === "" || d.total_beds_occupied === ""); })
+                        .y(function(d) {return y(d.percent_total_covid); })
+                        .defined(function(d) { return (d.covid_inpatients != null && d.total_beds_occupied != null); })
                     );
 
                 // Draw new ICU bed usage line
@@ -367,8 +369,8 @@
                     .duration(500)
                     .attr("d", d3.line()
                         .x(function(d) { return x_icu(d.date); })
-                        .y(function(d) { return y(100 * d.icu_beds_occupied / (d.icu_beds_occupied + d.icu_beds_available)); })
-                        .defined(function(d) { return !(d.icu_beds_occupied === "" || d.icu_beds_available === ""); })
+                        .y(function(d) { return y(d.percent_icu_occupied); })
+                        .defined(function(d) { return (d.icu_beds_occupied != null && d.icu_beds_available != null); })
                     );
 
                 // Draw new ICU bed COVID-19 usage line
@@ -377,10 +379,10 @@
                     .duration(500)
                     .attr("d", d3.line()
                         .x(function(d) { return x_icu(d.date); })
-                        .y(function(d) {return y(100 * d.covid_icu_inpatients / d.icu_beds_occupied); })
+                        .y(function(d) {return y(d.percent_icu_covid); })
                         .defined(function(d) {
-                            return !(d.covid_icu_inpatients === "" || d.icu_beds_occupied === ""
-                                || d.covid_icu_inpatients > d.icu_beds_occupied);
+                            return (d.covid_icu_inpatients != null && d.icu_beds_occupied != null
+                                && d.covid_icu_inpatients < d.icu_beds_occupied);
                         })
                     );
 
@@ -428,13 +430,21 @@
 
         });
 
+        // Properly handle null values loaded from CSV
+        function parseValue(value) {
+            if (value === "")
+                return null;
+            else
+                return +value;
+        }
+
         function getDateExtent(data, key1, key2) {
             let max = d3.max(data, function(d) { return d.date; });
             let min = d3.min(data, function(d) {
-                if (d[key1] === "" || d[key2] === "")
-                    return max;
-                else
+                if (d[key1] != null && d[key2] != null)
                     return d.date;
+                else
+                    return max;
             });
             return [d3.timeDay.offset(min, -1), d3.timeDay.offset(max, 1)]
         }
