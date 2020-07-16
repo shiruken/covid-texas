@@ -624,27 +624,32 @@
                     legend_icu_container
                         .transition()
                         .duration(250)
-                        .attr("transform", "translate(20, 190)");
+                        .attr("transform", "translate(20, 175)");
+                else if (selectedTSA === "M")
+                    legend_icu_container
+                        .transition()
+                        .duration(250)
+                        .attr("transform", "translate(20, 255)");
                 else if (selectedTSA === "Q")
                     legend_icu_container
                         .transition()
                         .duration(250)
-                        .attr("transform", "translate(20, 190)");
+                        .attr("transform", "translate(20, 175)");
                 else if (selectedTSA === "R")
                     legend_icu_container
                         .transition()
                         .duration(250)
-                        .attr("transform", "translate(20, 105)");
+                        .attr("transform", "translate(20, 100)");
                 else if (selectedTSA === "T")
                     legend_icu_container
                         .transition()
                         .duration(250)
-                        .attr("transform", "translate(20, 190)");
+                        .attr("transform", "translate(20, 175)");
                 else if (selectedTSA === "U")
                     legend_icu_container
                         .transition()
                         .duration(250)
-                        .attr("transform", "translate(20, 105)");                        
+                        .attr("transform", "translate(20, 100)");                        
                 // Reset legend position if previously moved
                 else if (legend_icu_container.attr("transform") != "translate(20, 20)")
                     legend_icu_container
