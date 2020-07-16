@@ -417,10 +417,9 @@
                     legend_icu_container
                         .transition()
                         .duration(500)
-                        .attr("transform", "translate(20, 105)");
-                        
+                        .attr("transform", "translate(20, 105)");                        
                 // Reset legend position if previously moved
-                if (legend_icu_container.attr("transform") != "translate(20, 20)")
+                else if (legend_icu_container.attr("transform") != "translate(20, 20)")
                     legend_icu_container
                         .transition()
                         .duration(500)
