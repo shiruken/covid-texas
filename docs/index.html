@@ -337,16 +337,22 @@
                 // Update x-axis ranges
                 xExtent_total = getDateExtent(data[selectedTSA], 'total_beds_occupied', 'total_beds_available'); 
                 x_total.domain(xExtent_total);
-                xAxis_total.call(d3.axisBottom(x_total));
+                xAxis_total
+                    .transition()
+                    .duration(250)
+                    .call(d3.axisBottom(x_total));
 
                 xExtent_icu = getDateExtent(data[selectedTSA], 'icu_beds_occupied', 'icu_beds_available');
                 x_icu.domain(xExtent_icu);
-                xAxis_icu.call(d3.axisBottom(x_icu));
+                xAxis_icu
+                    .transition()
+                    .duration(250)
+                    .call(d3.axisBottom(x_icu));
 
                 // Draw new total hospital bed usage line
                 plot_usage_total.datum(data[selectedTSA])
                     .transition()
-                    .duration(500)
+                    .duration(250)
                     .attr("d", d3.line()
                         .x(function(d) { return x_total(d.date); })
                         .y(function(d) { return y(d.percent_total_occupied); })
@@ -356,7 +362,7 @@
                 // Draw new total hospital bed COVID-19 usage line
                 plot_covid_total.datum(data[selectedTSA])
                     .transition()
-                    .duration(500)
+                    .duration(250)
                     .attr("d", d3.line()
                         .x(function(d) { return x_total(d.date); })
                         .y(function(d) {return y(d.percent_total_covid); })
@@ -366,7 +372,7 @@
                 // Draw new ICU bed usage line
                 plot_usage_icu.datum(data[selectedTSA])
                     .transition()
-                    .duration(500)
+                    .duration(250)
                     .attr("d", d3.line()
                         .x(function(d) { return x_icu(d.date); })
                         .y(function(d) { return y(d.percent_icu_occupied); })
@@ -376,7 +382,7 @@
                 // Draw new ICU bed COVID-19 usage line
                 plot_covid_icu.datum(data[selectedTSA])
                     .transition()
-                    .duration(500)
+                    .duration(250)
                     .attr("d", d3.line()
                         .x(function(d) { return x_icu(d.date); })
                         .y(function(d) {return y(d.percent_icu_covid); })
@@ -401,28 +407,33 @@
                 if (selectedTSA === "H")
                     legend_icu_container
                         .transition()
-                        .duration(500)
+                        .duration(250)
+                        .attr("transform", "translate(20, 190)");
+                else if (selectedTSA === "Q")
+                    legend_icu_container
+                        .transition()
+                        .duration(250)
                         .attr("transform", "translate(20, 190)");
                 else if (selectedTSA === "R")
                     legend_icu_container
                         .transition()
-                        .duration(500)
+                        .duration(250)
                         .attr("transform", "translate(20, 105)");
                 else if (selectedTSA === "T")
                     legend_icu_container
                         .transition()
-                        .duration(500)
+                        .duration(250)
                         .attr("transform", "translate(20, 190)");
                 else if (selectedTSA === "U")
                     legend_icu_container
                         .transition()
-                        .duration(500)
+                        .duration(250)
                         .attr("transform", "translate(20, 105)");                        
                 // Reset legend position if previously moved
                 else if (legend_icu_container.attr("transform") != "translate(20, 20)")
                     legend_icu_container
                         .transition()
-                        .duration(500)
+                        .duration(250)
                         .attr("transform", "translate(20, 20)");
 
             });
