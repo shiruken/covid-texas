@@ -298,13 +298,14 @@
             };
         }).then(function(data) {
 
-            const defaultTSA = "O";
+            const defaultTSA = "Total";
 
             // Group data by TSA
             var data = d3.nest()
                 .key(function(d) { return d.tsa; })
                 .object(data);
             var tsaIDs = Object.keys(data);
+            tsaIDs.unshift(tsaIDs.pop()); // Statewide Total should be first
 
             // Update subtitle
             let N = data[defaultTSA].length - 1;
