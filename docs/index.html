@@ -87,6 +87,18 @@
             stroke-dasharray: 4,4;
         }
 
+        .note line {
+            stroke: #999999;
+            stroke-width: 1px;
+            stroke-dasharray: 2,2;
+        }
+
+        .note text {
+            font-size: 0.8em;
+            fill: #999999;
+            white-space: pre;
+        }
+
         div.data {
             float: right;
             width: 220px;
@@ -342,6 +354,21 @@
                 .attr("transform", "translate(0," + height + ")")
                 .call(d3.axisBottom(x_total));
 
+            var note_total = svg_total.append('g')
+                .attr("class", "note");
+
+            note_total.append("line")
+                .attr("x1", x_total(parseDate('2020-05-29')))
+                .attr("x2", x_total(parseDate('2020-05-29')))
+                .attr("y1", y(15))
+                .attr("y2", height);
+
+            note_total.append("text")
+                .text('Data incomplete prior to May 29 ')
+                .attr("x", x_total(parseDate('2020-05-29')))             
+                .attr("y", y(13))
+                .attr("text-anchor", "end");
+
             var plot_usage_total = svg_total.append("path")
                 .datum(data[defaultTSA])
                 .attr("fill", "none")
@@ -430,6 +457,21 @@
                 .attr('class', 'xAxis')
                 .attr("transform", "translate(0," + height + ")")
                 .call(d3.axisBottom(x_icu));
+
+            var note_icu = svg_icu.append('g')
+                .attr("class", "note");
+
+            note_icu.append("line")
+                .attr("x1", x_icu(parseDate('2020-05-29')))
+                .attr("x2", x_icu(parseDate('2020-05-29')))
+                .attr("y1", y(30))
+                .attr("y2", height);
+
+            note_icu.append("text")
+                .text('Data incomplete prior to May 29 ')
+                .attr("x", x_icu(parseDate('2020-05-29')))             
+                .attr("y", y(28))
+                .attr("text-anchor", "end");
 
             var plot_usage_icu = svg_icu.append("path")
                 .datum(data[defaultTSA])
@@ -584,6 +626,15 @@
                 } else {
                     title_total.text("Hospital Bed Usage in " + location + " (TSA-" + tsa + ")");
                     title_icu.text("ICU Bed Usage in " + location + " (TSA-" + tsa + ")");
+                }
+
+                // Toggle 'Statewide Total' notes
+                if (selectedTSA === "Total") {
+                    note_total.transition().duration(250).style('opacity', 1);
+                    note_icu.transition().duration(250).style('opacity', 1);
+                } else {
+                    note_total.style('opacity', 0);
+                    note_icu.style('opacity', 0);
                 }
 
                 // Update mouseover overlay data
