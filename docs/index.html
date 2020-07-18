@@ -334,15 +334,20 @@
                 percent_icu_covid: 100 * +d.covid_icu_inpatients / +d.icu_beds_occupied
             };
         }).then(function(data) {
-
-            const defaultTSA = "Total";
-
+            
             // Group data by TSA
             var data = d3.nest()
                 .key(function(d) { return d.tsa; })
                 .object(data);
             var tsaIDs = Object.keys(data);
             tsaIDs.unshift(tsaIDs.pop()); // Statewide Total should be first
+
+            // Check for query string parameter defining the default TSA
+            var url = new URL(window.location.href);
+            var defaultTSA = url.searchParams.get("tsa");
+            if (defaultTSA === null || !tsaIDs.includes(defaultTSA)) {
+                defaultTSA = "Total"; // Default to Statewide Total
+            }
 
             // Update subtitle
             let N = data[defaultTSA].length - 1;
@@ -380,7 +385,8 @@
                 .call(d3.axisBottom(x_total));
 
             var note_total = svg_total.append('g')
-                .attr("class", "note");
+                .attr("class", "note")
+                .style("opacity", defaultTSA === "Total" ? 1 : 0);
 
             note_total.append("line")
                 .attr("x1", x_total(parseDate('2020-05-29')))
@@ -484,7 +490,8 @@
                 .call(d3.axisBottom(x_icu));
 
             var note_icu = svg_icu.append('g')
-                .attr("class", "note");
+                .attr("class", "note")
+                .style("opacity", defaultTSA === "Total" ? 1 : 0);
 
             note_icu.append("line")
                 .attr("x1", x_icu(parseDate('2020-05-29')))
@@ -583,6 +590,8 @@
             // Update charts when different TSA is selected
             d3.select("#tsaSelect").on("change", function(d) {
                 var selectedTSA = d3.select(this).property("value");
+
+                window.history.replaceState(null, null, "?tsa=" + selectedTSA);
 
                 // Update x-axis ranges
                 xExtent_total = getDateExtent(data[selectedTSA], 'total_beds_occupied', 'total_beds_available'); 
