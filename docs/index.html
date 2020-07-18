@@ -110,6 +110,28 @@
             stroke-dasharray: 4,4;
         }
 
+        circle {
+            transform: scale(1);            
+        }
+
+        circle.pulse {
+            transform-origin: center center;
+            transform-box: fill-box;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(0.75);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
         .note line {
             stroke: #999999;
             stroke-width: 1px;
@@ -433,12 +455,14 @@
             var focus_circle_usage_total = svg_total.append("circle")
                 .attr("r", 6)
                 .attr("fill", "#7570B3")
+                .classed("pulse", true)
                 .attr("cx", x_total(data[defaultTSA][N].date))
                 .attr("cy", y(data[defaultTSA][N].percent_total_occupied));
 
             var focus_circle_covid_total = svg_total.append("circle")
                 .attr("r", 6)
                 .attr("fill", "#D95F02")
+                .classed("pulse", true)
                 .attr("cx", x_total(data[defaultTSA][N].date))
                 .attr("cy", y(data[defaultTSA][N].percent_total_covid));
 
@@ -450,16 +474,20 @@
                 .attr('height', height)
                 .on("mouseover", function() { 
                     hover_line_total.style("opacity", 1);
+                    focus_circle_usage_total.classed("pulse", false);
+                    focus_circle_covid_total.classed("pulse", false);
                 })
                 .on("mouseout", function(d) {
                     hover_line_total.style("opacity", 0);
                     let N = d.length - 1;
                     focus_circle_usage_total
                         .attr("cx", x_total(d[N].date))
-                        .attr("cy", y(d[N].percent_total_occupied));
+                        .attr("cy", y(d[N].percent_total_occupied))
+                        .classed("pulse", true);
                     focus_circle_covid_total
                         .attr("cx", x_total(d[N].date))
-                        .attr("cy", y(d[N].percent_total_covid));
+                        .attr("cy", y(d[N].percent_total_covid))
+                        .classed("pulse", true);
                     updateTotalDetails(d[N]);
                 })
                 .on('mousemove', function(d) { 
@@ -541,12 +569,14 @@
             var focus_circle_usage_icu = svg_icu.append("circle")
                 .attr("r", 6)
                 .attr("fill", "#7570B3")
+                .classed("pulse", true)
                 .attr("cx", x_total(data[defaultTSA][N].date))
                 .attr("cy", y(data[defaultTSA][N].percent_icu_occupied));
 
             var focus_circle_covid_icu = svg_icu.append("circle")
                 .attr("r", 6)
                 .attr("fill", "#D95F02")
+                .classed("pulse", true)
                 .attr("cx", x_total(data[defaultTSA][N].date))
                 .attr("cy", y(data[defaultTSA][N].percent_icu_covid));
 
@@ -558,16 +588,20 @@
                 .attr('height', height)
                 .on("mouseover", function() { 
                     hover_line_icu.style("opacity", 1);
+                    focus_circle_usage_icu.classed("pulse", false);
+                    focus_circle_covid_icu.classed("pulse", false);
                 })
                 .on("mouseout", function(d) {
                     hover_line_icu.style("opacity", 0);
                     let N = d.length - 1;
                     focus_circle_usage_icu
                         .attr("cx", x_icu(d[N].date))
-                        .attr("cy", y(d[N].percent_icu_occupied));
+                        .attr("cy", y(d[N].percent_icu_occupied))
+                        .classed("pulse", true);
                     focus_circle_covid_icu
                         .attr("cx", x_icu(d[N].date))
-                        .attr("cy", y(d[N].percent_icu_covid));
+                        .attr("cy", y(d[N].percent_icu_covid))
+                        .classed("pulse", true);
                     updateICUDetails(d[N]);
                 })
                 .on('mousemove', function(d) { 
