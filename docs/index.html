@@ -493,16 +493,19 @@
                 .on('mousemove', function(d) { 
                     var x0 = x_total.invert(d3.mouse(this)[0]);
                     var i = bisectDate(d, x0, 0, d.length - 1);
-                    hover_line_total
-                        .attr("x1", x_total(d[i].date))
-                        .attr("x2", x_total(d[i].date));
-                    focus_circle_usage_total
-                        .attr("cx", x_total(d[i].date))
-                        .attr("cy", y(d[i].percent_total_occupied));
-                    focus_circle_covid_total
-                        .attr("cx", x_total(d[i].date))
-                        .attr("cy", y(d[i].percent_total_covid));
-                    updateTotalDetails(d[i]);
+
+                    if (d[i].total_beds_occupied != null) {
+                        hover_line_total
+                            .attr("x1", x_total(d[i].date))
+                            .attr("x2", x_total(d[i].date));
+                        focus_circle_usage_total
+                            .attr("cx", x_total(d[i].date))
+                            .attr("cy", y(d[i].percent_total_occupied));
+                        focus_circle_covid_total
+                            .attr("cx", x_total(d[i].date))
+                            .attr("cy", y(d[i].percent_total_covid));
+                        updateTotalDetails(d[i]);
+                    }
                  });
 
 
@@ -552,10 +555,7 @@
                 .attr("d", d3.line()
                     .x(function(d) { return x_icu(d.date); })
                     .y(function(d) {return y(d.percent_icu_covid); })
-                    .defined(function(d) {
-                        return (d.covid_icu_inpatients != null && d.icu_beds_occupied != null
-                                && d.covid_icu_inpatients < d.icu_beds_occupied);
-                    })
+                    .defined(function(d) {return (d.covid_icu_inpatients != null && d.icu_beds_occupied != null); })
                 );
 
             var title_icu = svg_icu.append("text")
@@ -608,17 +608,20 @@
                     var offset = bisectDate(d, xExtent_icu[0]) + 1;
                     var x0 = x_icu.invert(d3.mouse(this)[0]);
                     var i = bisectDate(d, x0, offset, d.length - 1);
-                    hover_line_icu
-                        .attr("x1", x_icu(d[i].date))
-                        .attr("x2", x_icu(d[i].date));
-                    focus_circle_usage_icu
-                        .attr("cx", x_icu(d[i].date))
-                        .attr("cy", y(d[i].percent_icu_occupied));
-                    focus_circle_covid_icu
-                        .attr("cx", x_icu(d[i].date))
-                        .attr("cy", y(d[i].percent_icu_covid));
-                    updateICUDetails(d[i]);
-                 });
+
+                    if (d[i].icu_beds_occupied != null) {
+                        focus_circle_usage_icu
+                            .attr("cx", x_icu(d[i].date))
+                            .attr("cy", y(d[i].percent_icu_occupied));
+                        focus_circle_covid_icu
+                            .attr("cx", x_icu(d[i].date))
+                            .attr("cy", y(d[i].percent_icu_covid));
+                        hover_line_icu
+                            .attr("x1", x_icu(d[i].date))
+                            .attr("x2", x_icu(d[i].date));
+                        updateICUDetails(d[i]);
+                    }
+                });
 
 
             // Update charts when different TSA is selected
@@ -679,10 +682,7 @@
                     .attr("d", d3.line()
                         .x(function(d) { return x_icu(d.date); })
                         .y(function(d) {return y(d.percent_icu_covid); })
-                        .defined(function(d) {
-                            return (d.covid_icu_inpatients != null && d.icu_beds_occupied != null
-                                && d.covid_icu_inpatients < d.icu_beds_occupied);
-                        })
+                        .defined(function(d) { return (d.covid_icu_inpatients != null && d.icu_beds_occupied != null); })
                     );
 
                 // Update titles
@@ -841,7 +841,7 @@
                 "</h3>" +
                 "<h3>" + 
                     "<strong class='covid-number'>" + 
-                    (data.percent_icu_covid < 100 ? data.percent_icu_covid : 'NA').toLocaleString(undefined, options) + 
+                    data.percent_icu_covid.toLocaleString(undefined, options) + 
                     "%</strong> of used ICU beds have COVID-19 patients" +
                 "</h3>" + 
                 "<dl>" +
