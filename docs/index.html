@@ -366,15 +366,15 @@
 
             // Check for query string parameter defining the default TSA
             var url = new URL(window.location.href);
-            var defaultTSA = url.searchParams.get("tsa");
-            if (defaultTSA === null || !tsaIDs.includes(defaultTSA)) {
-                defaultTSA = "Total"; // Default to Statewide Total
+            var TSA = url.searchParams.get("tsa");
+            if (TSA === null || !tsaIDs.includes(TSA)) {
+                TSA = "Total"; // Default to Statewide Total
             }
 
             // Update subtitle
-            let N = data[defaultTSA].length - 1;
+            let N = data[TSA].length - 1;
             d3.select("#subtitle").text("Trauma Service Area (TSA) data updated on "
-                + formatDate(data[defaultTSA][N].date));
+                + formatDate(data[TSA][N].date));
 
             // Populate select menu and select default TSA
             d3.select("#tsaSelect")
@@ -389,14 +389,14 @@
                         return data[d][0]['location'] + " (TSA-" + d + ")";               
                 })
                 .attr("value", function (d) { return d; })
-                .property("selected", function(d){ return d === defaultTSA; });
+                .property("selected", function(d){ return d === TSA; });
 
             // Populate details sections
-            updateTotalDetails(data[defaultTSA][N]);     
-            updateICUDetails(data[defaultTSA][N]);     
+            updateTotalDetails(data[TSA][N]);     
+            updateICUDetails(data[TSA][N]);     
  
             // Total Hospital Bed Usage Chart
-            var xExtent_total = getDateExtent(data[defaultTSA], 'total_beds_occupied', 'total_beds_available');
+            var xExtent_total = getDateExtent(data[TSA], 'total_beds_occupied', 'total_beds_available');
             var x_total = d3.scaleTime()
                 .domain(xExtent_total)
                 .range([0, width]);
@@ -408,7 +408,7 @@
 
             var note_total = svg_total.append('g')
                 .attr("class", "note")
-                .style("opacity", defaultTSA === "Total" ? 1 : 0);
+                .style("opacity", TSA === "Total" ? 1 : 0);
 
             note_total.append("line")
                 .attr("x1", x_total(parseDate('2020-05-29')))
@@ -423,7 +423,7 @@
                 .attr("text-anchor", "end");
 
             var plot_usage_total = svg_total.append("path")
-                .datum(data[defaultTSA])
+                .datum(data[TSA])
                 .attr("fill", "none")
                 .attr("stroke", "#7570B3")
                 .attr("stroke-width", 4)
@@ -434,7 +434,7 @@
                 );
 
             var plot_covid_total = svg_total.append("path")
-                .datum(data[defaultTSA])
+                .datum(data[TSA])
                 .attr("fill", "none")
                 .attr("stroke", "#D95F02")
                 .attr("stroke-width", 4)
@@ -449,25 +449,25 @@
                     .attr("y", 0 - (margin.top / 2))
                     .attr("text-anchor", "middle")  
                     .attr('class', 'chartTitle')
-                    .text("Hospital Bed Usage in " + data[defaultTSA][0].location 
-                          + " (TSA-" + data[defaultTSA][0].tsa + ")");
+                    .text("Hospital Bed Usage in " + data[TSA][0].location 
+                          + " (TSA-" + data[TSA][0].tsa + ")");
 
             var focus_circle_usage_total = svg_total.append("circle")
                 .attr("r", 6)
                 .attr("fill", "#7570B3")
                 .classed("pulse", true)
-                .attr("cx", x_total(data[defaultTSA][N].date))
-                .attr("cy", y(data[defaultTSA][N].percent_total_occupied));
+                .attr("cx", x_total(data[TSA][N].date))
+                .attr("cy", y(data[TSA][N].percent_total_occupied));
 
             var focus_circle_covid_total = svg_total.append("circle")
                 .attr("r", 6)
                 .attr("fill", "#D95F02")
                 .classed("pulse", true)
-                .attr("cx", x_total(data[defaultTSA][N].date))
-                .attr("cy", y(data[defaultTSA][N].percent_total_covid));
+                .attr("cx", x_total(data[TSA][N].date))
+                .attr("cy", y(data[TSA][N].percent_total_covid));
 
             var overlay_total = svg_total.append('rect')
-                .datum(data[defaultTSA])
+                .datum(data[TSA])
                 .style("fill", "none")
                 .style("pointer-events", "all")
                 .attr('width', width)
@@ -510,7 +510,7 @@
 
 
             // ICU Bed Usage Chart
-            var xExtent_icu = getDateExtent(data[defaultTSA], 'icu_beds_occupied', 'icu_beds_available');
+            var xExtent_icu = getDateExtent(data[TSA], 'icu_beds_occupied', 'icu_beds_available');
             var x_icu = d3.scaleTime()
                 .domain(xExtent_icu)
                 .range([0, width]);
@@ -522,7 +522,7 @@
 
             var note_icu = svg_icu.append('g')
                 .attr("class", "note")
-                .style("opacity", defaultTSA === "Total" ? 1 : 0);
+                .style("opacity", TSA === "Total" ? 1 : 0);
 
             note_icu.append("line")
                 .attr("x1", x_icu(parseDate('2020-05-29')))
@@ -537,7 +537,7 @@
                 .attr("text-anchor", "end");
 
             var plot_usage_icu = svg_icu.append("path")
-                .datum(data[defaultTSA])
+                .datum(data[TSA])
                 .attr("fill", "none")
                 .attr("stroke", "#7570B3")
                 .attr("stroke-width", 4)
@@ -548,7 +548,7 @@
                 );
 
             var plot_covid_icu = svg_icu.append("path")
-                .datum(data[defaultTSA])
+                .datum(data[TSA])
                 .attr("fill", "none")
                 .attr("stroke", "#D95F02")
                 .attr("stroke-width", 4)
@@ -563,25 +563,25 @@
                 .attr("y", 0 - (margin.top / 2))
                 .attr("text-anchor", "middle")  
                 .attr('class', 'chartTitle')
-                .text("ICU Bed Usage in " + data[defaultTSA][0].location 
-                        + " (TSA-" + data[defaultTSA][0].tsa + ")");
+                .text("ICU Bed Usage in " + data[TSA][0].location 
+                        + " (TSA-" + data[TSA][0].tsa + ")");
 
             var focus_circle_usage_icu = svg_icu.append("circle")
                 .attr("r", 6)
                 .attr("fill", "#7570B3")
                 .classed("pulse", true)
-                .attr("cx", x_total(data[defaultTSA][N].date))
-                .attr("cy", y(data[defaultTSA][N].percent_icu_occupied));
+                .attr("cx", x_total(data[TSA][N].date))
+                .attr("cy", y(data[TSA][N].percent_icu_occupied));
 
             var focus_circle_covid_icu = svg_icu.append("circle")
                 .attr("r", 6)
                 .attr("fill", "#D95F02")
                 .classed("pulse", true)
-                .attr("cx", x_total(data[defaultTSA][N].date))
-                .attr("cy", y(data[defaultTSA][N].percent_icu_covid));
+                .attr("cx", x_total(data[TSA][N].date))
+                .attr("cy", y(data[TSA][N].percent_icu_covid));
 
             var overlay_icu = svg_icu.append('rect')
-                .datum(data[defaultTSA])
+                .datum(data[TSA])
                 .style("fill", "none")
                 .style("pointer-events", "all")
                 .attr('width', width)
@@ -626,19 +626,19 @@
 
             // Update charts when different TSA is selected
             d3.select("#tsaSelect").on("change", function(d) {
-                var selectedTSA = d3.select(this).property("value");
+                var TSA = d3.select(this).property("value");
 
-                window.history.replaceState(null, null, "?tsa=" + selectedTSA);
+                window.history.replaceState(null, null, "?tsa=" + TSA);
 
                 // Update x-axis ranges
-                xExtent_total = getDateExtent(data[selectedTSA], 'total_beds_occupied', 'total_beds_available'); 
+                xExtent_total = getDateExtent(data[TSA], 'total_beds_occupied', 'total_beds_available'); 
                 x_total.domain(xExtent_total);
                 xAxis_total
                     .transition()
                     .duration(250)
                     .call(d3.axisBottom(x_total));
 
-                xExtent_icu = getDateExtent(data[selectedTSA], 'icu_beds_occupied', 'icu_beds_available');
+                xExtent_icu = getDateExtent(data[TSA], 'icu_beds_occupied', 'icu_beds_available');
                 x_icu.domain(xExtent_icu);
                 xAxis_icu
                     .transition()
@@ -646,7 +646,7 @@
                     .call(d3.axisBottom(x_icu));
 
                 // Draw new total hospital bed usage line
-                plot_usage_total.datum(data[selectedTSA])
+                plot_usage_total.datum(data[TSA])
                     .transition()
                     .duration(250)
                     .attr("d", d3.line()
@@ -656,7 +656,7 @@
                     );
 
                 // Draw new total hospital bed COVID-19 usage line
-                plot_covid_total.datum(data[selectedTSA])
+                plot_covid_total.datum(data[TSA])
                     .transition()
                     .duration(250)
                     .attr("d", d3.line()
@@ -666,7 +666,7 @@
                     );
 
                 // Draw new ICU bed usage line
-                plot_usage_icu.datum(data[selectedTSA])
+                plot_usage_icu.datum(data[TSA])
                     .transition()
                     .duration(250)
                     .attr("d", d3.line()
@@ -676,7 +676,7 @@
                     );
 
                 // Draw new ICU bed COVID-19 usage line
-                plot_covid_icu.datum(data[selectedTSA])
+                plot_covid_icu.datum(data[TSA])
                     .transition()
                     .duration(250)
                     .attr("d", d3.line()
@@ -686,9 +686,9 @@
                     );
 
                 // Update titles
-                let tsa = data[selectedTSA][0].tsa;
-                let location = data[selectedTSA][0].location;
-                if (selectedTSA === "Total") {
+                let tsa = data[TSA][0].tsa;
+                let location = data[TSA][0].location;
+                if (TSA === "Total") {
                     title_total.text("Statewide Hospital Bed Usage");
                     title_icu.text("Statewide ICU Bed Usage");
                 } else {
@@ -697,7 +697,7 @@
                 }
 
                 // Toggle 'Statewide Total' notes
-                if (selectedTSA === "Total") {
+                if (TSA === "Total") {
                     note_total.transition().duration(250).style('opacity', 1);
                     note_icu.transition().duration(250).style('opacity', 1);
                 } else {
@@ -706,66 +706,66 @@
                 }
 
                 // Update mouseover overlay data
-                overlay_total.datum(data[selectedTSA]);
-                overlay_icu.datum(data[selectedTSA]);
+                overlay_total.datum(data[TSA]);
+                overlay_icu.datum(data[TSA]);
 
                 // Update details sections
-                let N = data[selectedTSA].length - 1;
-                updateTotalDetails(data[selectedTSA][N]);
-                updateICUDetails(data[selectedTSA][N]);
+                let N = data[TSA].length - 1;
+                updateTotalDetails(data[TSA][N]);
+                updateICUDetails(data[TSA][N]);
 
                 // Move focus circles to new coordinates
                 focus_circle_usage_total
                     .transition()
                     .duration(250)
-                    .attr("cx", x_total(data[selectedTSA][N].date))
-                    .attr("cy", y(data[selectedTSA][N].percent_total_occupied));
+                    .attr("cx", x_total(data[TSA][N].date))
+                    .attr("cy", y(data[TSA][N].percent_total_occupied));
 
                 focus_circle_covid_total
                     .transition()
                     .duration(250)
-                    .attr("cx", x_total(data[selectedTSA][N].date))
-                    .attr("cy", y(data[selectedTSA][N].percent_total_covid));
+                    .attr("cx", x_total(data[TSA][N].date))
+                    .attr("cy", y(data[TSA][N].percent_total_covid));
 
                 focus_circle_usage_icu
                     .transition()
                     .duration(250)
-                    .attr("cx", x_icu(data[selectedTSA][N].date))
-                    .attr("cy", y(data[selectedTSA][N].percent_icu_occupied));
+                    .attr("cx", x_icu(data[TSA][N].date))
+                    .attr("cy", y(data[TSA][N].percent_icu_occupied));
 
                 focus_circle_covid_icu
                     .transition()
                     .duration(250)
-                    .attr("cx", x_icu(data[selectedTSA][N].date))
-                    .attr("cy", y(data[selectedTSA][N].percent_icu_covid));                    
+                    .attr("cx", x_icu(data[TSA][N].date))
+                    .attr("cy", y(data[TSA][N].percent_icu_covid));                    
 
                 // Move legend for overlapping data
-                if (selectedTSA === "H")
+                if (TSA === "H")
                     legend_icu_container
                         .transition()
                         .duration(250)
                         .attr("transform", "translate(20, 175)");
-                else if (selectedTSA === "M")
+                else if (TSA === "M")
                     legend_icu_container
                         .transition()
                         .duration(250)
                         .attr("transform", "translate(20, 255)");
-                else if (selectedTSA === "Q")
+                else if (TSA === "Q")
                     legend_icu_container
                         .transition()
                         .duration(250)
                         .attr("transform", "translate(20, 175)");
-                else if (selectedTSA === "R")
+                else if (TSA === "R")
                     legend_icu_container
                         .transition()
                         .duration(250)
                         .attr("transform", "translate(20, 100)");
-                else if (selectedTSA === "T")
+                else if (TSA === "T")
                     legend_icu_container
                         .transition()
                         .duration(250)
                         .attr("transform", "translate(20, 175)");
-                else if (selectedTSA === "U")
+                else if (TSA === "U")
                     legend_icu_container
                         .transition()
                         .duration(250)
