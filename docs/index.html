@@ -337,7 +337,7 @@
             .shapePadding(5);
 
         var legend_icu_container = svg_icu.append("g")
-            .attr("transform", "translate(20, 20)")
+            .attr("id", "legend-icu")
             .call(legend_icu);
 
 
@@ -605,6 +605,8 @@
                     .defined(function(d) {return (d.covid_icu_inpatients != null && d.icu_beds_occupied != null); })
                 );
 
+            moveICULegend(TSA, 0);
+
             var title_icu = svg_icu.append("text")
                 .attr("x", (width / 2))             
                 .attr("y", 0 - (margin.top / 2))
@@ -800,7 +802,7 @@
                             .attr("cx", x_total(d[i].date))
                             .attr("cy", y_count(d[i].total_beds));
                     else
-                    focus_circle_bed_count.style("opacity", 0);
+                        focus_circle_bed_count.style("opacity", 0);
 
                     if (d[i].icu_beds_occupied != null && d[i].icu_beds_available != null)
                         focus_circle_icu_count
@@ -997,46 +999,9 @@
                     .attr("cx", x_total(data[TSA][N].date))
                     .attr("cy", y_count(data[TSA][N].icu_beds));
 
-                // Move legend for overlapping data
-                if (TSA === "H")
-                    legend_icu_container
-                        .transition()
-                        .duration(250)
-                        .attr("transform", "translate(20, 175)");
-                else if (TSA === "M")
-                    legend_icu_container
-                        .transition()
-                        .duration(250)
-                        .attr("transform", "translate(20, 255)");
-                else if (TSA === "Q")
-                    legend_icu_container
-                        .transition()
-                        .duration(250)
-                        .attr("transform", "translate(20, 175)");
-                else if (TSA === "R")
-                    legend_icu_container
-                        .transition()
-                        .duration(250)
-                        .attr("transform", "translate(20, 100)");
-                else if (TSA === "T")
-                    legend_icu_container
-                        .transition()
-                        .duration(250)
-                        .attr("transform", "translate(20, 175)");
-                else if (TSA === "U")
-                    legend_icu_container
-                        .transition()
-                        .duration(250)
-                        .attr("transform", "translate(20, 100)");                        
-                // Reset legend position if previously moved
-                else if (legend_icu_container.attr("transform") != "translate(20, 20)")
-                    legend_icu_container
-                        .transition()
-                        .duration(250)
-                        .attr("transform", "translate(20, 20)");
-
+                // Reposition legends based on selected TSA
+                moveICULegend(TSA, 250);
                 moveCountLegend(TSA, 250);
-
 
             });
 
@@ -1146,6 +1111,39 @@
                     "<dd>" + data.icu_beds_available.toLocaleString() + "</dd>" +
                 "</dl>"
             );
+        }
+
+        // Position ICU chart legend based on currently selected TSA
+        function moveICULegend(TSA,duration) {
+            let tform;
+
+            switch(TSA) {
+                case "H":
+                    tform = "translate(20, 175)";
+                    break;
+                case "M":
+                    tform = "translate(20, 255)";
+                    break;
+                case "Q":
+                    tform = "translate(20, 175)";
+                    break;
+                case "R":
+                    tform = "translate(20, 100)";
+                    break;
+                case "T":
+                    tform = "translate(20, 175)";
+                    break;
+                case "U":
+                    tform = "translate(20, 100)";
+                    break;
+                default:
+                    tform = "translate(20, 20)";
+            }
+
+            d3.select("g#legend-icu")
+                .transition()
+                .duration(duration)
+                .attr("transform", tform);
         }
 
         // Position count chart legend based on currently selected TSA
