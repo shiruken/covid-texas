@@ -931,6 +931,11 @@
                 if (TSA === "Total") {
                     note_total.transition().duration(250).style('opacity', 1);
                     note_icu.transition().duration(250).style('opacity', 1);
+                    note_icu.select("line")
+                        .attr("x1", x_icu(parseDate('2020-05-29')))
+                        .attr("x2", x_icu(parseDate('2020-05-29')));
+                    note_icu.select("text")
+                        .attr("x", x_icu(parseDate('2020-05-29')))             
                     note_count.transition().duration(250).style('opacity', 1);
                     note_count.select("line").attr("y1", y_count(15000));
                     note_count.select("text").attr("y", y_count(14000));
