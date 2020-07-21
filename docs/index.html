@@ -683,7 +683,7 @@
 
             var yMax_count = d3.max(data[TSA], function(d) {return d.total_beds;} );
             var y_count = d3.scaleLinear()
-                .domain([0, yMax_count])
+                .domain([0, yMax_count]).nice(4)
                 .range([height, 0]);
 
             var yAxis_format_count = d3.axisLeft(y_count)
@@ -850,7 +850,7 @@
 
                 // Update y-axis ranges
                 yMax_count = d3.max(data[TSA], function(d) {return d.total_beds;} );
-                y_count.domain([0, yMax_count]);
+                y_count.domain([0, yMax_count]).nice(4);
                 yAxis_format_count = d3.axisLeft(y_count)
                     .ticks(4);
                 yAxisGrid_format_count = d3.axisLeft(y_count)
@@ -1121,6 +1121,9 @@
                 case "H":
                     tform = "translate(20, 175)";
                     break;
+                case "I":
+                    tform = "translate(20, 175)";
+                    break;
                 case "M":
                     tform = "translate(20, 255)";
                     break;
@@ -1149,49 +1152,46 @@
         // Position count chart legend based on currently selected TSA
         function moveCountLegend(TSA,duration) {
             let tform;
-            
+
             switch(TSA) {
                 case "A":
-                    tform = "translate(20, 270)";
-                    break;
-                case "B":
-                    tform = "translate(20, 160)";
+                    tform = "translate(20, 280)";
                     break;
                 case "C":
                     tform = "translate(20, 20)";
                     break;
                 case "D":
-                    tform = "translate(20, 180)";
+                    tform = "translate(20, 15)";
                     break;
-                case "F":
-                    tform = "translate(20, 165)";
+                case "E":
+                    tform = "translate(20, 30)";
                     break;
                 case "G":
-                    tform = "translate(20, 145)";
+                    tform = "translate(20, 20)";
                     break;
                 case "I":
-                    tform = "translate(20, 220)";
-                    break;
-                case "J":
-                    tform = "translate(20, 165)";
+                    tform = "translate(20, 225)";
                     break;
                 case "M":
-                    tform = "translate(20, 215)";
-                    break;
-                case "N":
-                    tform = "translate(20, 165)";
+                    tform = "translate(20, 225)";
                     break;
                 case "O":
-                    tform = "translate(20, 220)";
+                    tform = "translate(20, 225)";
                     break;
                 case "P":
-                    tform = "translate(20, 185)";
+                    tform = "translate(20, 30)";
                     break;
                 case "R":
-                    tform = "translate(20, 220)";
+                    tform = "translate(20, 225)";
+                    break;
+                case "S":
+                    tform = "translate(20, 30)";
+                    break;
+                case "U":
+                    tform = "translate(20, 30)";
                     break;
                 case "V":
-                    tform = "translate(20, 200)";
+                    tform = "translate(20, 30)";
                     break;
                 default:
                     tform = "translate(20, 175)";
