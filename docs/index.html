@@ -452,6 +452,7 @@
             if (TSA === "Total")
                 title_total.text("Statewide Hospital Bed Usage");
             else
+                title_total.text("Hospital Bed Usage in " + location + " (TSA-" + tsa + ")");
 
             var focus_circle_usage_total = svg_total.append("circle")
                 .attr("r", 6)
@@ -567,6 +568,7 @@
             if (TSA === "Total")
                 title_icu.text("Statewide ICU Bed Usage");
             else
+                title_icu.text("ICU Bed Usage in " + location + " (TSA-" + tsa + ")");
 
             var focus_circle_usage_icu = svg_icu.append("circle")
                 .attr("r", 6)
