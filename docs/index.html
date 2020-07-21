@@ -781,6 +781,7 @@
                     focus_circle_bed_count
                         .attr("cx", x_total(d[N].date))
                         .attr("cy", y_count(d[N].total_beds))
+                        .style("opacity", 1)
                         .classed("pulse", true);
                     focus_circle_icu_count
                         .attr("cx", x_total(d[N].date))
@@ -795,8 +796,11 @@
 
                     if (d[i].total_beds_occupied != null && d[i].total_beds_available != null)
                         focus_circle_bed_count
+                            .style("opacity", 1)
                             .attr("cx", x_total(d[i].date))
                             .attr("cy", y_count(d[i].total_beds));
+                    else
+                    focus_circle_bed_count.style("opacity", 0);
 
                     if (d[i].icu_beds_occupied != null && d[i].icu_beds_available != null)
                         focus_circle_icu_count
@@ -1121,12 +1125,12 @@
                 "<h4>" + formatDate(data.date) + "</h4>" +
                 "<h3>" +
                     "<strong class='bed-number'>" + 
-                    data.total_beds.toLocaleString(undefined, options) + 
+                    ((data.total_beds == null) ? 'NA' : data.total_beds.toLocaleString(undefined, options)) + 
                     "</strong> staffed beds" + 
                 "</h3>" +
                 "<dl>" +
                     "<dt>Occupied</dt>" +
-                    "<dd>" + data.total_beds_occupied.toLocaleString() + "</dd>" +
+                    "<dd>" + ((data.total_beds_occupied == null) ? 'NA' : data.total_beds_occupied.toLocaleString()) + "</dd>" +
                     "<dt>Available</dt>" +
                     "<dd>" + data.total_beds_available.toLocaleString() + "</dd>" +
                 "</dl>" +
