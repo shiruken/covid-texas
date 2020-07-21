@@ -179,6 +179,11 @@
             margin: 60px 10px 10px 20px;
         }
 
+        div#data-bed-count dl {
+            margin-top: 10px;
+            margin-bottom: 50px;
+        }
+
         div.data dt {
             margin-top: 10px;
         }
@@ -224,12 +229,14 @@
         <div id="chart-hospital-beds" class="chart"></div>
         <div id="data-hospital-beds" class="data"></div>
     </div>
-
     <div class="container">
         <div id="chart-icu-beds" class="chart"></div>
         <div id="data-icu-beds" class="data"></div>
     </div>
-
+    <div class="container">
+        <div id="chart-bed-count" class="chart"></div>
+        <div id="data-bed-count" class="data"></div>
+    </div>
     <footer>
         <p>
             Data from 
@@ -242,7 +249,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js" type="text/javascript"></script>
     <script type="text/javascript">
         
-        const margin = {top: 30, right: 15, bottom: 30, left: 50},
+        const margin = {top: 30, right: 15, bottom: 30, left: 55},
             width = 880 - margin.left - margin.right,
             height = 450 - margin.top - margin.bottom;
 
@@ -334,6 +341,41 @@
             .call(legend_icu);
 
 
+        // Bed Count Chart
+        var svg_count = d3.select('#chart-bed-count')
+            .append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        svg_count.append('g')
+            .attr('class', 'yAxisGrid');
+
+        svg_count.append("g")
+            .attr('class', 'yAxis');
+
+        var hover_line_count = svg_count.append("line")
+            .attr("class", "hover-line")
+            .attr("x1", width)
+            .attr("x2", width)
+            .attr("y1", 0)
+            .attr("y2", height)
+            .style("opacity", 0);
+
+        var legendScale_count = d3.scaleOrdinal()
+            .domain(["Staffed Hospital Beds", "Total ICU Beds"])
+            .range(["#7570B3", "#D95F02"]);
+
+        var legend_count = d3.legendColor()
+            .scale(legendScale_count)
+            .shapePadding(5);
+
+        var legend_count_container = svg_count.append("g")
+            .attr("id", "legend-count")
+            .call(legend_count);
+
+
         var parseDate = d3.timeParse("%Y-%m-%d");
         var formatDate = d3.timeFormat("%B %e, %Y");
         var bisectDate = d3.bisector(d => d.date).left;
@@ -346,9 +388,11 @@
                 date: parseDate(d['date']),
                 total_beds_available: parseValue(d.total_beds_available),
                 total_beds_occupied: parseValue(d.total_beds_occupied),
+                total_beds: +d.total_beds_occupied + +d.total_beds_available,
                 percent_total_occupied: 100 * +d.total_beds_occupied / (+d.total_beds_occupied + +d.total_beds_available),
                 icu_beds_available: parseValue(d.icu_beds_available),
                 icu_beds_occupied: parseValue(d.icu_beds_occupied),
+                icu_beds: +d.icu_beds_occupied + +d.icu_beds_available,
                 percent_icu_occupied: 100 * +d.icu_beds_occupied / (+d.icu_beds_occupied + +d.icu_beds_available),
                 covid_inpatients: parseValue(d.covid_inpatients),
                 covid_icu_inpatients: parseValue(d.covid_icu_inpatients),
@@ -393,7 +437,8 @@
 
             // Populate details sections
             updateTotalDetails(data[TSA][N]);     
-            updateICUDetails(data[TSA][N]);     
+            updateICUDetails(data[TSA][N]);  
+            updateCountDetails(data[TSA][N]);   
  
             // Total Hospital Bed Usage Chart
             var xExtent_total = getDateExtent(data[TSA], 'total_beds_occupied', 'total_beds_available');
@@ -628,6 +673,149 @@
                 });
 
 
+            // Bed Count Chart            
+            var xAxis_count = svg_count.append("g")
+                .attr('class', 'xAxis')
+                .attr("transform", "translate(0," + height + ")")
+                .call(d3.axisBottom(x_total));
+
+            var yMax_count = d3.max(data[TSA], function(d) {return d.total_beds;} );
+            var y_count = d3.scaleLinear()
+                .domain([0, yMax_count])
+                .range([height, 0]);
+
+            var yAxis_format_count = d3.axisLeft(y_count)
+                .ticks(4);
+
+            var yAxisGrid_format_count = d3.axisLeft(y_count)
+                .tickSize(-width)
+                .tickFormat('')
+                .ticks(4);
+
+            var yAxiGrid_count = svg_count.append('g')
+                .attr('class', 'yAxisGrid')
+                .call(yAxisGrid_format_count);
+
+            var yAxis_count = svg_count.append("g")
+                .attr('class', 'yAxis')
+                .call(yAxis_format_count);
+
+            var note_count = svg_count.append('g')
+                .attr("class", "note")
+                .style("opacity", TSA === "Total" ? 1 : 0);
+
+            note_count.append("line")
+                .attr("x1", x_total(parseDate('2020-05-29')))
+                .attr("x2", x_total(parseDate('2020-05-29')))
+                .attr("y1", y_count(15000))
+                .attr("y2", height);
+
+            note_count.append("text")
+                .text('Data incomplete prior to May 29 ')
+                .attr("x", x_total(parseDate('2020-05-29')))             
+                .attr("y", y_count(14000))
+                .attr("text-anchor", "end");
+
+            var plot_bed_count = svg_count.append("path")
+                .datum(data[TSA])
+                .attr("fill", "none")
+                .attr("stroke", "#7570B3")
+                .attr("stroke-width", 4)
+                .attr("d", d3.line()
+                    .x(function(d) { return x_total(d.date); })
+                    .y(function(d) { return y_count(d.total_beds); })
+                    .defined(function(d) { return (d.total_beds_occupied != null && d.total_beds_available != null); })
+                );
+
+            var plot_icu_count = svg_count.append("path")
+                .datum(data[TSA])
+                .attr("fill", "none")
+                .attr("stroke", "#D95F02")
+                .attr("stroke-width", 4)
+                .attr("d", d3.line()
+                    .x(function(d) { return x_total(d.date); })
+                    .y(function(d) {return y_count(d.icu_beds); })
+                    .defined(function(d) { return (d.icu_beds_occupied != null && d.icu_beds_available != null); })
+                );
+
+            moveCountLegend(TSA, 0);
+
+            var title_count = svg_count.append("text")
+                    .attr("x", (width / 2))             
+                    .attr("y", 0 - (margin.top / 2))
+                    .attr("text-anchor", "middle")  
+                    .attr('class', 'chartTitle')
+            if (TSA === "Total")
+                title_count.text("Statewide Total Hospital Resources");
+            else
+                title_count.text("Total Hospital Resources in " + data[TSA][0].location + " (TSA-" + data[TSA][0].tsa + ")");
+                
+            var focus_circle_bed_count = svg_count.append("circle")
+                .attr("r", 6)
+                .attr("fill", "#7570B3")
+                .classed("pulse", true)
+                .attr("cx", x_total(data[TSA][N].date))
+                .attr("cy", y_count(data[TSA][N].total_beds));
+
+            var focus_circle_icu_count = svg_count.append("circle")
+                .attr("r", 6)
+                .attr("fill", "#D95F02")
+                .classed("pulse", true)
+                .attr("cx", x_total(data[TSA][N].date))
+                .attr("cy", y_count(data[TSA][N].icu_beds));
+
+            var overlay_count = svg_count.append('rect')
+                .datum(data[TSA])
+                .style("fill", "none")
+                .style("pointer-events", "all")
+                .attr('width', width)
+                .attr('height', height)
+                .on("mouseover", function() { 
+                    hover_line_count.style("opacity", 1);
+                    focus_circle_bed_count.classed("pulse", false);
+                    focus_circle_icu_count.classed("pulse", false);
+                })
+                .on("mouseout", function(d) {
+                    hover_line_count.style("opacity", 0);
+                    let N = d.length - 1;
+                    focus_circle_bed_count
+                        .attr("cx", x_total(d[N].date))
+                        .attr("cy", y_count(d[N].total_beds))
+                        .classed("pulse", true);
+                    focus_circle_icu_count
+                        .attr("cx", x_total(d[N].date))
+                        .attr("cy", y_count(d[N].icu_beds))
+                        .style("opacity", 1)
+                        .classed("pulse", true);
+                    updateCountDetails(d[N]);
+                })
+                .on('mousemove', function(d) { 
+                    var x0 = x_total.invert(d3.mouse(this)[0]);
+                    var i = bisectDate(d, x0, 0, d.length - 1);
+
+                    if (d[i].total_beds_occupied != null && d[i].total_beds_available != null)
+                        focus_circle_bed_count
+                            .attr("cx", x_total(d[i].date))
+                            .attr("cy", y_count(d[i].total_beds));
+
+                    if (d[i].icu_beds_occupied != null && d[i].icu_beds_available != null)
+                        focus_circle_icu_count
+                            .style("opacity", 1)
+                            .attr("cx", x_total(d[i].date))
+                            .attr("cy", y_count(d[i].icu_beds));
+                    else
+                        focus_circle_icu_count.style("opacity", 0);
+
+                    if ((d[i].total_beds_occupied != null && d[i].total_beds_available != null) ||
+                        d[i].icu_beds_occupied != null && d[i].icu_beds_available != null) {
+                        hover_line_count
+                            .attr("x1", x_total(d[i].date))
+                            .attr("x2", x_total(d[i].date));
+                        updateCountDetails(d[i]);
+                    }
+                });
+
+
             // Update charts when different TSA is selected
             d3.select("#tsaSelect").on("change", function(d) {
                 var TSA = d3.select(this).property("value");
@@ -648,6 +836,23 @@
                     .transition()
                     .duration(250)
                     .call(d3.axisBottom(x_icu));
+
+                xAxis_count
+                    .transition()
+                    .duration(250)
+                    .call(d3.axisBottom(x_total));
+
+                // Update y-axis ranges
+                yMax_count = d3.max(data[TSA], function(d) {return d.total_beds;} );
+                y_count.domain([0, yMax_count]);
+                yAxis_format_count = d3.axisLeft(y_count)
+                    .ticks(4);
+                yAxisGrid_format_count = d3.axisLeft(y_count)
+                    .tickSize(-width)
+                    .tickFormat('')
+                    .ticks(4);
+                yAxiGrid_count.call(yAxisGrid_format_count);
+                yAxis_count.call(yAxis_format_count);
 
                 // Draw new total hospital bed usage line
                 plot_usage_total.datum(data[TSA])
@@ -689,34 +894,62 @@
                         .defined(function(d) { return (d.covid_icu_inpatients != null && d.icu_beds_occupied != null); })
                     );
 
+                // Draw new total bed count line
+                plot_bed_count.datum(data[TSA])
+                    .transition()
+                    .duration(250)
+                    .attr("d", d3.line()
+                        .x(function(d) { return x_total(d.date); })
+                        .y(function(d) { return y_count(d.total_beds); })
+                        .defined(function(d) { return (d.total_beds_occupied != null && d.total_beds_available != null); })
+                    );
+
+                // Draw new ICU bed count line
+                plot_icu_count.datum(data[TSA])
+                    .transition()
+                    .duration(250)
+                    .attr("d", d3.line()
+                        .x(function(d) { return x_total(d.date); })
+                        .y(function(d) { return y_count(d.icu_beds); })
+                        .defined(function(d) { return (d.icu_beds_occupied != null && d.icu_beds_available != null); })
+                    );
+
                 // Update titles
                 let tsa = data[TSA][0].tsa;
                 let location = data[TSA][0].location;
                 if (TSA === "Total") {
                     title_total.text("Statewide Hospital Bed Usage");
                     title_icu.text("Statewide ICU Bed Usage");
+                    title_count.text("Statewide Total Hospital Resources");
                 } else {
                     title_total.text("Hospital Bed Usage in " + location + " (TSA-" + tsa + ")");
                     title_icu.text("ICU Bed Usage in " + location + " (TSA-" + tsa + ")");
+                    title_count.text("Total Hospital Resources in " + location + " (TSA-" + tsa + ")");
                 }
 
                 // Toggle 'Statewide Total' notes
                 if (TSA === "Total") {
                     note_total.transition().duration(250).style('opacity', 1);
                     note_icu.transition().duration(250).style('opacity', 1);
+                    note_count.transition().duration(250).style('opacity', 1);
+                    note_count.select("line").attr("y1", y_count(15000));
+                    note_count.select("text").attr("y", y_count(14000));
                 } else {
                     note_total.style('opacity', 0);
                     note_icu.style('opacity', 0);
+                    note_count.style('opacity', 0);
                 }
 
                 // Update mouseover overlay data
                 overlay_total.datum(data[TSA]);
                 overlay_icu.datum(data[TSA]);
+                overlay_count.datum(data[TSA]);
 
                 // Update details sections
                 let N = data[TSA].length - 1;
                 updateTotalDetails(data[TSA][N]);
                 updateICUDetails(data[TSA][N]);
+                updateCountDetails(data[TSA][N]);
 
                 // Move focus circles to new coordinates
                 focus_circle_usage_total
@@ -741,7 +974,19 @@
                     .transition()
                     .duration(250)
                     .attr("cx", x_icu(data[TSA][N].date))
-                    .attr("cy", y(data[TSA][N].percent_icu_covid));                    
+                    .attr("cy", y(data[TSA][N].percent_icu_covid));
+
+                focus_circle_bed_count
+                    .transition()
+                    .duration(250)
+                    .attr("cx", x_total(data[TSA][N].date))
+                    .attr("cy", y_count(data[TSA][N].total_beds));
+
+                focus_circle_icu_count
+                    .transition()
+                    .duration(250)
+                    .attr("cx", x_total(data[TSA][N].date))
+                    .attr("cy", y_count(data[TSA][N].icu_beds));
 
                 // Move legend for overlapping data
                 if (TSA === "H")
@@ -780,6 +1025,9 @@
                         .transition()
                         .duration(250)
                         .attr("transform", "translate(20, 20)");
+
+                moveCountLegend(TSA, 250);
+
 
             });
 
@@ -859,6 +1107,93 @@
                     "<dd>" + data.covid_icu_inpatients.toLocaleString() + "</dd>" +
                 "</dl>"
             );
+        }
+
+        // Update Bed Count details
+        function updateCountDetails(data) {
+            var options = {minimumFractionDigits: 0, maximumFractionDigits: 0};
+            d3.select("#data-bed-count").html("" +
+                "<h4>" + formatDate(data.date) + "</h4>" +
+                "<h3>" +
+                    "<strong class='bed-number'>" + 
+                    data.total_beds.toLocaleString(undefined, options) + 
+                    "</strong> staffed beds" + 
+                "</h3>" +
+                "<dl>" +
+                    "<dt>Occupied</dt>" +
+                    "<dd>" + data.total_beds_occupied.toLocaleString() + "</dd>" +
+                    "<dt>Available</dt>" +
+                    "<dd>" + data.total_beds_available.toLocaleString() + "</dd>" +
+                "</dl>" +
+                "<h3>" + 
+                    "<strong class='covid-number'>" + 
+                    ((data.icu_beds_occupied == null) ? 'NA' : data.icu_beds.toLocaleString(undefined, options)) + 
+                    "</strong> total ICU beds" +
+                "</h3>" + 
+                "<dl>" +
+                    "<dt>Occupied</dt>" +
+                    "<dd>" + ((data.icu_beds_occupied == null) ? 'NA' : data.icu_beds_occupied.toLocaleString()) + "</dd>" +
+                    "<dt>Available</dt>" +
+                    "<dd>" + data.icu_beds_available.toLocaleString() + "</dd>" +
+                "</dl>"
+            );
+        }
+
+        // Position count chart legend based on currently selected TSA
+        function moveCountLegend(TSA,duration) {
+            let tform;
+            
+            switch(TSA) {
+                case "A":
+                    tform = "translate(20, 270)";
+                    break;
+                case "B":
+                    tform = "translate(20, 160)";
+                    break;
+                case "C":
+                    tform = "translate(20, 20)";
+                    break;
+                case "D":
+                    tform = "translate(20, 180)";
+                    break;
+                case "F":
+                    tform = "translate(20, 165)";
+                    break;
+                case "G":
+                    tform = "translate(20, 145)";
+                    break;
+                case "I":
+                    tform = "translate(20, 220)";
+                    break;
+                case "J":
+                    tform = "translate(20, 165)";
+                    break;
+                case "M":
+                    tform = "translate(20, 215)";
+                    break;
+                case "N":
+                    tform = "translate(20, 165)";
+                    break;
+                case "O":
+                    tform = "translate(20, 220)";
+                    break;
+                case "P":
+                    tform = "translate(20, 185)";
+                    break;
+                case "R":
+                    tform = "translate(20, 220)";
+                    break;
+                case "V":
+                    tform = "translate(20, 200)";
+                    break;
+                default:
+                    tform = "translate(20, 175)";
+            }
+
+            d3.select("g#legend-count")
+                .transition()
+                .duration(duration)
+                .attr("transform", tform);
         }
 
     </script>
