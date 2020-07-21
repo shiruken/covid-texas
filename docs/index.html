@@ -619,14 +619,14 @@
                 .attr("r", 6)
                 .attr("fill", "#7570B3")
                 .classed("pulse", true)
-                .attr("cx", x_total(data[TSA][N].date))
+                .attr("cx", x_icu(data[TSA][N].date))
                 .attr("cy", y(data[TSA][N].percent_icu_occupied));
 
             var focus_circle_covid_icu = svg_icu.append("circle")
                 .attr("r", 6)
                 .attr("fill", "#D95F02")
                 .classed("pulse", true)
-                .attr("cx", x_total(data[TSA][N].date))
+                .attr("cx", x_icu(data[TSA][N].date))
                 .attr("cy", y(data[TSA][N].percent_icu_covid));
 
             var overlay_icu = svg_icu.append('rect')
