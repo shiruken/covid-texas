@@ -445,12 +445,13 @@
                 );
 
             var title_total = svg_total.append("text")
-                    .attr("x", (width / 2))             
-                    .attr("y", 0 - (margin.top / 2))
-                    .attr("text-anchor", "middle")  
-                    .attr('class', 'chartTitle')
-                    .text("Hospital Bed Usage in " + data[TSA][0].location 
-                          + " (TSA-" + data[TSA][0].tsa + ")");
+                .attr("x", (width / 2))
+                .attr("y", 0 - (margin.top / 2))
+                .attr("text-anchor", "middle")
+                .attr('class', 'chartTitle');
+            if (TSA === "Total")
+                title_total.text("Statewide Hospital Bed Usage");
+            else
 
             var focus_circle_usage_total = svg_total.append("circle")
                 .attr("r", 6)
@@ -562,9 +563,10 @@
                 .attr("x", (width / 2))             
                 .attr("y", 0 - (margin.top / 2))
                 .attr("text-anchor", "middle")  
-                .attr('class', 'chartTitle')
-                .text("ICU Bed Usage in " + data[TSA][0].location 
-                        + " (TSA-" + data[TSA][0].tsa + ")");
+                .attr('class', 'chartTitle');
+            if (TSA === "Total")
+                title_icu.text("Statewide ICU Bed Usage");
+            else
 
             var focus_circle_usage_icu = svg_icu.append("circle")
                 .attr("r", 6)
