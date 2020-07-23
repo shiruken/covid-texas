@@ -65,13 +65,13 @@
             color: #999;
             font-weight: normal;
             margin-top: 5px;
-            margin-bottom: 50px;
             min-height: 22px;
         }
 
         div#control {
             text-align: center;
             font-size: 1.2em;
+            margin-top: 50px;
         }
 
         select#tsaSelect {
@@ -210,6 +210,16 @@
             border-bottom: 1px dotted #999;
         }
 
+        div.alert {
+            padding: 15px 30px;
+            margin: 20px auto;
+            border: 1px solid transparent;
+            border-radius: 4px;
+            background-color: #f2dede;
+            border-color: #ebccd1;
+            color: #a94442;
+        }
+
     </style>
 </head>
 
@@ -220,6 +230,7 @@
     <header>
         <h1 id="title">Texas COVID-19 Hospital Resource Usage</h1>
         <h2 id="subtitle"></h2>
+        <div class="alert">Today's DSHS data is incomplete "due to a transition in reporting to comply with new federal requirements"</div>
     </header>
 
     <div id="control">
