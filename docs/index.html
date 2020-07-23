@@ -833,7 +833,10 @@
             d3.select("#tsaSelect").on("change", function(d) {
                 var TSA = d3.select(this).property("value");
 
-                window.history.replaceState(null, null, "?tsa=" + TSA);
+                if (TSA === "Total")
+                    window.history.replaceState(null, null, window.location.pathname);
+                else
+                    window.history.replaceState(null, null, "?tsa=" + TSA);
 
                 // Update x-axis ranges
                 xExtent_total = getDateExtent(data[TSA], 'percent_total_occupied'); 
