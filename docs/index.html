@@ -382,25 +382,33 @@
 
 
         d3.csv('data.csv', function(d) {
+
+            let total_beds_available = parseValue(d.total_beds_available),
+                total_beds_occupied = parseValue(d.total_beds_occupied),
+                icu_beds_available = parseValue(d.icu_beds_available),
+                icu_beds_occupied = parseValue(d.icu_beds_occupied),
+                covid_inpatients = parseValue(d.covid_inpatients),
+                covid_icu_inpatients = parseValue(d.covid_icu_inpatients);
+                
             return {
                 tsa: d.tsa,
                 location: d.location,
                 date: parseDate(d['date']),
-                total_beds_available: parseValue(d.total_beds_available),
-                total_beds_occupied: parseValue(d.total_beds_occupied),
-                total_beds: +d.total_beds_occupied + +d.total_beds_available,
-                percent_total_occupied: 100 * +d.total_beds_occupied / (+d.total_beds_occupied + +d.total_beds_available),
-                icu_beds_available: parseValue(d.icu_beds_available),
-                icu_beds_occupied: parseValue(d.icu_beds_occupied),
-                icu_beds: +d.icu_beds_occupied + +d.icu_beds_available,
-                percent_icu_occupied: 100 * +d.icu_beds_occupied / (+d.icu_beds_occupied + +d.icu_beds_available),
-                covid_inpatients: parseValue(d.covid_inpatients),
-                covid_icu_inpatients: parseValue(d.covid_icu_inpatients),
-                percent_total_covid: 100 * +d.covid_inpatients / +d.total_beds_occupied,
-                percent_icu_covid: 100 * +d.covid_icu_inpatients / +d.icu_beds_occupied
+                total_beds_available: total_beds_available,
+                total_beds_occupied: total_beds_occupied,
+                total_beds: total_beds_occupied + total_beds_available,
+                percent_total_occupied: 100 * total_beds_occupied / (total_beds_occupied + total_beds_available),
+                icu_beds_available: icu_beds_available,
+                icu_beds_occupied: icu_beds_occupied,
+                icu_beds: icu_beds_occupied + icu_beds_available,
+                percent_icu_occupied: 100 * icu_beds_occupied / (icu_beds_occupied + icu_beds_available),
+                covid_inpatients: covid_inpatients,
+                covid_icu_inpatients: covid_icu_inpatients,
+                percent_total_covid: 100 * covid_inpatients / total_beds_occupied,
+                percent_icu_covid: 100 * covid_icu_inpatients / icu_beds_occupied
             };
         }).then(function(data) {
-            
+
             // Group data by TSA
             var data = d3.nest()
                 .key(function(d) { return d.tsa; })
@@ -441,7 +449,7 @@
             updateCountDetails(data[TSA][N]);   
  
             // Total Hospital Bed Usage Chart
-            var xExtent_total = getDateExtent(data[TSA], 'total_beds_occupied', 'total_beds_available');
+            var xExtent_total = getDateExtent(data[TSA], 'percent_total_occupied');
             var x_total = d3.scaleTime()
                 .domain(xExtent_total)
                 .range([0, width]);
@@ -475,7 +483,7 @@
                 .attr("d", d3.line()
                     .x(function(d) { return x_total(d.date); })
                     .y(function(d) { return y(d.percent_total_occupied); })
-                    .defined(function(d) { return (d.total_beds_occupied != null && d.total_beds_available != null); })
+                    .defined(function(d) { return !isNaN(d.percent_total_occupied); })
                 );
 
             var plot_covid_total = svg_total.append("path")
@@ -486,7 +494,7 @@
                 .attr("d", d3.line()
                     .x(function(d) { return x_total(d.date); })
                     .y(function(d) {return y(d.percent_total_covid); })
-                    .defined(function(d) { return (d.covid_inpatients != null && d.total_beds_occupied != null); })
+                    .defined(function(d) { return !isNaN(d.percent_total_covid); })
                 );
 
             var title_total = svg_total.append("text")
@@ -541,7 +549,7 @@
                     var x0 = x_total.invert(d3.mouse(this)[0]);
                     var i = bisectDate(d, x0, 0, d.length - 1);
 
-                    if (d[i].total_beds_occupied != null) {
+                    if (!isNaN(d[i].percent_total_occupied)) {
                         hover_line_total
                             .attr("x1", x_total(d[i].date))
                             .attr("x2", x_total(d[i].date));
@@ -557,7 +565,7 @@
 
 
             // ICU Bed Usage Chart
-            var xExtent_icu = getDateExtent(data[TSA], 'icu_beds_occupied', 'icu_beds_available');
+            var xExtent_icu = getDateExtent(data[TSA], 'percent_icu_occupied');
             var x_icu = d3.scaleTime()
                 .domain(xExtent_icu)
                 .range([0, width]);
@@ -591,7 +599,7 @@
                 .attr("d", d3.line()
                     .x(function(d) { return x_icu(d.date); })
                     .y(function(d) { return y(d.percent_icu_occupied); })
-                    .defined(function(d) { return (d.icu_beds_occupied != null && d.icu_beds_available != null); })
+                    .defined(function(d) { return !isNaN(d.percent_icu_occupied); })
                 );
 
             var plot_covid_icu = svg_icu.append("path")
@@ -602,7 +610,7 @@
                 .attr("d", d3.line()
                     .x(function(d) { return x_icu(d.date); })
                     .y(function(d) {return y(d.percent_icu_covid); })
-                    .defined(function(d) {return (d.covid_icu_inpatients != null && d.icu_beds_occupied != null); })
+                    .defined(function(d) {return !isNaN(d.percent_icu_covid); })
                 );
 
             moveICULegend(TSA, 0);
@@ -660,7 +668,7 @@
                     var x0 = x_icu.invert(d3.mouse(this)[0]);
                     var i = bisectDate(d, x0, offset, d.length - 1);
 
-                    if (d[i].icu_beds_occupied != null) {
+                    if (!isNaN(d[i].percent_icu_covid)) {
                         focus_circle_usage_icu
                             .attr("cx", x_icu(d[i].date))
                             .attr("cy", y(d[i].percent_icu_occupied));
@@ -726,7 +734,7 @@
                 .attr("d", d3.line()
                     .x(function(d) { return x_total(d.date); })
                     .y(function(d) { return y_count(d.total_beds); })
-                    .defined(function(d) { return (d.total_beds_occupied != null && d.total_beds_available != null); })
+                    .defined(function(d) { return !isNaN(d.total_beds); })
                 );
 
             var plot_icu_count = svg_count.append("path")
@@ -737,7 +745,7 @@
                 .attr("d", d3.line()
                     .x(function(d) { return x_total(d.date); })
                     .y(function(d) {return y_count(d.icu_beds); })
-                    .defined(function(d) { return (d.icu_beds_occupied != null && d.icu_beds_available != null); })
+                    .defined(function(d) { return !isNaN(d.icu_beds); })
                 );
 
             moveCountLegend(TSA, 0);
@@ -796,7 +804,7 @@
                     var x0 = x_total.invert(d3.mouse(this)[0]);
                     var i = bisectDate(d, x0, 0, d.length - 1);
 
-                    if (d[i].total_beds_occupied != null && d[i].total_beds_available != null)
+                    if (!isNaN(d[i].total_beds))
                         focus_circle_bed_count
                             .style("opacity", 1)
                             .attr("cx", x_total(d[i].date))
@@ -804,7 +812,7 @@
                     else
                         focus_circle_bed_count.style("opacity", 0);
 
-                    if (d[i].icu_beds_occupied != null && d[i].icu_beds_available != null)
+                    if (!isNaN(d[i].icu_beds))
                         focus_circle_icu_count
                             .style("opacity", 1)
                             .attr("cx", x_total(d[i].date))
@@ -812,8 +820,7 @@
                     else
                         focus_circle_icu_count.style("opacity", 0);
 
-                    if ((d[i].total_beds_occupied != null && d[i].total_beds_available != null) ||
-                        d[i].icu_beds_occupied != null && d[i].icu_beds_available != null) {
+                    if (!isNaN(d[i].total_beds) || !isNaN(d[i].icu_beds)) {
                         hover_line_count
                             .attr("x1", x_total(d[i].date))
                             .attr("x2", x_total(d[i].date));
@@ -829,14 +836,14 @@
                 window.history.replaceState(null, null, "?tsa=" + TSA);
 
                 // Update x-axis ranges
-                xExtent_total = getDateExtent(data[TSA], 'total_beds_occupied', 'total_beds_available'); 
+                xExtent_total = getDateExtent(data[TSA], 'percent_total_occupied'); 
                 x_total.domain(xExtent_total);
                 xAxis_total
                     .transition()
                     .duration(250)
                     .call(d3.axisBottom(x_total));
 
-                xExtent_icu = getDateExtent(data[TSA], 'icu_beds_occupied', 'icu_beds_available');
+                xExtent_icu = getDateExtent(data[TSA], 'percent_icu_occupied');
                 x_icu.domain(xExtent_icu);
                 xAxis_icu
                     .transition()
@@ -867,7 +874,7 @@
                     .attr("d", d3.line()
                         .x(function(d) { return x_total(d.date); })
                         .y(function(d) { return y(d.percent_total_occupied); })
-                        .defined(function(d) { return (d.total_beds_occupied != null && d.total_beds_available != null); })
+                        .defined(function(d) { return !isNaN(d.percent_total_occupied); })
                     );
 
                 // Draw new total hospital bed COVID-19 usage line
@@ -877,7 +884,7 @@
                     .attr("d", d3.line()
                         .x(function(d) { return x_total(d.date); })
                         .y(function(d) {return y(d.percent_total_covid); })
-                        .defined(function(d) { return (d.covid_inpatients != null && d.total_beds_occupied != null); })
+                        .defined(function(d) { return !isNaN(d.percent_total_covid); })
                     );
 
                 // Draw new ICU bed usage line
@@ -887,7 +894,7 @@
                     .attr("d", d3.line()
                         .x(function(d) { return x_icu(d.date); })
                         .y(function(d) { return y(d.percent_icu_occupied); })
-                        .defined(function(d) { return (d.icu_beds_occupied != null && d.icu_beds_available != null); })
+                        .defined(function(d) { return !isNaN(d.percent_icu_occupied); })
                     );
 
                 // Draw new ICU bed COVID-19 usage line
@@ -897,7 +904,7 @@
                     .attr("d", d3.line()
                         .x(function(d) { return x_icu(d.date); })
                         .y(function(d) {return y(d.percent_icu_covid); })
-                        .defined(function(d) { return (d.covid_icu_inpatients != null && d.icu_beds_occupied != null); })
+                        .defined(function(d) { return !isNaN(d.percent_icu_covid); })
                     );
 
                 // Draw new total bed count line
@@ -907,7 +914,7 @@
                     .attr("d", d3.line()
                         .x(function(d) { return x_total(d.date); })
                         .y(function(d) { return y_count(d.total_beds); })
-                        .defined(function(d) { return (d.total_beds_occupied != null && d.total_beds_available != null); })
+                        .defined(function(d) { return !isNaN(d.total_beds); })
                     );
 
                 // Draw new ICU bed count line
@@ -917,7 +924,7 @@
                     .attr("d", d3.line()
                         .x(function(d) { return x_total(d.date); })
                         .y(function(d) { return y_count(d.icu_beds); })
-                        .defined(function(d) { return (d.icu_beds_occupied != null && d.icu_beds_available != null); })
+                        .defined(function(d) { return !isNaN(d.icu_beds); })
                     );
 
                 // Update titles
@@ -1007,22 +1014,22 @@
 
         });
 
-        // Properly handle null values loaded from CSV
+        // Missing values are parsed as NaN
         function parseValue(value) {
             if (value === "")
-                return null;
+                return NaN;
             else
                 return +value;
         }
 
-        // Return padded date extent for set of keys
-        function getDateExtent(data, key1, key2) {
+        // Return padded date extent for given key
+        function getDateExtent(data, key) {
             let max = d3.max(data, function(d) { return d.date; });
             let min = d3.min(data, function(d) {
-                if (d[key1] != null && d[key2] != null)
-                    return d.date;
-                else
+                if (isNaN(d[key]))
                     return max;
+                else
+                    return d.date;
             });
             return [d3.timeDay.offset(min, -1), d3.timeDay.offset(max, 1)]
         }
@@ -1090,23 +1097,23 @@
                 "<h4>" + formatDate(data.date) + "</h4>" +
                 "<h3>" +
                     "<strong class='bed-number'>" + 
-                    ((data.total_beds == null) ? 'NA' : data.total_beds.toLocaleString(undefined, options)) + 
+                    (isNaN(data.total_beds) ? 'NA' : data.total_beds.toLocaleString(undefined, options)) + 
                     "</strong> staffed beds" + 
                 "</h3>" +
                 "<dl>" +
                     "<dt>Occupied</dt>" +
-                    "<dd>" + ((data.total_beds_occupied == null) ? 'NA' : data.total_beds_occupied.toLocaleString()) + "</dd>" +
+                    "<dd>" + (isNaN(data.total_beds_occupied) ? 'NA' : data.total_beds_occupied.toLocaleString()) + "</dd>" +
                     "<dt>Available</dt>" +
                     "<dd>" + data.total_beds_available.toLocaleString() + "</dd>" +
                 "</dl>" +
                 "<h3>" + 
                     "<strong class='covid-number'>" + 
-                    ((data.icu_beds_occupied == null) ? 'NA' : data.icu_beds.toLocaleString(undefined, options)) + 
+                    (isNaN(data.icu_beds_occupied) ? 'NA' : data.icu_beds.toLocaleString(undefined, options)) + 
                     "</strong> total ICU beds" +
                 "</h3>" + 
                 "<dl>" +
                     "<dt>Occupied</dt>" +
-                    "<dd>" + ((data.icu_beds_occupied == null) ? 'NA' : data.icu_beds_occupied.toLocaleString()) + "</dd>" +
+                    "<dd>" + (isNaN(data.icu_beds_occupied) ? 'NA' : data.icu_beds_occupied.toLocaleString()) + "</dd>" +
                     "<dt>Available</dt>" +
                     "<dd>" + data.icu_beds_available.toLocaleString() + "</dd>" +
                 "</dl>"
