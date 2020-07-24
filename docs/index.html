@@ -335,9 +335,8 @@
             .attr("y2", height)
             .style("opacity", 0);
 
-        var legend_total = generateLegend(svg_total, "Hospital Beds Used", "Used Beds with COVID-19")
-            .attr("id", "legend-total");
-
+        var legend = generateLegend("Hospital Beds Used", "Used Beds with COVID-19");
+        var legend_total = svg_total.append(() => legend.node());
 
         // ICU Bed Usage Chart
         var svg_icu = d3.select('#chart-icu-beds')
@@ -363,9 +362,8 @@
             .attr("y2", height)
             .style("opacity", 0);
 
-        var legend_icu = generateLegend(svg_icu, "ICU Beds Used", "Used ICU Beds with COVID-19")
-            .attr("id", "legend-icu");
-
+        var legend = generateLegend("ICU Beds Used", "Used ICU Beds with COVID-19");
+        var legend_total = svg_icu.append(() => legend.node());
 
         // Bed Count Chart
         var svg_count = d3.select('#chart-bed-count')
@@ -389,9 +387,8 @@
             .attr("y2", height)
             .style("opacity", 0);
 
-        var legend_count = generateLegend(svg_count, "Staffed Hospital Beds", "Total ICU Beds")
-            .attr("id", "legend-count");
-
+        var legend = generateLegend("Staffed Hospital Beds", "Total ICU Beds");
+        var legend_total = svg_count.append(() => legend.node());
 
         var parseDate = d3.timeParse("%Y-%m-%d");
         var formatDate = d3.timeFormat("%B %e, %Y");
@@ -1174,9 +1171,9 @@
             return [d3.timeDay.offset(min, -1), d3.timeDay.offset(max, 1)]
         }
         
-        function generateLegend(selection, label1, label2) {
+        function generateLegend(label1, label2) {
             
-            let legend = selection.append("g")
+            let legend = d3.create("svg:g")
                 .classed("legend", true)
                 .attr("transform", "translate(20, 10)");
 
@@ -1334,7 +1331,7 @@
                     tform = "translate(20, 10)";
             }
 
-            d3.select("g#legend-icu")
+            d3.select("#chart-icu-beds g.legend")
                 .transition()
                 .duration(duration)
                 .attr("transform", tform);
@@ -1388,7 +1385,7 @@
                     tform = "translate(20, 165)";
             }
 
-            d3.select("g#legend-count")
+            d3.select("#chart-bed-count g.legend")
                 .transition()
                 .duration(duration)
                 .attr("transform", tform);
