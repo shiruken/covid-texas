@@ -164,6 +164,20 @@
             white-space: pre;
         }
 
+        .legend rect.purple {
+            fill: #7570B3;
+        }
+
+        .legend rect.orange {
+            fill: #D95F02;
+        }
+
+        .legend line {
+            stroke: #000000;
+            stroke-width: 3;
+            stroke-dasharray: 3;
+        }
+
         div.data {
             float: right;
             width: 220px;
@@ -277,7 +291,6 @@
     </footer>
 
     <script src="https://d3js.org/d3.v5.min.js" type="text/javascript"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js" type="text/javascript"></script>
     <script type="text/javascript">
         
         const margin = {top: 30, right: 15, bottom: 30, left: 55},
@@ -322,17 +335,8 @@
             .attr("y2", height)
             .style("opacity", 0);
 
-        var legendScale_total = d3.scaleOrdinal()
-            .domain(["Hospital Beds Used", "Used Beds with COVID-19"])
-            .range(["#7570B3", "#D95F02"]);
-
-        var legend_total = d3.legendColor()
-            .scale(legendScale_total)
-            .shapePadding(5);
-
-        var legend_total_container = svg_total.append("g")
-            .attr("transform", "translate(20, 20)")
-            .call(legend_total);
+        var legend_total = generateLegend(svg_total, "Hospital Beds Used", "Used Beds with COVID-19")
+            .attr("id", "legend-total");
 
 
         // ICU Bed Usage Chart
@@ -359,17 +363,8 @@
             .attr("y2", height)
             .style("opacity", 0);
 
-        var legendScale_icu = d3.scaleOrdinal()
-            .domain(["ICU Beds Used", "Used ICU Beds with COVID-19"])
-            .range(["#7570B3", "#D95F02"]);
-
-        var legend_icu = d3.legendColor()
-            .scale(legendScale_icu)
-            .shapePadding(5);
-
-        var legend_icu_container = svg_icu.append("g")
-            .attr("id", "legend-icu")
-            .call(legend_icu);
+        var legend_icu = generateLegend(svg_icu, "ICU Beds Used", "Used ICU Beds with COVID-19")
+            .attr("id", "legend-icu");
 
 
         // Bed Count Chart
@@ -394,17 +389,8 @@
             .attr("y2", height)
             .style("opacity", 0);
 
-        var legendScale_count = d3.scaleOrdinal()
-            .domain(["Staffed Hospital Beds", "Total ICU Beds"])
-            .range(["#7570B3", "#D95F02"]);
-
-        var legend_count = d3.legendColor()
-            .scale(legendScale_count)
-            .shapePadding(5);
-
-        var legend_count_container = svg_count.append("g")
-            .attr("id", "legend-count")
-            .call(legend_count);
+        var legend_count = generateLegend(svg_count, "Staffed Hospital Beds", "Total ICU Beds")
+            .attr("id", "legend-count");
 
 
         var parseDate = d3.timeParse("%Y-%m-%d");
@@ -1188,6 +1174,50 @@
             return [d3.timeDay.offset(min, -1), d3.timeDay.offset(max, 1)]
         }
         
+        function generateLegend(selection, label1, label2) {
+            
+            let legend = selection.append("g")
+                .classed("legend", true)
+                .attr("transform", "translate(20, 10)");
+
+            legend.append("rect")
+                .classed("purple", true)
+                .attr("x", 0)
+                .attr("y", 0)
+                .attr("width", 15)
+                .attr("height", 15);
+
+            legend.append("text")
+                .attr("x", 25)
+                .attr("y", 13)
+                .text(label1);
+
+            legend.append("rect")
+                .classed("orange", true)
+                .attr("x", 0)
+                .attr("y", 22)
+                .attr("width", 15)
+                .attr("height", 15);
+
+            legend.append("text")
+                .attr("x", 25)
+                .attr("y", 35)
+                .text(label2);
+
+            legend.append("line")
+                .attr("x1", 0)
+                .attr("x2", 15)
+                .attr("y1", 51)
+                .attr("y2", 51);
+
+            legend.append("text")
+                .attr("x", 25)
+                .attr("y", 57)
+                .text("Moving Average (7-day)");
+
+            return legend;
+        }
+
         // Update Total Hospital Bed details
         function updateTotalDetails(data) {
             var options = {minimumFractionDigits: 0, maximumFractionDigits: 0};
@@ -1280,28 +1310,28 @@
 
             switch(TSA) {
                 case "H":
-                    tform = "translate(20, 175)";
+                    tform = "translate(20, 165)";
                     break;
                 case "I":
-                    tform = "translate(20, 175)";
+                    tform = "translate(20, 165)";
                     break;
                 case "M":
-                    tform = "translate(20, 255)";
+                    tform = "translate(20, 245)";
                     break;
                 case "Q":
-                    tform = "translate(20, 175)";
+                    tform = "translate(20, 165)";
                     break;
                 case "R":
-                    tform = "translate(20, 100)";
+                    tform = "translate(20, 85)";
                     break;
                 case "T":
-                    tform = "translate(20, 175)";
+                    tform = "translate(20, 165)";
                     break;
                 case "U":
-                    tform = "translate(20, 100)";
+                    tform = "translate(20, 165)";
                     break;
                 default:
-                    tform = "translate(20, 20)";
+                    tform = "translate(20, 10)";
             }
 
             d3.select("g#legend-icu")
@@ -1316,46 +1346,46 @@
 
             switch(TSA) {
                 case "A":
-                    tform = "translate(20, 280)";
+                    tform = "translate(20, 270)";
                     break;
                 case "C":
-                    tform = "translate(20, 20)";
+                    tform = "translate(20, 10)";
                     break;
                 case "D":
-                    tform = "translate(20, 15)";
+                    tform = "translate(20, 20)";
                     break;
                 case "E":
-                    tform = "translate(20, 30)";
+                    tform = "translate(20, 10)";
                     break;
-                case "G":
+                case "H":
                     tform = "translate(20, 20)";
                     break;
                 case "I":
-                    tform = "translate(20, 225)";
+                    tform = "translate(20, 215)";
                     break;
                 case "M":
-                    tform = "translate(20, 225)";
+                    tform = "translate(20, 215)";
                     break;
                 case "O":
-                    tform = "translate(20, 225)";
+                    tform = "translate(20, 215)";
                     break;
                 case "P":
-                    tform = "translate(20, 30)";
+                    tform = "translate(20, 20)";
                     break;
                 case "R":
-                    tform = "translate(20, 225)";
+                    tform = "translate(20, 215)";
                     break;
                 case "S":
-                    tform = "translate(20, 30)";
+                    tform = "translate(20, 20)";
                     break;
                 case "U":
-                    tform = "translate(20, 30)";
+                    tform = "translate(20, 10)";
                     break;
                 case "V":
-                    tform = "translate(20, 30)";
+                    tform = "translate(20, 20)";
                     break;
                 default:
-                    tform = "translate(20, 175)";
+                    tform = "translate(20, 165)";
             }
 
             d3.select("g#legend-count")

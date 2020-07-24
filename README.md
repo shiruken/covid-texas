@@ -7,7 +7,6 @@ https://covid-texas.csullender.com/
 ## Sources
 
 * Data from the [Texas DSHS](https://www.dshs.state.tx.us/coronavirus/additionaldata/)
-* Legend generated using [d3-legend by Susie Lu](https://d3-legend.susielu.com/)
 
 ## About the Data
 
