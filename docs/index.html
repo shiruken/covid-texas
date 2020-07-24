@@ -105,7 +105,7 @@
             font-weight: bold;
         }
 
-        path.line-purple, path.line-orange {
+        path.line-purple, path.line-orange, path.line-average {
             fill: none;
             stroke-width: 4;
         }
@@ -118,10 +118,16 @@
             stroke: #D95F02;
         }
 
+        path.line-average {
+            stroke: #000000;
+            stroke-width: 2;
+            stroke-dasharray: 3;
+        }
+
         .hover-line {
             stroke: #999999;
             stroke-width: 1px;
-            stroke-dasharray: 4,4;
+            stroke-dasharray: 4;
         }
 
         circle {
@@ -413,8 +419,15 @@
                 icu_beds_available = parseValue(d.icu_beds_available),
                 icu_beds_occupied = parseValue(d.icu_beds_occupied),
                 covid_inpatients = parseValue(d.covid_inpatients),
-                covid_icu_inpatients = parseValue(d.covid_icu_inpatients);
-                
+                covid_icu_inpatients = parseValue(d.covid_icu_inpatients),
+                percent_total_covid = 100 * covid_inpatients / total_beds_occupied,
+                percent_icu_covid = 100 * covid_icu_inpatients / icu_beds_occupied;
+
+                if (!isFinite(percent_total_covid))
+                    percent_total_covid = NaN;
+                if (!isFinite(percent_icu_covid))
+                    percent_icu_covid = NaN;
+
             return {
                 tsa: d.tsa,
                 location: d.location,
@@ -429,8 +442,8 @@
                 percent_icu_occupied: 100 * icu_beds_occupied / (icu_beds_occupied + icu_beds_available),
                 covid_inpatients: covid_inpatients,
                 covid_icu_inpatients: covid_icu_inpatients,
-                percent_total_covid: 100 * covid_inpatients / total_beds_occupied,
-                percent_icu_covid: 100 * covid_icu_inpatients / icu_beds_occupied
+                percent_total_covid: percent_total_covid,
+                percent_icu_covid: percent_icu_covid
             };
         }).then(function(data) {
 
@@ -441,13 +454,30 @@
             var tsaIDs = Object.keys(data);
             tsaIDs.unshift(tsaIDs.pop()); // Statewide Total should be first
 
+            // Compute simple moving average (7-day) for all metrics by TSA
+            tsaIDs.forEach(function(tsa) {
+                for (let i = 0; i < data[tsa].length; i++) {
+                    let slice = []
+                    if (i < 6)
+                        slice = data[tsa].slice(0, i + 1);
+                    else
+                        slice = data[tsa].slice(i - 6, i + 1);
+
+                    data[tsa][i].percent_total_occupied_sma = d3.mean(slice, d => d.percent_total_occupied);
+                    data[tsa][i].percent_total_covid_sma = d3.mean(slice, d => d.percent_total_covid);
+                    data[tsa][i].percent_icu_occupied_sma = d3.mean(slice, d => d.percent_icu_occupied);
+                    data[tsa][i].percent_icu_covid_sma = d3.mean(slice, d => d.percent_icu_covid);
+                    data[tsa][i].total_beds_sma = d3.mean(slice, d => d.total_beds);
+                    data[tsa][i].icu_beds_sma = d3.mean(slice, d => d.icu_beds);
+                }
+            });
+
             // Check for query string parameter defining the default TSA
             var url = new URL(window.location.href);
             var TSA = url.searchParams.get("tsa");
-            if (TSA === null || !tsaIDs.includes(TSA)) {
+            if (TSA === null || !tsaIDs.includes(TSA))
                 TSA = "Total"; // Default to Statewide Total
-            }
-
+            
             // Update subtitle
             let N = data[TSA].length - 1;
             d3.select("#subtitle").text("Trauma Service Area (TSA) data updated on "
@@ -509,6 +539,15 @@
                     .defined(function(d) { return !isNaN(d.percent_total_occupied); })
                 );
 
+            var plot_usage_total_sma = svg_total.append("path")
+                .datum(data[TSA])
+                .classed("line-average", true)
+                .attr("d", d3.line()
+                    .x(function(d) { return x_total(d.date); })
+                    .y(function(d) { return y(d.percent_total_occupied_sma); })
+                    .defined(function(d) { return !isNaN(d.percent_total_occupied_sma); })
+                );
+
             var plot_covid_total = svg_total.append("path")
                 .datum(data[TSA])
                 .classed("line-orange", true)
@@ -516,6 +555,15 @@
                     .x(function(d) { return x_total(d.date); })
                     .y(function(d) {return y(d.percent_total_covid); })
                     .defined(function(d) { return !isNaN(d.percent_total_covid); })
+                );
+
+            var plot_covid_total_sma = svg_total.append("path")
+                .datum(data[TSA])
+                .classed("line-average", true)
+                .attr("d", d3.line()
+                    .x(function(d) { return x_total(d.date); })
+                    .y(function(d) {return y(d.percent_total_covid_sma); })
+                    .defined(function(d) { return !isNaN(d.percent_total_covid_sma); })
                 );
 
             var title_total = svg_total.append("text")
@@ -621,6 +669,15 @@
                     .defined(function(d) { return !isNaN(d.percent_icu_occupied); })
                 );
 
+            var plot_usage_icu_sma = svg_icu.append("path")
+                .datum(data[TSA])
+                .classed("line-average", true)
+                .attr("d", d3.line()
+                    .x(function(d) { return x_icu(d.date); })
+                    .y(function(d) { return y(d.percent_icu_occupied_sma); })
+                    .defined(function(d) { return !isNaN(d.percent_icu_occupied_sma); })
+                );
+
             var plot_covid_icu = svg_icu.append("path")
                 .datum(data[TSA])
                 .classed("line-orange", true)
@@ -628,6 +685,15 @@
                     .x(function(d) { return x_icu(d.date); })
                     .y(function(d) {return y(d.percent_icu_covid); })
                     .defined(function(d) {return !isNaN(d.percent_icu_covid); })
+                );
+                
+            var plot_covid_icu_sma = svg_icu.append("path")
+                .datum(data[TSA])
+                .classed("line-average", true)
+                .attr("d", d3.line()
+                    .x(function(d) { return x_icu(d.date); })
+                    .y(function(d) {return y(d.percent_icu_covid_sma); })
+                    .defined(function(d) {return !isNaN(d.percent_icu_covid_sma); })
                 );
 
             moveICULegend(TSA, 0);
@@ -752,6 +818,15 @@
                     .defined(function(d) { return !isNaN(d.total_beds); })
                 );
 
+            var plot_bed_count_sma = svg_count.append("path")
+                .datum(data[TSA])
+                .classed("line-average", true)
+                .attr("d", d3.line()
+                    .x(function(d) { return x_total(d.date); })
+                    .y(function(d) { return y_count(d.total_beds_sma); })
+                    .defined(function(d) { return !isNaN(d.total_beds_sma); })
+                );
+
             var plot_icu_count = svg_count.append("path")
                 .datum(data[TSA])
                 .classed("line-orange", true)
@@ -759,6 +834,15 @@
                     .x(function(d) { return x_total(d.date); })
                     .y(function(d) {return y_count(d.icu_beds); })
                     .defined(function(d) { return !isNaN(d.icu_beds); })
+                );
+
+            var plot_icu_count_sma = svg_count.append("path")
+                .datum(data[TSA])
+                .classed("line-average", true)
+                .attr("d", d3.line()
+                    .x(function(d) { return x_total(d.date); })
+                    .y(function(d) {return y_count(d.icu_beds_sma); })
+                    .defined(function(d) { return !isNaN(d.icu_beds_sma); })
                 );
 
             moveCountLegend(TSA, 0);
@@ -893,6 +977,15 @@
                         .defined(function(d) { return !isNaN(d.percent_total_occupied); })
                     );
 
+                plot_usage_total_sma.datum(data[TSA])
+                    .transition()
+                    .duration(250)
+                    .attr("d", d3.line()
+                        .x(function(d) { return x_total(d.date); })
+                        .y(function(d) { return y(d.percent_total_occupied_sma); })
+                        .defined(function(d) { return !isNaN(d.percent_total_occupied_sma); })
+                    );
+
                 // Draw new total hospital bed COVID-19 usage line
                 plot_covid_total.datum(data[TSA])
                     .transition()
@@ -901,6 +994,15 @@
                         .x(function(d) { return x_total(d.date); })
                         .y(function(d) {return y(d.percent_total_covid); })
                         .defined(function(d) { return !isNaN(d.percent_total_covid); })
+                    );
+
+                plot_covid_total_sma.datum(data[TSA])
+                    .transition()
+                    .duration(250)
+                    .attr("d", d3.line()
+                        .x(function(d) { return x_total(d.date); })
+                        .y(function(d) {return y(d.percent_total_covid_sma); })
+                        .defined(function(d) { return !isNaN(d.percent_total_covid_sma); })
                     );
 
                 // Draw new ICU bed usage line
@@ -913,6 +1015,15 @@
                         .defined(function(d) { return !isNaN(d.percent_icu_occupied); })
                     );
 
+                plot_usage_icu_sma.datum(data[TSA])
+                    .transition()
+                    .duration(250)
+                    .attr("d", d3.line()
+                        .x(function(d) { return x_icu(d.date); })
+                        .y(function(d) { return y(d.percent_icu_occupied_sma); })
+                        .defined(function(d) { return !isNaN(d.percent_icu_occupied_sma); })
+                    );
+
                 // Draw new ICU bed COVID-19 usage line
                 plot_covid_icu.datum(data[TSA])
                     .transition()
@@ -921,6 +1032,15 @@
                         .x(function(d) { return x_icu(d.date); })
                         .y(function(d) {return y(d.percent_icu_covid); })
                         .defined(function(d) { return !isNaN(d.percent_icu_covid); })
+                    );
+
+                plot_covid_icu_sma.datum(data[TSA])
+                    .transition()
+                    .duration(250)
+                    .attr("d", d3.line()
+                        .x(function(d) { return x_icu(d.date); })
+                        .y(function(d) {return y(d.percent_icu_covid_sma); })
+                        .defined(function(d) { return !isNaN(d.percent_icu_covid_sma); })
                     );
 
                 // Draw new total bed count line
@@ -933,6 +1053,15 @@
                         .defined(function(d) { return !isNaN(d.total_beds); })
                     );
 
+                plot_bed_count_sma.datum(data[TSA])
+                    .transition()
+                    .duration(250)
+                    .attr("d", d3.line()
+                        .x(function(d) { return x_total(d.date); })
+                        .y(function(d) { return y_count(d.total_beds_sma); })
+                        .defined(function(d) { return !isNaN(d.total_beds_sma); })
+                    );
+
                 // Draw new ICU bed count line
                 plot_icu_count.datum(data[TSA])
                     .transition()
@@ -941,6 +1070,15 @@
                         .x(function(d) { return x_total(d.date); })
                         .y(function(d) { return y_count(d.icu_beds); })
                         .defined(function(d) { return !isNaN(d.icu_beds); })
+                    );
+
+                plot_icu_count_sma.datum(data[TSA])
+                    .transition()
+                    .duration(250)
+                    .attr("d", d3.line()
+                        .x(function(d) { return x_total(d.date); })
+                        .y(function(d) { return y_count(d.icu_beds_sma); })
+                        .defined(function(d) { return !isNaN(d.icu_beds_sma); })
                     );
 
                 // Update titles
