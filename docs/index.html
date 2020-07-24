@@ -105,6 +105,19 @@
             font-weight: bold;
         }
 
+        path.line-purple, path.line-orange {
+            fill: none;
+            stroke-width: 4;
+        }
+
+        path.line-purple {
+            stroke: #7570B3;
+        }
+
+        path.line-orange {
+            stroke: #D95F02;
+        }
+
         .hover-line {
             stroke: #999999;
             stroke-width: 1px;
@@ -489,9 +502,7 @@
 
             var plot_usage_total = svg_total.append("path")
                 .datum(data[TSA])
-                .attr("fill", "none")
-                .attr("stroke", "#7570B3")
-                .attr("stroke-width", 4)
+                .classed("line-purple", true)
                 .attr("d", d3.line()
                     .x(function(d) { return x_total(d.date); })
                     .y(function(d) { return y(d.percent_total_occupied); })
@@ -500,9 +511,7 @@
 
             var plot_covid_total = svg_total.append("path")
                 .datum(data[TSA])
-                .attr("fill", "none")
-                .attr("stroke", "#D95F02")
-                .attr("stroke-width", 4)
+                .classed("line-orange", true)
                 .attr("d", d3.line()
                     .x(function(d) { return x_total(d.date); })
                     .y(function(d) {return y(d.percent_total_covid); })
@@ -605,9 +614,7 @@
 
             var plot_usage_icu = svg_icu.append("path")
                 .datum(data[TSA])
-                .attr("fill", "none")
-                .attr("stroke", "#7570B3")
-                .attr("stroke-width", 4)
+                .classed("line-purple", true)
                 .attr("d", d3.line()
                     .x(function(d) { return x_icu(d.date); })
                     .y(function(d) { return y(d.percent_icu_occupied); })
@@ -616,9 +623,7 @@
 
             var plot_covid_icu = svg_icu.append("path")
                 .datum(data[TSA])
-                .attr("fill", "none")
-                .attr("stroke", "#D95F02")
-                .attr("stroke-width", 4)
+                .classed("line-orange", true)
                 .attr("d", d3.line()
                     .x(function(d) { return x_icu(d.date); })
                     .y(function(d) {return y(d.percent_icu_covid); })
@@ -740,9 +745,7 @@
 
             var plot_bed_count = svg_count.append("path")
                 .datum(data[TSA])
-                .attr("fill", "none")
-                .attr("stroke", "#7570B3")
-                .attr("stroke-width", 4)
+                .classed("line-purple", true)
                 .attr("d", d3.line()
                     .x(function(d) { return x_total(d.date); })
                     .y(function(d) { return y_count(d.total_beds); })
@@ -751,9 +754,7 @@
 
             var plot_icu_count = svg_count.append("path")
                 .datum(data[TSA])
-                .attr("fill", "none")
-                .attr("stroke", "#D95F02")
-                .attr("stroke-width", 4)
+                .classed("line-orange", true)
                 .attr("d", d3.line()
                     .x(function(d) { return x_total(d.date); })
                     .y(function(d) {return y_count(d.icu_beds); })
