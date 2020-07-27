@@ -103,36 +103,40 @@
         text.chartTitle {
             font-size: 1.1em;
             font-weight: bold;
+            text-anchor: middle;
         }
 
-        #total-beds-used circle, #icu-beds-used circle, #total-bed-count circle {
+        .purple circle, circle.purple {
             fill: #7570B3;
         }
 
-        #total-beds-covid circle, #icu-beds-covid circle, #icu-bed-count circle {
+        .orange circle, circle.orange {
             fill: #D95F02;
         }
 
-        #total-beds-used path, #total-beds-covid path,
-        #icu-beds-used path, #icu-beds-covid path,
-        #total-bed-count path, #icu-bed-count path {
+        .data path {
             fill: none;
             stroke-width: 4;
             stroke-linecap: round;
         }
 
-        #total-beds-used path, #icu-beds-used path, #total-bed-count path {
+        .purple path {
             stroke: #7570B3;
         }
 
-        #total-beds-covid path, #icu-beds-covid path, #icu-bed-count path {
+        .orange path {
             stroke: #D95F02;
         }
 
-        .hover-line {
+        line.hover-line {
             stroke: #999999;
             stroke-width: 1px;
             stroke-dasharray: 4;
+        }
+
+        rect.overlay {
+            fill: none;
+            pointer-events: all;
         }
 
         .note line {
@@ -145,14 +149,6 @@
             font-size: 0.8em;
             fill: #999999;
             white-space: pre;
-        }
-
-        .legend .purple {
-            fill: #7570B3;
-        }
-
-        .legend .orange {
-            fill: #D95F02;
         }
 
         .legend line {
@@ -294,89 +290,24 @@
             .ticks(5);
 
         // Total Hospital Bed Usage Chart
-        var svg_total = d3.select('#chart-hospital-beds')
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        svg_total.append('g')
-            .attr('class', 'yAxisGrid')
-            .call(yAxisGrid);
-
-        svg_total.append("g")
-            .attr('class', 'yAxis')
-            .call(yAxis);
-
-        var hover_line_total = svg_total.append("line")
-            .attr("class", "hover-line")
-            .attr("x1", width)
-            .attr("x2", width)
-            .attr("y1", 0)
-            .attr("y2", height)
-            .style("opacity", 0);
-
-        createLegend(svg_total, "Hospital Beds Used", "Used Beds with COVID-19");
-
-        svg_total.append("g").attr("id", "total-beds-used");
-        svg_total.append("g").attr("id", "total-beds-covid");
+        const svg_total = createChartFramework("#chart-hospital-beds");
+        svg_total.select(".yAxisGrid").call(yAxisGrid);
+        svg_total.select(".yAxis").call(yAxis);
+        let hover_line_total = svg_total.select(".hover-line");
+        createLegend("#chart-hospital-beds", "Hospital Beds Used", "Used Beds with COVID-19");
 
         // ICU Bed Usage Chart
-        var svg_icu = d3.select('#chart-icu-beds')
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-            
-        svg_icu.append('g')
-            .attr('class', 'yAxisGrid')
-            .call(yAxisGrid);
-
-        svg_icu.append("g")
-            .attr('class', 'yAxis')
-            .call(yAxis);
-
-        var hover_line_icu = svg_icu.append("line")
-            .attr("class", "hover-line")
-            .attr("x1", width)
-            .attr("x2", width)
-            .attr("y1", 0)
-            .attr("y2", height)
-            .style("opacity", 0);
-
-        createLegend(svg_icu, "ICU Beds Used", "Used ICU Beds with COVID-19");
-
-        svg_icu.append("g").attr("id", "icu-beds-used");
-        svg_icu.append("g").attr("id", "icu-beds-covid");
+        const svg_icu = createChartFramework("#chart-icu-beds");
+        svg_icu.select(".yAxisGrid").call(yAxisGrid);
+        svg_icu.select(".yAxis").call(yAxis);
+        let hover_line_icu = svg_icu.select(".hover-line");
+        createLegend("#chart-icu-beds", "ICU Beds Used", "Used ICU Beds with COVID-19");
 
         // Bed Count Chart
-        var svg_count = d3.select('#chart-bed-count')
-            .append("svg")
-            .attr("width", width + margin.left + margin.right)
-            .attr("height", height + margin.top + margin.bottom)
-            .append("g")
-            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+        const svg_count = createChartFramework("#chart-bed-count");
+        var hover_line_count = svg_count.select(".hover-line");
+        createLegend("#chart-bed-count", "Staffed Hospital Beds", "Total ICU Beds");
 
-        svg_count.append('g')
-            .attr('class', 'yAxisGrid');
-
-        svg_count.append("g")
-            .attr('class', 'yAxis');
-
-        var hover_line_count = svg_count.append("line")
-            .attr("class", "hover-line")
-            .attr("x1", width)
-            .attr("x2", width)
-            .attr("y1", 0)
-            .attr("y2", height)
-            .style("opacity", 0);
-
-        createLegend(svg_count, "Staffed Hospital Beds", "Total ICU Beds");
-
-        svg_count.append("g").attr("id", "total-bed-count");
-        svg_count.append("g").attr("id", "icu-bed-count");
 
         var parseDate = d3.timeParse("%Y-%m-%d");
         var formatDate = d3.timeFormat("%B %e, %Y");
@@ -480,13 +411,10 @@
                 .domain(xExtent_total)
                 .range([0, width]);
             
-            var xAxis_total = svg_total.append("g")
-                .attr('class', 'xAxis')
-                .attr("transform", "translate(0," + height + ")")
+            var xAxis_total = svg_total.select(".xAxis")
                 .call(d3.axisBottom(x_total));
 
-            var note_total = svg_total.append('g')
-                .attr("class", "note")
+            var note_total = svg_total.select(".note")
                 .style("opacity", TSA === "Total" ? 1 : 0);
 
             note_total.append("line")
@@ -503,32 +431,17 @@
 
             updateTotalBedChart(data[TSA], 0);
 
-            var title_total = svg_total.append("text")
-                .attr("x", (width / 2))
-                .attr("y", 0 - (margin.top / 2))
-                .attr("text-anchor", "middle")
-                .attr('class', 'chartTitle');
+            var title_total = svg_total.select(".chartTitle");
             if (TSA === "Total")
                 title_total.text("Statewide Hospital Bed Usage");
             else
                 title_total.text("Hospital Bed Usage in " + data[TSA][0].location + " (TSA-" + data[TSA][0].tsa + ")");
 
-            var focus_circle_usage_total = svg_total.append("circle")
-                .attr("r", 5)
-                .attr("fill", "#7570B3")
-                .style("opacity", 0);
+            var focus_circle_usage_total = svg_total.select("circle.focus.purple");
+            var focus_circle_covid_total = svg_total.select("circle.focus.orange");
 
-            var focus_circle_covid_total = svg_total.append("circle")
-                .attr("r", 5)
-                .attr("fill", "#D95F02")
-                .style("opacity", 0);
-
-            var overlay_total = svg_total.append('rect')
+            var overlay_total = svg_total.select(".overlay")
                 .datum(data[TSA])
-                .style("fill", "none")
-                .style("pointer-events", "all")
-                .attr('width', width)
-                .attr('height', height)
                 .on("mouseover", function() { 
                     focus_circle_usage_total.style("opacity", 1);
                     focus_circle_covid_total.style("opacity", 1);
@@ -565,13 +478,10 @@
                 .domain(xExtent_icu)
                 .range([0, width]);
             
-            var xAxis_icu = svg_icu.append("g")
-                .attr('class', 'xAxis')
-                .attr("transform", "translate(0," + height + ")")
+            var xAxis_icu = svg_icu.select(".xAxis")
                 .call(d3.axisBottom(x_icu));
 
-            var note_icu = svg_icu.append('g')
-                .attr("class", "note")
+            var note_icu = svg_icu.select(".note")
                 .style("opacity", TSA === "Total" ? 1 : 0);
 
             note_icu.append("line")
@@ -588,32 +498,17 @@
 
             updateICUBedChart(data[TSA], 0);
 
-            var title_icu = svg_icu.append("text")
-                .attr("x", (width / 2))             
-                .attr("y", 0 - (margin.top / 2))
-                .attr("text-anchor", "middle")  
-                .attr('class', 'chartTitle');
+            var title_icu = svg_icu.select(".chartTitle");
             if (TSA === "Total")
                 title_icu.text("Statewide ICU Bed Usage");
             else
                 title_icu.text("ICU Bed Usage in " + data[TSA][0].location + " (TSA-" + data[TSA][0].tsa + ")");
 
-            var focus_circle_usage_icu = svg_icu.append("circle")
-                .attr("r", 5)
-                .attr("fill", "#7570B3")
-                .style("opacity", 0);
+            var focus_circle_usage_icu = svg_icu.select("circle.focus.purple");
+            var focus_circle_covid_icu = svg_icu.select("circle.focus.orange");
 
-            var focus_circle_covid_icu = svg_icu.append("circle")
-                .attr("r", 5)
-                .attr("fill", "#D95F02")
-                .style("opacity", 0);
-
-            var overlay_icu = svg_icu.append('rect')
+            var overlay_icu = svg_icu.select('.overlay')
                 .datum(data[TSA])
-                .style("fill", "none")
-                .style("pointer-events", "all")
-                .attr('width', width)
-                .attr('height', height)
                 .on("mouseover", function() {
                     focus_circle_usage_icu.style("opacity", 1);
                     focus_circle_covid_icu.style("opacity", 1);
@@ -645,10 +540,8 @@
                 });
 
 
-            // Bed Count Chart            
-            var xAxis_count = svg_count.append("g")
-                .attr('class', 'xAxis')
-                .attr("transform", "translate(0," + height + ")")
+            // Bed Count Chart    
+            var xAxis_count = svg_count.select(".xAxis")
                 .call(d3.axisBottom(x_total));
 
             var yMax_count = d3.max(data[TSA], function(d) {return d.total_beds;} );
@@ -664,16 +557,13 @@
                 .tickFormat('')
                 .ticks(4);
 
-            var yAxiGrid_count = svg_count.append('g')
-                .attr('class', 'yAxisGrid')
+            var yAxiGrid_count = svg_count.select(".yAxisGrid")
                 .call(yAxisGrid_format_count);
 
-            var yAxis_count = svg_count.append("g")
-                .attr('class', 'yAxis')
+            var yAxis_count = svg_count.select(".yAxis")
                 .call(yAxis_format_count);
 
-            var note_count = svg_count.append('g')
-                .attr("class", "note")
+            var note_count = svg_count.select(".note")
                 .style("opacity", TSA === "Total" ? 1 : 0);
 
             note_count.append("line")
@@ -690,32 +580,17 @@
 
             updateCountChart(data[TSA], 0);
 
-            var title_count = svg_count.append("text")
-                    .attr("x", (width / 2))             
-                    .attr("y", 0 - (margin.top / 2))
-                    .attr("text-anchor", "middle")  
-                    .attr('class', 'chartTitle')
+            var title_count = svg_count.select(".chartTitle");
             if (TSA === "Total")
                 title_count.text("Statewide Total Hospital Resources");
             else
                 title_count.text("Total Hospital Resources in " + data[TSA][0].location + " (TSA-" + data[TSA][0].tsa + ")");
                 
-            var focus_circle_bed_count = svg_count.append("circle")
-                .attr("r", 6)
-                .attr("fill", "#7570B3")
-                .style("opacity", 0);
+            var focus_circle_bed_count = svg_count.select("circle.focus.purple");
+            var focus_circle_icu_count = svg_count.select("circle.focus.orange");
 
-            var focus_circle_icu_count = svg_count.append("circle")
-                .attr("r", 6)
-                .attr("fill", "#D95F02")
-                .style("opacity", 0);
-
-            var overlay_count = svg_count.append('rect')
+            var overlay_count = svg_count.select(".overlay")
                 .datum(data[TSA])
-                .style("fill", "none")
-                .style("pointer-events", "all")
-                .attr('width', width)
-                .attr('height', height)
                 .on("mouseover", function() { 
                     focus_circle_bed_count.style("opacity", 1);
                     focus_circle_icu_count.style("opacity", 1);
@@ -844,62 +719,25 @@
                 updateICUDetails(data[TSA][N]);
                 updateCountDetails(data[TSA][N]);
 
-                // Move focus circles to new coordinates
-                focus_circle_usage_total
-                    .transition()
-                    .duration(250)
-                    .attr("cx", x_total(data[TSA][N].date))
-                    .attr("cy", y(data[TSA][N].percent_total_occupied));
-
-                focus_circle_covid_total
-                    .transition()
-                    .duration(250)
-                    .attr("cx", x_total(data[TSA][N].date))
-                    .attr("cy", y(data[TSA][N].percent_total_covid));
-
-                focus_circle_usage_icu
-                    .transition()
-                    .duration(250)
-                    .attr("cx", x_icu(data[TSA][N].date))
-                    .attr("cy", y(data[TSA][N].percent_icu_occupied));
-
-                focus_circle_covid_icu
-                    .transition()
-                    .duration(250)
-                    .attr("cx", x_icu(data[TSA][N].date))
-                    .attr("cy", y(data[TSA][N].percent_icu_covid));
-
-                focus_circle_bed_count
-                    .transition()
-                    .duration(250)
-                    .attr("cx", x_total(data[TSA][N].date))
-                    .attr("cy", y_count(data[TSA][N].total_beds));
-
-                focus_circle_icu_count
-                    .transition()
-                    .duration(250)
-                    .attr("cx", x_total(data[TSA][N].date))
-                    .attr("cy", y_count(data[TSA][N].icu_beds));
-
             });
 
             function updateTotalBedChart(data, duration) {
 
                 // Total Hospital Bed Usage
                 let filtered = filterData(data, "percent_total_occupied", x_total, y);
-                drawScatterPlot("#total-beds-used", filtered, duration);
+                drawScatterPlot("#chart-hospital-beds .data.purple", filtered, duration);
 
                 // Total Hospital Bed Usage - Simple Moving Average
                 filtered = filterData(data, "percent_total_occupied_sma", x_total, y);
-                drawLinePlot("#total-beds-used", filtered, duration);
+                drawLinePlot("#chart-hospital-beds .data.purple", filtered, duration);
 
                 // Total Hospital Bed COVID-19 Usage
                 filtered = filterData(data, "percent_total_covid", x_total, y);
-                drawScatterPlot("#total-beds-covid", filtered, duration);
+                drawScatterPlot("#chart-hospital-beds .data.orange", filtered, duration);
 
                 // Total Hospital Bed COVID-19 Usage - Simple Moving Average
                 filtered = filterData(data, "percent_total_covid_sma", x_total, y);
-                drawLinePlot("#total-beds-covid", filtered, duration);
+                drawLinePlot("#chart-hospital-beds .data.orange", filtered, duration);
 
             }
 
@@ -908,19 +746,19 @@
 
                 // Total Hospital Bed Usage
                 let filtered = filterData(data, "percent_icu_occupied", x_icu, y);
-                drawScatterPlot("#icu-beds-used", filtered, duration);
+                drawScatterPlot("#chart-icu-beds .data.purple", filtered, duration);
 
                 // Total Hospital Bed Usage - Simple Moving Average
                 filtered = filterData(data, "percent_icu_occupied_sma", x_icu, y);
-                drawLinePlot("#icu-beds-used", filtered, duration);
+                drawLinePlot("#chart-icu-beds .data.purple", filtered, duration);
 
                 // Total Hospital Bed COVID-19 Usage
                 filtered = filterData(data, "percent_icu_covid", x_icu, y);
-                drawScatterPlot("#icu-beds-covid", filtered, duration);
+                drawScatterPlot("#chart-icu-beds .data.orange", filtered, duration);
 
                 // Total Hospital Bed COVID-19 Usage - Simple Moving Average
                 filtered = filterData(data, "percent_icu_covid_sma", x_icu, y);
-                drawLinePlot("#icu-beds-covid", filtered, duration);
+                drawLinePlot("#chart-icu-beds .data.orange", filtered, duration);
 
                 moveICULegend(tsa, duration);
             }
@@ -930,19 +768,19 @@
 
                 // Total Staffed Hospital Bed Count
                 let filtered = filterData(data, "total_beds", x_total, y_count);
-                drawScatterPlot("#total-bed-count", filtered, duration);
+                drawScatterPlot("#chart-bed-count .data.purple", filtered, duration);
 
                 // Total Staffed Hospital Bed Count - Simple Moving Average
                 filtered = filterData(data, "total_beds_sma", x_total, y_count);
-                drawLinePlot("#total-bed-count", filtered, duration);
+                drawLinePlot("#chart-bed-count .data.purple", filtered, duration);
 
                 // Total ICU Bed Count
                 filtered = filterData(data, "icu_beds", x_total, y_count);
-                drawScatterPlot("#icu-bed-count", filtered, duration);
+                drawScatterPlot("#chart-bed-count .data.orange", filtered, duration);
 
                 // Total ICU Bed Count - Simple Moving Average
                 filtered = filterData(data, "icu_beds_sma", x_total, y_count);
-                drawLinePlot("#icu-bed-count", filtered, duration);
+                drawLinePlot("#chart-bed-count .data.orange", filtered, duration);
 
                 moveCountLegend(tsa, duration);
 
@@ -970,10 +808,76 @@
             return [d3.timeDay.offset(min, -1), d3.timeDay.offset(max, 1)]
         }
         
-        function createLegend(element, label1, label2) {
-            let legend = element.append("svg:g")
+        function createChartFramework(selector) {
+            let svg = d3.select(selector)
+                .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            svg.append("g")
+                .classed("yAxisGrid", true);
+
+            svg.append("g")
+                .classed("yAxis", true);
+
+            svg.append("g")
+                .classed("xAxis", true)
+                .attr("transform", "translate(0, " + height + ")");
+
+            svg.append("line")
+                .classed("hover-line", true)
+                .attr("x1", width)
+                .attr("x2", width)
+                .attr("y1", 0)
+                .attr("y2", height)
+                .style("opacity", 0);
+
+            svg.append("g")
                 .classed("legend", true)
                 .attr("transform", "translate(20, 10)");
+
+            svg.append("g")
+                .classed("note", true)
+                .style("opacity", 0);
+
+            svg.append("g")
+                .classed("data", true)
+                .classed("purple", true);
+
+            svg.append("g")
+                .classed("data", true)
+                .classed("orange", true);
+
+            svg.append("circle")
+                .classed("focus", true)
+                .classed("purple", true)
+                .attr("r", 5)
+                .style("opacity", 0);
+
+            svg.append("circle")
+                .classed("focus", true)
+                .classed("orange", true)
+                .attr("r", 5)
+                .style("opacity", 0);
+
+            svg.append("text")
+                .classed("chartTitle", true)
+                .attr("x", (width / 2))
+                .attr("y", 0 - (margin.top / 2));
+
+            svg.append("rect")
+                .classed("overlay", true)
+                .attr("width", width)
+                .attr("height", height);
+
+            return svg;
+        }
+
+        function createLegend(selector, label1, label2) {
+            let legend = d3.select(selector)
+                .select(".legend");
 
             legend.append("circle")
                 .classed("purple", true)
