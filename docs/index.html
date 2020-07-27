@@ -848,88 +848,90 @@
                 });
         }
 
+        // Format valid numbers to local string
+        function formatNumber(value) {
+            if (isNaN(value))
+                return "NA";
+            else
+                return value.toLocaleString();
+        }
+
+        // Format valid numbers to local string with percent sign
+        function formatPercent(value) {
+            let options = {minimumFractionDigits: 0, maximumFractionDigits: 0};
+            if (isNaN(value))
+                return "NA";
+            else
+                return value.toLocaleString(undefined, options) + "%";
+        }
+
         // Update Total Hospital Bed details
         function updateTotalDetails(data) {
-            let options = {minimumFractionDigits: 0, maximumFractionDigits: 0};
             d3.select("#data-hospital-beds").html("" +
                 "<h4>" + formatDate(data.date) + "</h4>" +
                 "<h3>" +
-                    "<strong class='bed-number'>" + 
-                    data.percent_total_occupied.toLocaleString(undefined, options) + 
-                    "%</strong> of beds used" + 
+                    "<strong class='bed-number'>" + formatPercent(data.percent_total_occupied) + "</strong> of beds used" + 
                 "</h3>" +
                 "<h3>" + 
-                    "<strong class='covid-number'>" + 
-                    data.percent_total_covid.toLocaleString(undefined, options) + 
-                    "%</strong> of used beds have COVID-19 patients" +
+                    "<strong class='covid-number'>" + formatPercent(data.percent_total_covid) + "</strong> of used beds have COVID-19 patients" +
                 "</h3>" + 
                 "<dl>" +
                     "<dt>Staffed Hospital Beds</dt>" +
-                    "<dd>" + (data.total_beds_available + data.total_beds_occupied).toLocaleString() + "</dd>" +
+                    "<dd>" + formatNumber(data.total_beds) + "</dd>" +
                     "<dt>Occupied Hospital Beds</dt>" +
-                    "<dd>" + data.total_beds_occupied.toLocaleString() + "</dd>" +
+                    "<dd>" + formatNumber(data.total_beds_occupied) + "</dd>" +
                     "<dt>Available Hospital Beds</dt>" +
-                    "<dd>" + data.total_beds_available.toLocaleString() + "</dd>" +
+                    "<dd>" + formatNumber(data.total_beds_available) + "</dd>" +
                     "<dt>COVID-19 Patients</dt>" +
-                    "<dd>" + data.covid_inpatients.toLocaleString() + "</dd>" +
+                    "<dd>" + formatNumber(data.covid_inpatients) + "</dd>" +
                 "</dl>"
             );
         }
 
         // Update ICU Bed details
         function updateICUDetails(data) {
-            let options = {minimumFractionDigits: 0, maximumFractionDigits: 0};
             d3.select("#data-icu-beds").html("" +
                 "<h4>" + formatDate(data.date) + "</h4>" +
                 "<h3>" +
-                    "<strong class='bed-number'>" + 
-                    data.percent_icu_occupied.toLocaleString(undefined, options) + 
-                    "%</strong> of ICU beds used" + 
+                    "<strong class='bed-number'>" + formatPercent(data.percent_icu_occupied) + "</strong> of ICU beds used" + 
                 "</h3>" +
                 "<h3>" + 
-                    "<strong class='covid-number'>" + 
-                    data.percent_icu_covid.toLocaleString(undefined, options) + 
-                    "%</strong> of used ICU beds have COVID-19 patients" +
+                    "<strong class='covid-number'>" + formatPercent(data.percent_icu_covid) + "</strong> of used ICU beds have COVID-19 patients" +
                 "</h3>" + 
                 "<dl>" +
                     "<dt>Total ICU Beds</dt>" +
-                    "<dd>" + (data.icu_beds_available + data.icu_beds_occupied).toLocaleString() + "</dd>" +
+                    "<dd>" + formatNumber(data.icu_beds) + "</dd>" +
                     "<dt>Occupied ICU Beds</dt>" +
-                    "<dd>" + data.icu_beds_occupied.toLocaleString() + "</dd>" +
+                    "<dd>" + formatNumber(data.icu_beds_occupied) + "</dd>" +
                     "<dt>Available ICU Beds</dt>" +
-                    "<dd>" + data.icu_beds_available.toLocaleString() + "</dd>" +
+                    "<dd>" + formatNumber(data.icu_beds_available) + "</dd>" +
                     "<dt>COVID-19 ICU Patients</dt>" +
-                    "<dd>" + data.covid_icu_inpatients.toLocaleString() + "</dd>" +
+                    "<dd>" + formatNumber(data.covid_icu_inpatients) + "</dd>" +
                 "</dl>"
             );
         }
 
         // Update Bed Count details
         function updateCountDetails(data) {
-            let options = {minimumFractionDigits: 0, maximumFractionDigits: 0};
             d3.select("#data-bed-count").html("" +
                 "<h4>" + formatDate(data.date) + "</h4>" +
                 "<h3>" +
-                    "<strong class='bed-number'>" + 
-                    (isNaN(data.total_beds) ? 'NA' : data.total_beds.toLocaleString(undefined, options)) + 
-                    "</strong> staffed beds" + 
+                    "<strong class='bed-number'>" + formatNumber(data.total_beds) + "</strong> staffed beds" + 
                 "</h3>" +
                 "<dl>" +
                     "<dt>Occupied</dt>" +
-                    "<dd>" + (isNaN(data.total_beds_occupied) ? 'NA' : data.total_beds_occupied.toLocaleString()) + "</dd>" +
+                    "<dd>" + formatNumber(data.total_beds_occupied) + "</dd>" +
                     "<dt>Available</dt>" +
-                    "<dd>" + data.total_beds_available.toLocaleString() + "</dd>" +
+                    "<dd>" + formatNumber(data.total_beds_available) + "</dd>" +
                 "</dl>" +
                 "<h3>" + 
-                    "<strong class='covid-number'>" + 
-                    (isNaN(data.icu_beds_occupied) ? 'NA' : data.icu_beds.toLocaleString(undefined, options)) + 
-                    "</strong> total ICU beds" +
+                    "<strong class='covid-number'>" + formatNumber(data.icu_beds) + "</strong> total ICU beds" +
                 "</h3>" + 
                 "<dl>" +
                     "<dt>Occupied</dt>" +
-                    "<dd>" + (isNaN(data.icu_beds_occupied) ? 'NA' : data.icu_beds_occupied.toLocaleString()) + "</dd>" +
+                    "<dd>" + formatNumber(data.icu_beds_occupied) + "</dd>" +
                     "<dt>Available</dt>" +
-                    "<dd>" + data.icu_beds_available.toLocaleString() + "</dd>" +
+                    "<dd>" + formatNumber(data.icu_beds_available) + "</dd>" +
                 "</dl>"
             );
         }
