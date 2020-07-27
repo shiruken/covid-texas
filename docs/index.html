@@ -145,7 +145,7 @@
             stroke-dasharray: 2,2;
         }
 
-        .note text {
+        .note text, .warning text {
             font-size: 0.8em;
             fill: #999999;
             white-space: pre;
@@ -156,6 +156,10 @@
             stroke: #000000;
             stroke-width: 4;
             stroke-linecap: round;
+        }
+
+        .warning rect {
+            fill: #F2DEDE;
         }
 
         div.data {
@@ -455,9 +459,18 @@
                 updateOverlay("#chart-hospital-beds", data, "percent_total_occupied", "percent_total_covid",
                               xExtent, xScale, yScale, updateTotalDetails);
                     
+                // Update warning region
+                let x_warning = xScale(parseDate('2020-07-23'));
+                let width_warning = xScale(parseDate('2020-07-27')) - xScale(parseDate('2020-07-23'));
+                updateWarning("#chart-hospital-beds", x_warning, width_warning, duration);
+
                 // Update note
-                if (tsa === "Total")
-                    updateNotePosition("#chart-hospital-beds", xScale(parseDate('2020-05-29')), yScale(15), yScale(13));
+                if (tsa === "Total") {
+                    let x_note = xScale(parseDate('2020-05-29'));
+                    let y_line_note = yScale(15);
+                    let y_text_note = yScale(13);
+                    updateNotePosition("#chart-hospital-beds",  x_note, y_line_note, y_text_note);
+                }                    
                 chart.select(".note")
                     .transition()
                     .duration(duration)
@@ -523,9 +536,18 @@
                 updateOverlay("#chart-icu-beds", data, "percent_icu_occupied", "percent_icu_covid",
                               xExtent, xScale, yScale, updateICUDetails);
 
+                // Update warning region
+                let x_warning = xScale(parseDate('2020-07-23'));
+                let width_warning = xScale(parseDate('2020-07-27')) - xScale(parseDate('2020-07-23'));
+                updateWarning("#chart-icu-beds", x_warning, width_warning, duration);
+
                 // Update note
-                if (tsa === "Total")
-                    updateNotePosition("#chart-icu-beds", xScale(parseDate('2020-05-29')), yScale(30), yScale(28));
+                if (tsa === "Total") {
+                    let x_note = xScale(parseDate('2020-05-29'));
+                    let y_line_note = yScale(30);
+                    let y_text_note = yScale(28);
+                    updateNotePosition("#chart-icu-beds", x_note, y_line_note, y_text_note);
+                }
                 chart.select(".note")
                     .transition()
                     .duration(duration)
@@ -596,9 +618,18 @@
                 updateOverlay("#chart-bed-count", data, "total_beds", "icu_beds",
                               xExtent, xScale, yScale, updateCountDetails);
 
+                // Update warning region
+                let x_warning = xScale(parseDate('2020-07-23'));
+                let width_warning = xScale(parseDate('2020-07-27')) - xScale(parseDate('2020-07-23'));
+                updateWarning("#chart-bed-count", x_warning, width_warning, duration);
+
                 // Update note
-                if (tsa === "Total")
-                    updateNotePosition("#chart-bed-count", xScale(parseDate('2020-05-29')), yScale(15000), yScale(14000));
+                if (tsa === "Total") {
+                    let x_note = xScale(parseDate('2020-05-29'));
+                    let y_line_note = yScale(15000);
+                    let y_text_note = yScale(14000);
+                    updateNotePosition("#chart-bed-count", x_note, y_line_note, y_text_note);
+                }
                 chart.select(".note")
                     .transition()
                     .duration(duration)
@@ -644,6 +675,14 @@
                     .attr("height", height + margin.top + margin.bottom)
                 .append("g")
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            let warning = svg.append("g")
+                .classed("warning", true);
+            warning.append("rect")
+                .attr("height", height);
+            warning.append("text")
+                .attr("y", 20)
+                .text("Data incomplete between July 23-27 ");
 
             svg.append("g")
                 .classed("yAxisGrid", true);
@@ -847,6 +886,21 @@
                         updateDetailFnc(d[i]);
                     }
                 });
+        }
+
+        function updateWarning(selector, x, width, duration) {
+            let warning = d3.select(selector).select(".warning");
+
+            warning.select("rect")
+                .transition()
+                .duration(duration)
+                .attr("x", x)
+                .attr("width", width);
+                
+            warning.select("text")
+                .transition()
+                .duration(duration)
+                .attr("x", x);
         }
 
         // Format valid numbers to local string
