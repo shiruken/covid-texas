@@ -277,43 +277,14 @@
             width = 880 - margin.left - margin.right,
             height = 450 - margin.top - margin.bottom;
 
-        // Define y-axis (for percentages)
-        var yScale = d3.scaleLinear()
-            .domain([0, 100])
-            .range([height, 0]);
+        // Initialize charts
+        createChartFramework("#chart-hospital-beds", "Hospital Beds Used", "Used Beds with COVID-19");
+        createChartFramework("#chart-icu-beds", "ICU Beds Used", "Used ICU Beds with COVID-19");
+        createChartFramework("#chart-bed-count", "Staffed Hospital Beds", "Total ICU Beds");
 
-        var yAxis = d3.axisLeft(yScale)
-            .ticks(5)
-            .tickFormat(d => d + "%");
-
-        var yAxisGrid = d3.axisLeft(yScale)
-            .ticks(5)
-            .tickFormat('')
-            .tickSize(-width);
-
-        // Total Hospital Bed Usage Chart
-        const svg_total = createChartFramework("#chart-hospital-beds");
-        svg_total.select(".yAxisGrid").call(yAxisGrid);
-        svg_total.select(".yAxis").call(yAxis);
-        createLegend("#chart-hospital-beds", "Hospital Beds Used", "Used Beds with COVID-19");
-
-        // ICU Bed Usage Chart
-        const svg_icu = createChartFramework("#chart-icu-beds");
-        svg_icu.select(".yAxisGrid").call(yAxisGrid);
-        svg_icu.select(".yAxis").call(yAxis);
-        let hover_line_icu = svg_icu.select(".hover-line");
-        createLegend("#chart-icu-beds", "ICU Beds Used", "Used ICU Beds with COVID-19");
-
-        // Bed Count Chart
-        const svg_count = createChartFramework("#chart-bed-count");
-        var hover_line_count = svg_count.select(".hover-line");
-        createLegend("#chart-bed-count", "Staffed Hospital Beds", "Total ICU Beds");
-
-
-        var parseDate = d3.timeParse("%Y-%m-%d");
-        var formatDate = d3.timeFormat("%B %e, %Y");
-        var bisectDate = d3.bisector(d => d.date).left;
-
+        const parseDate = d3.timeParse("%Y-%m-%d");
+        const formatDate = d3.timeFormat("%B %e, %Y");
+        const bisectDate = d3.bisector(d => d.date).left;
 
         d3.csv('data.csv', function(d) {
 
@@ -348,13 +319,13 @@
                 percent_total_covid: percent_total_covid,
                 percent_icu_covid: percent_icu_covid
             };
-        }).then(function(data) {
+        }).then(function(data_csv) {
 
             // Group data by TSA
-            var data = d3.nest()
+            let data = d3.nest()
                 .key(function(d) { return d.tsa; })
-                .object(data);
-            var tsaIDs = Object.keys(data);
+                .object(data_csv);
+            let tsaIDs = Object.keys(data);
             tsaIDs.unshift(tsaIDs.pop()); // Statewide Total should be first
 
             // Compute simple moving average (7-day) for all metrics by TSA
@@ -376,8 +347,8 @@
             });
 
             // Check for query string parameter defining the default TSA
-            var url = new URL(window.location.href);
-            var TSA = url.searchParams.get("tsa");
+            let url = new URL(window.location.href);
+            let TSA = url.searchParams.get("tsa");
             if (TSA === null || !tsaIDs.includes(TSA))
                 TSA = "Total"; // Default to Statewide Total
             
@@ -413,8 +384,7 @@
 
             // Update charts when different TSA is selected
             d3.select("#tsaSelect").on("change", function(d) {
-                var TSA = d3.select(this).property("value");
-
+                TSA = d3.select(this).property("value");
                 if (TSA === "Total")
                     window.history.replaceState(null, null, window.location.pathname);
                 else
@@ -443,10 +413,26 @@
                 let xScale = d3.scaleTime()
                     .domain(xExtent)
                     .range([0, width]);
-                let xAxis = chart.select(".xAxis")
+                chart.select(".xAxis")
                     .transition()
                     .duration(duration)
                     .call(d3.axisBottom(xScale));
+
+                // Update y-axis
+                let yScale = d3.scaleLinear()
+                    .domain([0, 100])
+                    .range([height, 0]);
+                let yAxis = d3.axisLeft(yScale)
+                    .ticks(5)
+                    .tickFormat(d => d + "%");
+                chart.select(".yAxis")
+                    .call(yAxis);
+                let yAxisGrid = d3.axisLeft(yScale)
+                    .ticks(5)
+                    .tickFormat('')
+                    .tickSize(-width);
+                chart.select(".yAxisGrid")
+                    .call(yAxisGrid);
 
                 // Total Hospital Bed Usage
                 let filtered = filterData(data, "percent_total_occupied", xScale, yScale);
@@ -495,10 +481,26 @@
                 let xScale = d3.scaleTime()
                     .domain(xExtent)
                     .range([0, width]);
-                let xAxis = chart.select(".xAxis")
+                chart.select(".xAxis")
                     .transition()
                     .duration(duration)
                     .call(d3.axisBottom(xScale));
+
+                // Update y-axis
+                let yScale = d3.scaleLinear()
+                    .domain([0, 100])
+                    .range([height, 0]);
+                let yAxis = d3.axisLeft(yScale)
+                    .ticks(5)
+                    .tickFormat(d => d + "%");
+                chart.select(".yAxis")
+                    .call(yAxis);
+                let yAxisGrid = d3.axisLeft(yScale)
+                    .ticks(5)
+                    .tickFormat('')
+                    .tickSize(-width);
+                chart.select(".yAxisGrid")
+                    .call(yAxisGrid);
 
                 // Total Hospital Bed Usage
                 let filtered = filterData(data, "percent_icu_occupied", xScale, yScale);
@@ -548,7 +550,7 @@
                 let xScale = d3.scaleTime()
                     .domain(xExtent)
                     .range([0, width]);
-                let xAxis = chart.select(".xAxis")
+                chart.select(".xAxis")
                     .transition()
                     .duration(duration)
                     .call(d3.axisBottom(xScale));
@@ -634,7 +636,7 @@
             return [d3.timeDay.offset(min, -1), d3.timeDay.offset(max, 1)]
         }
         
-        function createChartFramework(selector) {
+        function createChartFramework(selector, legend1, legend2) {
             let svg = d3.select(selector)
                 .append("svg")
                     .attr("width", width + margin.left + margin.right)
@@ -658,9 +660,42 @@
                 .attr("y2", height)
                 .style("opacity", 0);
 
-            svg.append("g")
+            let legend = svg.append("g")
                 .classed("legend", true)
                 .attr("transform", "translate(20, 10)");
+
+            legend.append("circle")
+                .classed("purple", true)
+                .attr("cx", 8)
+                .attr("cy", 8)
+                .attr("r", 4);
+
+            legend.append("text")
+                .attr("x", 25)
+                .attr("y", 13)
+                .text(legend1);
+
+            legend.append("circle")
+                .classed("orange", true)
+                .attr("cx", 8)
+                .attr("cy", 30)
+                .attr("r", 4)
+
+            legend.append("text")
+                .attr("x", 25)
+                .attr("y", 36)
+                .text(legend2);
+
+            legend.append("line")
+                .attr("x1", 0)
+                .attr("x2", 16)
+                .attr("y1", 52)
+                .attr("y2", 52);
+
+            legend.append("text")
+                .attr("x", 25)
+                .attr("y", 58)
+                .text("Moving Average (7-day)");
 
             let note = svg.append("g")
                 .classed("note", true)
@@ -700,44 +735,6 @@
                 .attr("height", height);
 
             return svg;
-        }
-
-        function createLegend(selector, label1, label2) {
-            let legend = d3.select(selector)
-                .select(".legend");
-
-            legend.append("circle")
-                .classed("purple", true)
-                .attr("cx", 8)
-                .attr("cy", 8)
-                .attr("r", 4);
-
-            legend.append("text")
-                .attr("x", 25)
-                .attr("y", 13)
-                .text(label1);
-
-            legend.append("circle")
-                .classed("orange", true)
-                .attr("cx", 8)
-                .attr("cy", 30)
-                .attr("r", 4)
-
-            legend.append("text")
-                .attr("x", 25)
-                .attr("y", 36)
-                .text(label2);
-
-            legend.append("line")
-                .attr("x1", 0)
-                .attr("x2", 16)
-                .attr("y1", 52)
-                .attr("y2", 52);
-
-            legend.append("text")
-                .attr("x", 25)
-                .attr("y", 58)
-                .text("Moving Average (7-day)");
         }
 
         function updateNotePosition(selector, x, y_line, y_text) {
@@ -853,7 +850,7 @@
 
         // Update Total Hospital Bed details
         function updateTotalDetails(data) {
-            var options = {minimumFractionDigits: 0, maximumFractionDigits: 0};
+            let options = {minimumFractionDigits: 0, maximumFractionDigits: 0};
             d3.select("#data-hospital-beds").html("" +
                 "<h4>" + formatDate(data.date) + "</h4>" +
                 "<h3>" +
@@ -881,7 +878,7 @@
 
         // Update ICU Bed details
         function updateICUDetails(data) {
-            var options = {minimumFractionDigits: 0, maximumFractionDigits: 0};
+            let options = {minimumFractionDigits: 0, maximumFractionDigits: 0};
             d3.select("#data-icu-beds").html("" +
                 "<h4>" + formatDate(data.date) + "</h4>" +
                 "<h3>" +
@@ -909,7 +906,7 @@
 
         // Update Bed Count details
         function updateCountDetails(data) {
-            var options = {minimumFractionDigits: 0, maximumFractionDigits: 0};
+            let options = {minimumFractionDigits: 0, maximumFractionDigits: 0};
             d3.select("#data-bed-count").html("" +
                 "<h4>" + formatDate(data.date) + "</h4>" +
                 "<h3>" +
