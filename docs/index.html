@@ -607,7 +607,7 @@
             // Update warning region
             let x_warning = xScale(parseDate('2020-07-23'));
             let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
-            updateWarning("#chart-hospital-beds", x_warning, width_warning, duration);
+            updateWarning("#chart-hospital-beds", tsa, x_warning, width_warning, duration);
 
             // Update note
             if (tsa === "Total") {
@@ -685,7 +685,7 @@
             // Update warning region
             let x_warning = xScale(parseDate('2020-07-23'));
             let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
-            updateWarning("#chart-icu-beds", x_warning, width_warning, duration);
+            updateWarning("#chart-icu-beds", tsa, x_warning, width_warning, duration);
 
             // Update note
             if (tsa === "Total") {
@@ -768,7 +768,7 @@
             // Update warning region
             let x_warning = xScale(parseDate('2020-07-23'));
             let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
-            updateWarning("#chart-bed-count", x_warning, width_warning, duration);
+            updateWarning("#chart-bed-count", tsa, x_warning, width_warning, duration);
 
             // Update note
             if (tsa === "Total") {
@@ -911,7 +911,7 @@
 
         // Draw and update the position of the highlighted region 
         // delineating the period of incomplete data between July 23-28
-        function updateWarning(selector, x, width, duration) {
+        function updateWarning(selector, tsa, x, width, duration) {
             let warning = d3.select(selector).select(".warning");
 
             warning.select("rect")
@@ -920,10 +920,20 @@
                 .attr("x", x)
                 .attr("width", width);
                 
+            let y = 20;
+            if (selector === "#chart-icu-beds")
+                if (["I", "M", "N", "Q", "R", "T", "U", "V"].includes(tsa))
+                    y = height - 20;
+            
+            if (selector === "#chart-bed-count")
+                if (["I"].includes(tsa))
+                    y = height - 20;
+
             warning.select("text")
                 .transition()
                 .duration(duration)
-                .attr("x", x);
+                .attr("x", x)
+                .attr("y", y);
         }
 
         // Format valid numbers to local string
