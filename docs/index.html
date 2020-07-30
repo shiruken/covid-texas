@@ -248,7 +248,6 @@
     <header>
         <h1 id="title">Texas COVID-19 Hospital Resource Usage</h1>
         <h2 id="subtitle"></h2>
-        <div class="alert">DSHS data released on July 28th is inconsistent with previously reported values. Charts will not be updated until these new numbers can be validated.</div>
     </header>
 
     <div id="control">
@@ -331,7 +330,7 @@
                 .key(function(d) { return d.tsa; })
                 .object(data_csv);
             let tsaIDs = Object.keys(data);
-            tsaIDs.unshift(tsaIDs.pop()); // Statewide Total should be first
+            tsaIDs.unshift(tsaIDs.splice(tsaIDs.indexOf("Total"), 1)[0]); // Statewide Total should be first
 
             // Compute simple moving average (7-day) for all metrics by TSA
             tsaIDs.forEach(function(tsa) {
@@ -461,7 +460,7 @@
                     
                 // Update warning region
                 let x_warning = xScale(parseDate('2020-07-23'));
-                let width_warning = xScale(parseDate('2020-07-27')) - xScale(parseDate('2020-07-23'));
+                let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
                 updateWarning("#chart-hospital-beds", x_warning, width_warning, duration);
 
                 // Update note
@@ -538,7 +537,7 @@
 
                 // Update warning region
                 let x_warning = xScale(parseDate('2020-07-23'));
-                let width_warning = xScale(parseDate('2020-07-27')) - xScale(parseDate('2020-07-23'));
+                let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
                 updateWarning("#chart-icu-beds", x_warning, width_warning, duration);
 
                 // Update note
@@ -620,7 +619,7 @@
 
                 // Update warning region
                 let x_warning = xScale(parseDate('2020-07-23'));
-                let width_warning = xScale(parseDate('2020-07-27')) - xScale(parseDate('2020-07-23'));
+                let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
                 updateWarning("#chart-bed-count", x_warning, width_warning, duration);
 
                 // Update note
@@ -682,7 +681,7 @@
                 .attr("height", height);
             warning.append("text")
                 .attr("y", 20)
-                .text("Data incomplete between July 23-27 ");
+                .text("Data incomplete between July 23-28 ");
 
             svg.append("g")
                 .classed("yAxisGrid", true);
@@ -1047,6 +1046,9 @@
                 case "G":
                     tform = "translate(20, 165)";
                     break;
+                case "H":
+                    tform = "translate(20, 5)";
+                    break;
                 case "I":
                     tform = "translate(20, 215)";
                     break;
@@ -1072,7 +1074,7 @@
                     tform = "translate(20, 180)";
                     break;
                 case "R":
-                    tform = "translate(20, 215)";
+                    tform = "translate(20, 30)";
                     break;
                 case "U":
                     tform = "translate(20, 30)";
