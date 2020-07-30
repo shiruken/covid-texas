@@ -422,244 +422,6 @@
 
             });
 
-
-            function updateTotalBedChart(data, duration) {
-                let chart = d3.select("#chart-hospital-beds");
-                let tsa = data[0].tsa;
-
-                // Update x-axis
-                let xExtent = getDateExtent(data, "percent_total_occupied");
-                let xScale = d3.scaleTime()
-                    .domain(xExtent)
-                    .range([0, width]);
-                chart.select(".xAxis")
-                    .transition()
-                    .duration(duration)
-                    .call(d3.axisBottom(xScale));
-
-                // Update y-axis
-                let yScale = d3.scaleLinear()
-                    .domain([0, 100])
-                    .range([height, 0]);
-                let yAxis = d3.axisLeft(yScale)
-                    .ticks(5)
-                    .tickFormat(d => d + "%");
-                chart.select(".yAxis")
-                    .call(yAxis);
-                let yAxisGrid = d3.axisLeft(yScale)
-                    .ticks(5)
-                    .tickFormat('')
-                    .tickSize(-width);
-                chart.select(".yAxisGrid")
-                    .call(yAxisGrid);
-
-                // Total Hospital Bed Usage
-                let filtered = filterData(data, "percent_total_occupied", xScale, yScale);
-                drawScatterPlot("#chart-hospital-beds .data.purple", filtered, duration);
-
-                // Total Hospital Bed Usage - Simple Moving Average
-                filtered = filterData(data, "percent_total_occupied_sma", xScale, yScale);
-                drawLinePlot("#chart-hospital-beds .data.purple", filtered, duration);
-
-                // Total Hospital Bed COVID-19 Usage
-                filtered = filterData(data, "percent_total_covid", xScale, yScale);
-                drawScatterPlot("#chart-hospital-beds .data.orange", filtered, duration);
-
-                // Total Hospital Bed COVID-19 Usage - Simple Moving Average
-                filtered = filterData(data, "percent_total_covid_sma", xScale, yScale);
-                drawLinePlot("#chart-hospital-beds .data.orange", filtered, duration);
-
-                // Update overlay
-                updateOverlay("#chart-hospital-beds", data, "percent_total_occupied", "percent_total_covid",
-                              xExtent, xScale, yScale, updateTotalDetails);
-                    
-                // Update warning region
-                let x_warning = xScale(parseDate('2020-07-23'));
-                let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
-                updateWarning("#chart-hospital-beds", x_warning, width_warning, duration);
-
-                // Update note
-                if (tsa === "Total") {
-                    let x_note = xScale(parseDate('2020-05-29'));
-                    let y_line_note = yScale(15);
-                    let y_text_note = yScale(13);
-                    updateNotePosition("#chart-hospital-beds",  x_note, y_line_note, y_text_note);
-                }                    
-                chart.select(".note")
-                    .transition()
-                    .duration(duration)
-                    .style("opacity", tsa === "Total" ? 1 : 0);
-
-                // Update title
-                let title = "";
-                if (tsa === "Total")
-                    title = "Statewide Hospital Bed Usage";
-                else
-                    title = "Hospital Bed Usage in " + data[0].location + " (TSA-" + tsa + ")";
-                chart.select(".chartTitle").text(title);
-
-            }
-
-            function updateICUBedChart(data, duration) {
-                let chart = d3.select("#chart-icu-beds");
-                let tsa = data[0].tsa;
-
-                // Update x-axis
-                let xExtent = getDateExtent(data, "percent_icu_occupied");
-                let xScale = d3.scaleTime()
-                    .domain(xExtent)
-                    .range([0, width]);
-                chart.select(".xAxis")
-                    .transition()
-                    .duration(duration)
-                    .call(d3.axisBottom(xScale));
-
-                // Update y-axis
-                let yScale = d3.scaleLinear()
-                    .domain([0, 100])
-                    .range([height, 0]);
-                let yAxis = d3.axisLeft(yScale)
-                    .ticks(5)
-                    .tickFormat(d => d + "%");
-                chart.select(".yAxis")
-                    .call(yAxis);
-                let yAxisGrid = d3.axisLeft(yScale)
-                    .ticks(5)
-                    .tickFormat('')
-                    .tickSize(-width);
-                chart.select(".yAxisGrid")
-                    .call(yAxisGrid);
-
-                // Total Hospital Bed Usage
-                let filtered = filterData(data, "percent_icu_occupied", xScale, yScale);
-                drawScatterPlot("#chart-icu-beds .data.purple", filtered, duration);
-
-                // Total Hospital Bed Usage - Simple Moving Average
-                filtered = filterData(data, "percent_icu_occupied_sma", xScale, yScale);
-                drawLinePlot("#chart-icu-beds .data.purple", filtered, duration);
-
-                // Total Hospital Bed COVID-19 Usage
-                filtered = filterData(data, "percent_icu_covid", xScale, yScale);
-                drawScatterPlot("#chart-icu-beds .data.orange", filtered, duration);
-
-                // Total Hospital Bed COVID-19 Usage - Simple Moving Average
-                filtered = filterData(data, "percent_icu_covid_sma", xScale, yScale);
-                drawLinePlot("#chart-icu-beds .data.orange", filtered, duration);
-
-                // Update overlay
-                updateOverlay("#chart-icu-beds", data, "percent_icu_occupied", "percent_icu_covid",
-                              xExtent, xScale, yScale, updateICUDetails);
-
-                // Update warning region
-                let x_warning = xScale(parseDate('2020-07-23'));
-                let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
-                updateWarning("#chart-icu-beds", x_warning, width_warning, duration);
-
-                // Update note
-                if (tsa === "Total") {
-                    let x_note = xScale(parseDate('2020-05-29'));
-                    let y_line_note = yScale(30);
-                    let y_text_note = yScale(28);
-                    updateNotePosition("#chart-icu-beds", x_note, y_line_note, y_text_note);
-                }
-                chart.select(".note")
-                    .transition()
-                    .duration(duration)
-                    .style("opacity", tsa === "Total" ? 1 : 0);
-
-                // Update title
-                let title = "";
-                if (tsa === "Total")
-                    title = "Statewide ICU Bed Usage";
-                else
-                    title = "ICU Bed Usage in " + data[0].location + " (TSA-" + tsa + ")";
-                chart.select(".chartTitle").text(title);
-
-                moveICULegend(tsa, duration);
-            }
-
-            function updateCountChart(data, duration) {
-                let chart = d3.select("#chart-bed-count");
-                let tsa = data[0].tsa;
-
-                // Update x-axis
-                let xExtent = getDateExtent(data, "total_beds");
-                let xScale = d3.scaleTime()
-                    .domain(xExtent)
-                    .range([0, width]);
-                chart.select(".xAxis")
-                    .transition()
-                    .duration(duration)
-                    .call(d3.axisBottom(xScale));
-
-                // Update y-axis
-                let yMax = d3.max(data, d => d.total_beds);
-                let yScale = d3.scaleLinear()
-                    .domain([0, yMax]).nice(4)
-                    .range([height, 0]);
-                let yAxis = d3.axisLeft(yScale)
-                    .ticks(4);
-                chart.select(".yAxis")
-                    .transition()
-                    .duration(duration)
-                    .call(yAxis);
-                let yAxisGrid = d3.axisLeft(yScale)
-                    .ticks(4)
-                    .tickFormat('')
-                    .tickSize(-width);
-                chart.select(".yAxisGrid")
-                    .transition()
-                    .duration(duration)
-                    .call(yAxisGrid);
-
-                // Total Staffed Hospital Bed Count
-                let filtered = filterData(data, "total_beds", xScale, yScale);
-                drawScatterPlot("#chart-bed-count .data.purple", filtered, duration);
-
-                // Total Staffed Hospital Bed Count - Simple Moving Average
-                filtered = filterData(data, "total_beds_sma", xScale, yScale);
-                drawLinePlot("#chart-bed-count .data.purple", filtered, duration);
-
-                // Total ICU Bed Count
-                filtered = filterData(data, "icu_beds", xScale, yScale);
-                drawScatterPlot("#chart-bed-count .data.orange", filtered, duration);
-
-                // Total ICU Bed Count - Simple Moving Average
-                filtered = filterData(data, "icu_beds_sma", xScale, yScale);
-                drawLinePlot("#chart-bed-count .data.orange", filtered, duration);
-
-                // Update overlay
-                updateOverlay("#chart-bed-count", data, "total_beds", "icu_beds",
-                              xExtent, xScale, yScale, updateCountDetails);
-
-                // Update warning region
-                let x_warning = xScale(parseDate('2020-07-23'));
-                let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
-                updateWarning("#chart-bed-count", x_warning, width_warning, duration);
-
-                // Update note
-                if (tsa === "Total") {
-                    let x_note = xScale(parseDate('2020-05-29'));
-                    let y_line_note = yScale(15000);
-                    let y_text_note = yScale(14000);
-                    updateNotePosition("#chart-bed-count", x_note, y_line_note, y_text_note);
-                }
-                chart.select(".note")
-                    .transition()
-                    .duration(duration)
-                    .style("opacity", tsa === "Total" ? 1 : 0);
-
-                // Update title
-                let title = "";
-                if (tsa === "Total")
-                    title = "Statewide Total Hospital Resources";
-                else
-                    title = "Total Hospital Resources in " + data[0].location + " (TSA-" + tsa + ")";
-                chart.select(".chartTitle").text(title);
-
-                moveCountLegend(tsa, duration);
-            }
-
         });
 
         // Missing values are parsed as NaN
@@ -681,7 +443,8 @@
             });
             return [d3.timeDay.offset(min, -1), d3.timeDay.offset(max, 1)]
         }
-        
+
+        // Create basic chart structure under selector with given legend values     
         function createChartFramework(selector, legend1, legend2) {
             let svg = d3.select(selector)
                 .append("svg")
@@ -690,6 +453,7 @@
                 .append("g")
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
+            // Highlighted region delineating period of incomplete data
             let warning = svg.append("g")
                 .classed("warning", true);
             warning.append("rect")
@@ -708,49 +472,46 @@
                 .classed("xAxis", true)
                 .attr("transform", "translate(0, " + height + ")");
 
+            // Vertical line during mouse-over
             svg.append("line")
                 .classed("hover-line", true)
                 .attr("y1", 0)
                 .attr("y2", height)
                 .style("opacity", 0);
 
+            // Legend
             let legend = svg.append("g")
                 .classed("legend", true)
                 .attr("transform", "translate(20, 10)");
-
             legend.append("circle")
                 .classed("purple", true)
                 .attr("cx", 8)
                 .attr("cy", 8)
                 .attr("r", 4);
-
             legend.append("text")
                 .attr("x", 25)
                 .attr("y", 13)
                 .text(legend1);
-
             legend.append("circle")
                 .classed("orange", true)
                 .attr("cx", 8)
                 .attr("cy", 30)
                 .attr("r", 4)
-
             legend.append("text")
                 .attr("x", 25)
                 .attr("y", 36)
                 .text(legend2);
-
             legend.append("line")
                 .attr("x1", 0)
                 .attr("x2", 16)
                 .attr("y1", 52)
                 .attr("y2", 52);
-
             legend.append("text")
                 .attr("x", 25)
                 .attr("y", 58)
                 .text("Moving Average (7-day)");
 
+            // Note indicating incomplete total data
             let note = svg.append("g")
                 .classed("note", true)
                 .style("opacity", 0);
@@ -758,20 +519,20 @@
             note.append("text")
                 .text("Data incomplete prior to May 29 ");
 
+            // Chart data elements
             svg.append("g")
                 .classed("data", true)
                 .classed("purple", true);
-
             svg.append("g")
                 .classed("data", true)
                 .classed("orange", true);
 
+            // Focus indicators during mouseover
             svg.append("circle")
                 .classed("focus", true)
                 .classed("purple", true)
                 .attr("r", 5)
                 .style("opacity", 0);
-
             svg.append("circle")
                 .classed("focus", true)
                 .classed("orange", true)
@@ -783,6 +544,7 @@
                 .attr("x", (width / 2))
                 .attr("y", 0 - (margin.top / 2));
 
+            // Overlay for handling comparison-view mouseover
             svg.append("rect")
                 .classed("overlay", true)
                 .attr("width", width)
@@ -791,6 +553,247 @@
             return svg;
         }
 
+        // Generate the total hospital bed chart
+        function updateTotalBedChart(data, duration) {
+            let chart = d3.select("#chart-hospital-beds");
+            let tsa = data[0].tsa;
+
+            // Update x-axis
+            let xExtent = getDateExtent(data, "percent_total_occupied");
+            let xScale = d3.scaleTime()
+                .domain(xExtent)
+                .range([0, width]);
+            chart.select(".xAxis")
+                .transition()
+                .duration(duration)
+                .call(d3.axisBottom(xScale));
+
+            // Update y-axis
+            let yScale = d3.scaleLinear()
+                .domain([0, 100])
+                .range([height, 0]);
+            let yAxis = d3.axisLeft(yScale)
+                .ticks(5)
+                .tickFormat(d => d + "%");
+            chart.select(".yAxis")
+                .call(yAxis);
+            let yAxisGrid = d3.axisLeft(yScale)
+                .ticks(5)
+                .tickFormat('')
+                .tickSize(-width);
+            chart.select(".yAxisGrid")
+                .call(yAxisGrid);
+
+            // Total Hospital Bed Usage
+            let filtered = filterData(data, "percent_total_occupied", xScale, yScale);
+            drawScatterPlot("#chart-hospital-beds .data.purple", filtered, duration);
+
+            // Total Hospital Bed Usage - Simple Moving Average
+            filtered = filterData(data, "percent_total_occupied_sma", xScale, yScale);
+            drawLinePlot("#chart-hospital-beds .data.purple", filtered, duration);
+
+            // Total Hospital Bed COVID-19 Usage
+            filtered = filterData(data, "percent_total_covid", xScale, yScale);
+            drawScatterPlot("#chart-hospital-beds .data.orange", filtered, duration);
+
+            // Total Hospital Bed COVID-19 Usage - Simple Moving Average
+            filtered = filterData(data, "percent_total_covid_sma", xScale, yScale);
+            drawLinePlot("#chart-hospital-beds .data.orange", filtered, duration);
+
+            // Update overlay
+            updateOverlay("#chart-hospital-beds", data, "percent_total_occupied", "percent_total_covid",
+                            xExtent, xScale, yScale, updateTotalDetails);
+                
+            // Update warning region
+            let x_warning = xScale(parseDate('2020-07-23'));
+            let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
+            updateWarning("#chart-hospital-beds", x_warning, width_warning, duration);
+
+            // Update note
+            if (tsa === "Total") {
+                let x_note = xScale(parseDate('2020-05-29'));
+                let y_line_note = yScale(15);
+                let y_text_note = yScale(13);
+                updateNotePosition("#chart-hospital-beds",  x_note, y_line_note, y_text_note);
+            }                    
+            chart.select(".note")
+                .transition()
+                .duration(duration)
+                .style("opacity", tsa === "Total" ? 1 : 0);
+
+            // Update title
+            let title = "";
+            if (tsa === "Total")
+                title = "Statewide Hospital Bed Usage";
+            else
+                title = "Hospital Bed Usage in " + data[0].location + " (TSA-" + tsa + ")";
+            chart.select(".chartTitle").text(title);
+
+        }
+
+        // Generate the ICU bed chart
+        function updateICUBedChart(data, duration) {
+            let chart = d3.select("#chart-icu-beds");
+            let tsa = data[0].tsa;
+
+            // Update x-axis
+            let xExtent = getDateExtent(data, "percent_icu_occupied");
+            let xScale = d3.scaleTime()
+                .domain(xExtent)
+                .range([0, width]);
+            chart.select(".xAxis")
+                .transition()
+                .duration(duration)
+                .call(d3.axisBottom(xScale));
+
+            // Update y-axis
+            let yScale = d3.scaleLinear()
+                .domain([0, 100])
+                .range([height, 0]);
+            let yAxis = d3.axisLeft(yScale)
+                .ticks(5)
+                .tickFormat(d => d + "%");
+            chart.select(".yAxis")
+                .call(yAxis);
+            let yAxisGrid = d3.axisLeft(yScale)
+                .ticks(5)
+                .tickFormat('')
+                .tickSize(-width);
+            chart.select(".yAxisGrid")
+                .call(yAxisGrid);
+
+            // Total Hospital Bed Usage
+            let filtered = filterData(data, "percent_icu_occupied", xScale, yScale);
+            drawScatterPlot("#chart-icu-beds .data.purple", filtered, duration);
+
+            // Total Hospital Bed Usage - Simple Moving Average
+            filtered = filterData(data, "percent_icu_occupied_sma", xScale, yScale);
+            drawLinePlot("#chart-icu-beds .data.purple", filtered, duration);
+
+            // Total Hospital Bed COVID-19 Usage
+            filtered = filterData(data, "percent_icu_covid", xScale, yScale);
+            drawScatterPlot("#chart-icu-beds .data.orange", filtered, duration);
+
+            // Total Hospital Bed COVID-19 Usage - Simple Moving Average
+            filtered = filterData(data, "percent_icu_covid_sma", xScale, yScale);
+            drawLinePlot("#chart-icu-beds .data.orange", filtered, duration);
+
+            // Update overlay
+            updateOverlay("#chart-icu-beds", data, "percent_icu_occupied", "percent_icu_covid",
+                            xExtent, xScale, yScale, updateICUDetails);
+
+            // Update warning region
+            let x_warning = xScale(parseDate('2020-07-23'));
+            let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
+            updateWarning("#chart-icu-beds", x_warning, width_warning, duration);
+
+            // Update note
+            if (tsa === "Total") {
+                let x_note = xScale(parseDate('2020-05-29'));
+                let y_line_note = yScale(30);
+                let y_text_note = yScale(28);
+                updateNotePosition("#chart-icu-beds", x_note, y_line_note, y_text_note);
+            }
+            chart.select(".note")
+                .transition()
+                .duration(duration)
+                .style("opacity", tsa === "Total" ? 1 : 0);
+
+            // Update title
+            let title = "";
+            if (tsa === "Total")
+                title = "Statewide ICU Bed Usage";
+            else
+                title = "ICU Bed Usage in " + data[0].location + " (TSA-" + tsa + ")";
+            chart.select(".chartTitle").text(title);
+
+            moveICULegend(tsa, duration);
+        }
+
+        // Generate the bed count chart
+        function updateCountChart(data, duration) {
+            let chart = d3.select("#chart-bed-count");
+            let tsa = data[0].tsa;
+
+            // Update x-axis
+            let xExtent = getDateExtent(data, "total_beds");
+            let xScale = d3.scaleTime()
+                .domain(xExtent)
+                .range([0, width]);
+            chart.select(".xAxis")
+                .transition()
+                .duration(duration)
+                .call(d3.axisBottom(xScale));
+
+            // Update y-axis
+            let yMax = d3.max(data, d => d.total_beds);
+            let yScale = d3.scaleLinear()
+                .domain([0, yMax]).nice(4)
+                .range([height, 0]);
+            let yAxis = d3.axisLeft(yScale)
+                .ticks(4);
+            chart.select(".yAxis")
+                .transition()
+                .duration(duration)
+                .call(yAxis);
+            let yAxisGrid = d3.axisLeft(yScale)
+                .ticks(4)
+                .tickFormat('')
+                .tickSize(-width);
+            chart.select(".yAxisGrid")
+                .transition()
+                .duration(duration)
+                .call(yAxisGrid);
+
+            // Total Staffed Hospital Bed Count
+            let filtered = filterData(data, "total_beds", xScale, yScale);
+            drawScatterPlot("#chart-bed-count .data.purple", filtered, duration);
+
+            // Total Staffed Hospital Bed Count - Simple Moving Average
+            filtered = filterData(data, "total_beds_sma", xScale, yScale);
+            drawLinePlot("#chart-bed-count .data.purple", filtered, duration);
+
+            // Total ICU Bed Count
+            filtered = filterData(data, "icu_beds", xScale, yScale);
+            drawScatterPlot("#chart-bed-count .data.orange", filtered, duration);
+
+            // Total ICU Bed Count - Simple Moving Average
+            filtered = filterData(data, "icu_beds_sma", xScale, yScale);
+            drawLinePlot("#chart-bed-count .data.orange", filtered, duration);
+
+            // Update overlay
+            updateOverlay("#chart-bed-count", data, "total_beds", "icu_beds",
+                            xExtent, xScale, yScale, updateCountDetails);
+
+            // Update warning region
+            let x_warning = xScale(parseDate('2020-07-23'));
+            let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
+            updateWarning("#chart-bed-count", x_warning, width_warning, duration);
+
+            // Update note
+            if (tsa === "Total") {
+                let x_note = xScale(parseDate('2020-05-29'));
+                let y_line_note = yScale(15000);
+                let y_text_note = yScale(14000);
+                updateNotePosition("#chart-bed-count", x_note, y_line_note, y_text_note);
+            }
+            chart.select(".note")
+                .transition()
+                .duration(duration)
+                .style("opacity", tsa === "Total" ? 1 : 0);
+
+            // Update title
+            let title = "";
+            if (tsa === "Total")
+                title = "Statewide Total Hospital Resources";
+            else
+                title = "Total Hospital Resources in " + data[0].location + " (TSA-" + tsa + ")";
+            chart.select(".chartTitle").text(title);
+
+            moveCountLegend(tsa, duration);
+        }
+
+        // Move note indicating incomplete total data prior to May 31 to new position
         function updateNotePosition(selector, x, y_line, y_text) {
             d3.select(selector).select(".note line")
                 .attr("x1", x)
@@ -813,6 +816,7 @@
             return filtered;
         }
 
+        // Draw and update scatter plot of daily values
         function drawScatterPlot(selector, data, duration) {
             let circles = d3.select(selector)
                 .selectAll("circle")
@@ -831,6 +835,7 @@
             circles.exit().remove();
         }
 
+        // Draw and update line plot of simple moving average
         function drawLinePlot(selector, data, duration) {
             let path = d3.select(selector).select("path");
 
@@ -854,6 +859,8 @@
                 .attr("stroke-dashoffset", 0);
         }
 
+        // Draw and update overlay for controlling mouseover functionality
+        // with highlighted data points and vertical hover line
         function updateOverlay(selector, data, yProp1, yProp2, xExtent, xScale, yScale, updateDetailFnc) {
             let overlay = d3.select(selector).select(".overlay");
             let focus_purple = d3.select(selector).select("circle.focus.purple");
@@ -902,6 +909,8 @@
                 });
         }
 
+        // Draw and update the position of the highlighted region 
+        // delineating the period of incomplete data between July 23-28
         function updateWarning(selector, x, width, duration) {
             let warning = d3.select(selector).select(".warning");
 
