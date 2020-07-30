@@ -272,20 +272,20 @@
         <select name="tsa" id="tsaSelect"></select>
     </div>
     <div class="container">
-        <div id="chart-hospital-beds" class="chart"></div>
-        <div id="data-hospital-beds" class="data"></div>
-    </div>
-    <div class="container">
-        <div id="chart-icu-beds" class="chart"></div>
-        <div id="data-icu-beds" class="data"></div>
+        <div id="chart-covid" class="chart"></div>
+        <div id="data-covid" class="data"></div>
     </div>
     <div class="container">
         <div id="chart-bed-count" class="chart"></div>
         <div id="data-bed-count" class="data"></div>
     </div>
     <div class="container">
-        <div id="chart-covid" class="chart"></div>
-        <div id="data-covid" class="data"></div>
+        <div id="chart-hospital-beds" class="chart"></div>
+        <div id="data-hospital-beds" class="data"></div>
+    </div>
+    <div class="container">
+        <div id="chart-icu-beds" class="chart"></div>
+        <div id="data-icu-beds" class="data"></div>
     </div>
     <footer>
         <p>
@@ -309,10 +309,10 @@
             height = 450 - margin.top - margin.bottom;
 
         // Initialize charts
+        createChartFramework("#chart-covid", "COVID-19 Inpatients", "COVID-19 ICU Inpatients");
+        createChartFramework("#chart-bed-count", "Staffed Hospital Beds", "Total ICU Beds");
         createChartFramework("#chart-hospital-beds", "Hospital Beds Used", "Used Beds with COVID-19");
         createChartFramework("#chart-icu-beds", "ICU Beds Used", "Used ICU Beds with COVID-19");
-        createChartFramework("#chart-bed-count", "Staffed Hospital Beds", "Total ICU Beds");
-        createChartFramework("#chart-covid", "COVID-19 Inpatients", "COVID-19 ICU Inpatients");
 
         const parseDate = d3.timeParse("%Y-%m-%d");
         const formatDate = d3.timeFormat("%B %e, %Y");
@@ -407,16 +407,16 @@
                 .property("selected", function(d){ return d === TSA; });
 
              // Initial display of charts
+            updateCOVIDChart(data[TSA], 0);
+            updateCountChart(data[TSA], 0);
             updateTotalBedChart(data[TSA], 0);
             updateICUBedChart(data[TSA], 0);   
-            updateCountChart(data[TSA], 0);
-            updateCOVIDChart(data[TSA], 0);
 
             // Populate details sections
+            updateCOVIDDetails(data[TSA][N]);
+            updateCountDetails(data[TSA][N]);
             updateTotalDetails(data[TSA][N]);
             updateICUDetails(data[TSA][N]);
-            updateCountDetails(data[TSA][N]);
-            updateCOVIDDetails(data[TSA][N]);
 
             // Update charts when different TSA is selected
             d3.select("#tsaSelect").on("change", function(d) {
@@ -427,17 +427,17 @@
                     window.history.replaceState(null, null, "?tsa=" + TSA);
 
                 // Update charts
+                updateCOVIDChart(data[TSA], 500);
+                updateCountChart(data[TSA], 500);
                 updateTotalBedChart(data[TSA], 500);
                 updateICUBedChart(data[TSA], 500);
-                updateCountChart(data[TSA], 500);
-                updateCOVIDChart(data[TSA], 500);
 
                 // Update details
                 let N = data[TSA].length - 1;
+                updateCOVIDDetails(data[TSA][N]);
+                updateCountDetails(data[TSA][N]);
                 updateTotalDetails(data[TSA][N]);
                 updateICUDetails(data[TSA][N]);
-                updateCountDetails(data[TSA][N]);
-                updateCOVIDDetails(data[TSA][N]);
 
             });
 
