@@ -114,6 +114,10 @@
             fill: #D95F02;
         }
 
+        .green circle, circle.green {
+            fill: #1b9e77;
+        }
+
         .data path {
             fill: none;
             stroke-width: 4;
@@ -126,6 +130,10 @@
 
         .orange path {
             stroke: #D95F02;
+        }
+
+        .green path {
+            stroke: #1b9e77;
         }
 
         line.hover-line {
@@ -275,6 +283,10 @@
         <div id="chart-bed-count" class="chart"></div>
         <div id="data-bed-count" class="data"></div>
     </div>
+    <div class="container">
+        <div id="chart-covid" class="chart"></div>
+        <div id="data-covid" class="data"></div>
+    </div>
     <footer>
         <p>
             <a href="https://www.dshs.state.tx.us/coronavirus/additionaldata/" title="Link to Texas DSHS COVID-19 data">Data from Texas DSHS</a> 
@@ -300,6 +312,7 @@
         createChartFramework("#chart-hospital-beds", "Hospital Beds Used", "Used Beds with COVID-19");
         createChartFramework("#chart-icu-beds", "ICU Beds Used", "Used ICU Beds with COVID-19");
         createChartFramework("#chart-bed-count", "Staffed Hospital Beds", "Total ICU Beds");
+        createChartFramework("#chart-covid", "COVID-19 Inpatients", "COVID-19 ICU Inpatients");
 
         const parseDate = d3.timeParse("%Y-%m-%d");
         const formatDate = d3.timeFormat("%B %e, %Y");
@@ -362,6 +375,8 @@
                     data[tsa][i].percent_icu_covid_sma = d3.mean(slice, d => d.percent_icu_covid);
                     data[tsa][i].total_beds_sma = d3.mean(slice, d => d.total_beds);
                     data[tsa][i].icu_beds_sma = d3.mean(slice, d => d.icu_beds);
+                    data[tsa][i].covid_inpatients_sma = d3.mean(slice, d => d.covid_inpatients);
+                    data[tsa][i].covid_icu_inpatients_sma = d3.mean(slice, d => d.covid_icu_inpatients);
                 }
             });
 
@@ -395,11 +410,13 @@
             updateTotalBedChart(data[TSA], 0);
             updateICUBedChart(data[TSA], 0);   
             updateCountChart(data[TSA], 0);
+            updateCOVIDChart(data[TSA], 0);
 
             // Populate details sections
             updateTotalDetails(data[TSA][N]);
             updateICUDetails(data[TSA][N]);
             updateCountDetails(data[TSA][N]);
+            updateCOVIDDetails(data[TSA][N]);
 
             // Update charts when different TSA is selected
             d3.select("#tsaSelect").on("change", function(d) {
@@ -413,12 +430,14 @@
                 updateTotalBedChart(data[TSA], 500);
                 updateICUBedChart(data[TSA], 500);
                 updateCountChart(data[TSA], 500);
+                updateCOVIDChart(data[TSA], 500);
 
                 // Update details
                 let N = data[TSA].length - 1;
                 updateTotalDetails(data[TSA][N]);
                 updateICUDetails(data[TSA][N]);
                 updateCountDetails(data[TSA][N]);
+                updateCOVIDDetails(data[TSA][N]);
 
             });
 
@@ -793,6 +812,89 @@
             moveCountLegend(tsa, duration);
         }
 
+        // Generate the COVID-19 inpatients chart
+        function updateCOVIDChart(data, duration) {
+            let chart = d3.select("#chart-covid");
+            let tsa = data[0].tsa;
+
+            // Update x-axis
+            let xExtent = getDateExtent(data, "covid_inpatients");
+            let xScale = d3.scaleTime()
+                .domain(xExtent)
+                .range([0, width]);
+            chart.select(".xAxis")
+                .transition()
+                .duration(duration)
+                .call(d3.axisBottom(xScale));
+
+            // Update y-axis
+            let yMax = d3.max(data, d => d.covid_inpatients);
+            let yScale = d3.scaleLinear()
+                .domain([0, yMax]).nice(4)
+                .range([height, 0]);
+            let yAxis = d3.axisLeft(yScale)
+                .ticks(4);
+            chart.select(".yAxis")
+                .transition()
+                .duration(duration)
+                .call(yAxis);
+            let yAxisGrid = d3.axisLeft(yScale)
+                .ticks(4)
+                .tickFormat('')
+                .tickSize(-width);
+            chart.select(".yAxisGrid")
+                .transition()
+                .duration(duration)
+                .call(yAxisGrid);
+
+            // Total COVID-19 Inpatients
+            let filtered = filterData(data, "covid_inpatients", xScale, yScale);
+            drawScatterPlot("#chart-covid .data.purple", filtered, duration);
+
+            // Total COVID-19 Inpatients - Simple Moving Average
+            filtered = filterData(data, "covid_inpatients_sma", xScale, yScale);
+            drawLinePlot("#chart-covid .data.purple", filtered, duration);
+
+            // Total COVID-19 ICU Inpatients
+            filtered = filterData(data, "covid_icu_inpatients", xScale, yScale);
+            drawScatterPlot("#chart-covid .data.orange", filtered, duration);
+
+            // Total COVID-19 ICU Inpatients - Simple Moving Average
+            filtered = filterData(data, "covid_icu_inpatients_sma", xScale, yScale);
+            drawLinePlot("#chart-covid .data.orange", filtered, duration);
+
+            // Update overlay
+            updateOverlay("#chart-covid", data, "covid_inpatients", "covid_icu_inpatients",
+                            xExtent, xScale, yScale, updateCOVIDDetails);
+
+            // Update warning region
+            let x_warning = xScale(parseDate('2020-07-23'));
+            let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
+            updateWarning("#chart-covid", tsa, x_warning, width_warning, duration);
+
+            // Update note
+            if (tsa === "Total") {
+                let x_note = xScale(parseDate('2020-05-29'));
+                let y_line_note = yScale(3200);
+                let y_text_note = yScale(2900);
+                updateNotePosition("#chart-covid", x_note, y_line_note, y_text_note);
+            }
+            chart.select(".note")
+                .transition()
+                .duration(duration)
+                .style("opacity", tsa === "Total" ? 1 : 0);
+
+            // Update title
+            let title = "";
+            if (tsa === "Total")
+                title = "Statewide COVID-19 Hospitalizations";
+            else
+                title = "COVID-19 Hospitalizations in " + data[0].location + " (TSA-" + tsa + ")";
+            chart.select(".chartTitle").text(title);
+
+            moveCOVIDLegend(tsa, duration);
+        }
+
         // Move note indicating incomplete total data prior to May 31 to new position
         function updateNotePosition(selector, x, y_line, y_text) {
             d3.select(selector).select(".note line")
@@ -929,6 +1031,10 @@
                 if (["I"].includes(tsa))
                     y = height - 20;
 
+            if (selector === "#chart-covid")
+                if (["E", "O", "Q"].includes(tsa))
+                        y = height - 20;
+
             warning.select("text")
                 .transition()
                 .duration(duration)
@@ -1021,6 +1127,19 @@
                     "<dt>Available</dt>" +
                     "<dd>" + formatNumber(data.icu_beds_available) + "</dd>" +
                 "</dl>"
+            );
+        }
+
+        // Update COVID-19 details
+        function updateCOVIDDetails(data) {
+            d3.select("#data-covid").html("" +
+                "<h4>" + formatDate(data.date) + "</h4>" +
+                "<h3>" +
+                    "<strong class='bed-number'>" + formatNumber(data.covid_inpatients) + "</strong> COVID-19 inpatients" + 
+                "</h3>" +
+                "<h3>" + 
+                    "<strong class='covid-number'>" + formatNumber(data.covid_icu_inpatients) + "</strong> COVID-19 ICU inpatients" +
+                "</h3>"
             );
         }
 
@@ -1121,6 +1240,66 @@
             }
 
             d3.select("#chart-bed-count g.legend")
+                .transition()
+                .duration(duration)
+                .attr("transform", tform);
+        }
+
+        // Position COVID-19 chart legend based on currently selected TSA
+        function moveCOVIDLegend(TSA,duration) {
+            let tform;
+
+            switch(TSA) {
+                case "A":
+                    tform = "translate(300, 5)";
+                    break;
+                case "B":
+                    tform = "translate(20, 10)";
+                    break;
+                case "C":
+                    tform = "translate(20, 30)";
+                    break;
+                case "G":
+                    tform = "translate(20, 30)";
+                    break;
+                case "H":
+                    tform = "translate(20, 10)";
+                    break;
+                case "J":
+                    tform = "translate(20, 30)";
+                    break;
+                case "K":
+                    tform = "translate(20, 10)";
+                    break;
+                case "L":
+                    tform = "translate(20, 30)";
+                    break;
+                case "M":
+                    tform = "translate(20, 10)";
+                    break;
+                case "O":
+                    tform = "translate(20, 30)";
+                    break;
+                case "Q":
+                    tform = "translate(20, 30)";
+                    break;
+                case "R":
+                    tform = "translate(20, 30)";
+                    break;
+                case "T":
+                    tform = "translate(20, 30)";
+                    break;
+                case "U":
+                    tform = "translate(20, 30)";
+                    break;
+                case "Total":
+                    tform = "translate(20, 5)";
+                    break;
+                default:
+                    tform = "translate(20, 20)";
+            }
+
+            d3.select("#chart-covid g.legend")
                 .transition()
                 .duration(duration)
                 .attr("transform", tform);
