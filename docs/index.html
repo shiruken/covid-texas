@@ -296,8 +296,8 @@
         <p id="data-desc">
             Hospital data reported daily by the <a href="https://dshs.texas.gov/" title="Link to Texas DSHS website">Texas Department of Health State Services</a> are used for all metrics. 
             The "Statewide Total" is manually calculated by aggregating values from all available <a href="https://www.dshs.texas.gov/emstraumasystems/etrarac.shtm" title="Link to Regional Advisory Council website">trauma service areas</a> (TSAs). 
-            This aggregation is incomplete prior to May 29, 2020, because of incomplete reporting from TSA-F (Paris) and TSA-R (Galveston). 
-            Data for all TSAs is incomplete between July 23 to July 28 <a href="https://www.kxan.com/news/coronavirus/hospitalizations/18-of-texas-hospitals-arent-reporting-complete-data-dshs-says/" title="KXAN article about hospital reporting issues">due to a transition in hospital reporting</a> to comply with new federal requirements.
+            This aggregation is incomplete for bed counts prior to May 29, 2020, because of fragmented reporting from TSA-F (Paris) and TSA-R (Galveston). 
+            All data is incomplete between July 23 to July 28 <a href="https://www.kxan.com/news/coronavirus/hospitalizations/18-of-texas-hospitals-arent-reporting-complete-data-dshs-says/" title="KXAN article about hospital reporting issues">due to a transition in hospital reporting</a> to comply with new federal requirements.
         </p>
     </footer>
 
@@ -871,18 +871,6 @@
             let x_warning = xScale(parseDate('2020-07-23'));
             let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
             updateWarning("#chart-covid", tsa, x_warning, width_warning, duration);
-
-            // Update note
-            if (tsa === "Total") {
-                let x_note = xScale(parseDate('2020-05-29'));
-                let y_line_note = yScale(3200);
-                let y_text_note = yScale(2900);
-                updateNotePosition("#chart-covid", x_note, y_line_note, y_text_note);
-            }
-            chart.select(".note")
-                .transition()
-                .duration(duration)
-                .style("opacity", tsa === "Total" ? 1 : 0);
 
             // Update title
             let title = "";
