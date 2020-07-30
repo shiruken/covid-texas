@@ -213,6 +213,8 @@
         }
 
         footer {
+            width: 1000px;
+            margin: 0px auto;
             text-align: center;
             color: #999;
             clear: both;
@@ -227,6 +229,10 @@
             border-bottom: 1px dotted #999;
         }
 
+        p#data-desc {
+            font-size: 0.8em;
+        }
+
         div.alert {
             padding: 15px 30px;
             margin: 20px auto;
@@ -235,6 +241,9 @@
             background-color: #f2dede;
             border-color: #ebccd1;
             color: #a94442;
+        }
+
+        div.alert, p#data-desc {
             max-height: 999999px;
         }
 
@@ -268,9 +277,15 @@
     </div>
     <footer>
         <p>
-            Data from 
-            <a href="https://www.dshs.state.tx.us/coronavirus/additionaldata/" target="_blank">Texas DSHS</a> · 
-            <a href="https://github.com/shiruken/covid-texas" target="_blank">View on GitHub</a>
+            <a href="https://www.dshs.state.tx.us/coronavirus/additionaldata/" title="Link to Texas DSHS COVID-19 data">Data from Texas DSHS</a> 
+            · 
+            <a href="https://github.com/shiruken/covid-texas" title="Link to website source code on GitHub">View on GitHub</a>
+        </p>
+        <p id="data-desc">
+            Hospital data reported daily by the <a href="https://dshs.texas.gov/" title="Link to Texas DSHS website">Texas Department of Health State Services</a> are used for all metrics. 
+            The "Statewide Total" is manually calculated by aggregating values from all available <a href="https://www.dshs.texas.gov/emstraumasystems/etrarac.shtm" title="Link to Regional Advisory Council website">trauma service areas</a> (TSAs). 
+            This aggregation is incomplete prior to May 29, 2020, because of incomplete reporting from TSA-F (Paris) and TSA-R (Galveston). 
+            Data for all TSAs is incomplete between July 23 to July 28 <a href="https://www.kxan.com/news/coronavirus/hospitalizations/18-of-texas-hospitals-arent-reporting-complete-data-dshs-says/" title="KXAN article about hospital reporting issues">due to a transition in hospital reporting</a> to comply with new federal requirements.
         </p>
     </footer>
 
