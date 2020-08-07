@@ -150,14 +150,24 @@
         .note line {
             stroke: #999999;
             stroke-width: 1px;
-            stroke-dasharray: 2,2;
+            stroke-dasharray: 2;
         }
 
-        .note text, .warning text {
+        .note text, .warning text, .note-occupancy text {
             font-size: 0.8em;
             fill: #999999;
             white-space: pre;
             text-anchor: end;
+        }
+
+        .note-occupancy line {
+            stroke: #666666;
+            stroke-width: 2px;
+            stroke-dasharray: 2;
+        }
+
+        .note-occupancy text {
+            text-anchor: middle;
         }
 
         .legend line {
@@ -295,6 +305,7 @@
         </p>
         <p id="data-desc">
             Hospital data reported daily by the <a href="https://dshs.texas.gov/" title="Link to Texas DSHS website">Texas Department of Health State Services</a> are used for all metrics. 
+            Average statewide staffed hospital bed occupancy rate for Texas as reported by the <a href="https://www.cdc.gov/nchs/index.htm" title="Visit the NCHS website">National Center for Health Statistics</a> in <a href="https://www.cdc.gov/nchs/hus/contents2017.htm#Table_091" title="View Table 91 from report"><em>Health, United States, 2017</em></a>.
             The "Statewide Total" is manually calculated by aggregating values from all available <a href="https://www.dshs.texas.gov/emstraumasystems/etrarac.shtm" title="Link to Regional Advisory Council website">trauma service areas</a> (TSAs). 
             This aggregation is incomplete for bed counts prior to May 29, 2020, because of fragmented reporting from TSA-F (Paris) and TSA-R (Galveston). 
             All data is incomplete between July 23 to July 28 <a href="https://www.kxan.com/news/coronavirus/hospitalizations/18-of-texas-hospitals-arent-reporting-complete-data-dshs-says/" title="KXAN article about hospital reporting issues">due to a transition in hospital reporting</a> to comply with new federal requirements. 
@@ -316,6 +327,21 @@
         createChartFramework("#chart-bed-count", "Staffed Hospital Beds", "Total ICU Beds");
         createChartFramework("#chart-hospital-beds", "Hospital Beds Used", "Used Beds with COVID-19");
         createChartFramework("#chart-icu-beds", "ICU Beds Used", "Used ICU Beds with COVID-19");
+
+        // Add average occupancy rate to hospital bed usage chart
+        let note_occupancy = d3.select("#chart-hospital-beds g")
+            .insert("g", "g.note + *")
+            .classed("note-occupancy", true)
+            .style("opacity", 0);
+        note_occupancy.append("line")
+            .attr("x1", 0)
+            .attr("x2", width)
+            .attr("y1", height * 0.4)
+            .attr("y2", height * 0.4);
+        note_occupancy.append("text")
+            .attr("x", width * 0.6)
+            .attr("y", height * 0.385)
+            .text("Average annual occupancy rate (60%)");
 
         const parseDate = d3.timeParse("%Y-%m-%d");
         const formatDate = d3.timeFormat("%B %e, %Y");
@@ -631,14 +657,20 @@
             let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
             updateWarning("#chart-hospital-beds", tsa, x_warning, width_warning, duration);
 
-            // Update note
+            // Update incomplete data note
             if (tsa === "Total") {
                 let x_note = xScale(parseDate('2020-05-29'));
                 let y_line_note = yScale(15);
                 let y_text_note = yScale(13);
-                updateNotePosition("#chart-hospital-beds",  x_note, y_line_note, y_text_note);
+                updateNotePosition("#chart-hospital-beds", x_note, y_line_note, y_text_note);
             }                    
             chart.select(".note")
+                .transition()
+                .duration(duration)
+                .style("opacity", tsa === "Total" ? 1 : 0);
+
+            // Toggle visibility of average hospital occupancy note
+            chart.select(".note-occupancy")
                 .transition()
                 .duration(duration)
                 .style("opacity", tsa === "Total" ? 1 : 0);
@@ -709,7 +741,7 @@
             let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
             updateWarning("#chart-icu-beds", tsa, x_warning, width_warning, duration);
 
-            // Update note
+            // Update incomplete data note
             if (tsa === "Total") {
                 let x_note = xScale(parseDate('2020-05-29'));
                 let y_line_note = yScale(30);
@@ -792,7 +824,7 @@
             let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
             updateWarning("#chart-bed-count", tsa, x_warning, width_warning, duration);
 
-            // Update note
+            // Update incomplete data note
             if (tsa === "Total") {
                 let x_note = xScale(parseDate('2020-05-29'));
                 let y_line_note = yScale(15000);

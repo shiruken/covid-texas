@@ -6,7 +6,8 @@ https://covid-texas.csullender.com/
 
 ## Sources
 
-* Data from the [Texas DSHS](https://www.dshs.state.tx.us/coronavirus/additionaldata/)
+* Hospitalization and COVID-19 data from [Texas DSHS](https://www.dshs.state.tx.us/coronavirus/additionaldata/)
+* Average staffed hospital bed occupancy rate for Texas as reported by [NCHS](https://www.cdc.gov/nchs/index.htm) in [_Health, United States, 2017_](https://www.cdc.gov/nchs/hus/contents2017.htm#Table_091).
 
 ## About the Data
 
