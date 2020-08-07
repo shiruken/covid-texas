@@ -1016,7 +1016,7 @@
                     y = height - 20;
             
             if (selector === "#chart-bed-count")
-                if (["I"].includes(tsa))
+                if (["I", "R", "T"].includes(tsa))
                     y = height - 20;
 
             if (selector === "#chart-covid")
@@ -1175,7 +1175,13 @@
             let tform;
 
             switch(TSA) {
+                case "A":
+                    tform = "translate(100, 165)";
+                    break;                    
                 case "C":
+                    tform = "translate(20, 10)";
+                    break;
+                case "D":
                     tform = "translate(20, 2)";
                     break;
                 case "E":
@@ -1184,11 +1190,11 @@
                 case "G":
                     tform = "translate(20, 165)";
                     break;
-                case "H":
-                    tform = "translate(20, 30)";
-                    break;
                 case "I":
                     tform = "translate(20, 215)";
+                    break;
+                case "J":
+                    tform = "translate(20, 165)";
                     break;
                 case "L":
                     tform = "translate(20, 175)";
@@ -1209,16 +1215,13 @@
                     tform = "translate(20, 180)";
                     break;
                 case "R":
-                    tform = "translate(20, 30)";
+                    tform = "translate(20, 210)";
                     break;
                 case "T":
                     tform = "translate(20, 10)";
                     break;
                 case "U":
                     tform = "translate(20, 30)";
-                    break;
-                case "V":
-                    tform = "translate(20, 10)";
                     break;
                 default:
                     tform = "translate(20, 20)";
@@ -1236,7 +1239,7 @@
 
             switch(TSA) {
                 case "A":
-                    tform = "translate(300, 5)";
+                    tform = "translate(300, 2)";
                     break;
                 case "B":
                     tform = "translate(20, 10)";
@@ -1254,7 +1257,7 @@
                     tform = "translate(20, 30)";
                     break;
                 case "K":
-                    tform = "translate(20, 10)";
+                    tform = "translate(20, 30)";
                     break;
                 case "L":
                     tform = "translate(20, 5)";
@@ -1278,7 +1281,7 @@
                     tform = "translate(20, 30)";
                     break;
                 case "Total":
-                    tform = "translate(20, 5)";
+                    tform = "translate(20, 2)";
                     break;
                 default:
                     tform = "translate(20, 20)";
