@@ -232,23 +232,32 @@
 
         footer {
             width: 900px;
-            margin: 0px auto;
+            margin: 0px auto 30px auto;
             text-align: center;
             color: #999;
             clear: both;
         }
 
-        footer a, footer a:visited {
+        p#links a, p#links a:visited {
             color: #999;
             text-decoration: none;
         }
 
-        footer a:hover, a:active {
-            border-bottom: 1px dotted #999;
+        p#links a:hover, p#links a:active {
+            border-bottom: 1px dotted #666666;
+            color: #666666;
         }
 
         p#data-desc {
             font-size: 0.8em;
+        }
+
+        p#data-desc a, p#data-desc a:visited {
+            color: #999999;
+        }
+
+        p#data-desc a:hover, p#data-desc a:active {
+            color: #666666;
         }
 
         div.alert {
@@ -298,14 +307,14 @@
         <div id="data-icu-beds" class="data"></div>
     </div>
     <footer>
-        <p>
+        <p id="links">
             <a href="https://www.dshs.state.tx.us/coronavirus/additionaldata/" title="Link to Texas DSHS COVID-19 data">Data from Texas DSHS</a> 
             · 
             <a href="https://github.com/shiruken/covid-texas" title="Link to website source code on GitHub">View on GitHub</a>
         </p>
         <p id="data-desc">
-            Hospital data reported daily by the <a href="https://dshs.texas.gov/" title="Link to Texas DSHS website">Texas Department of Health State Services</a> are used for all metrics. 
-            Average statewide staffed hospital bed occupancy rate for Texas as reported by the <a href="https://www.cdc.gov/nchs/index.htm" title="Visit the NCHS website">National Center for Health Statistics</a> in <a href="https://www.cdc.gov/nchs/hus/contents2017.htm#Table_091" title="View Table 91 from report"><em>Health, United States, 2017</em></a>.
+            Hospital data <a href="https://txdshs.maps.arcgis.com/apps/opsdashboard/index.html#/0d8bdf9be927459d9cb11b9eaef6101f" title="View Texas DSHS COVID-19 Test and Hospital Dashboard">reported daily</a> by the Texas Department of Health State Services are used for all metrics. 
+            Average staffed community hospital bed occupancy rate for Texas as reported by the National Center for Health Statistics</a> in <a href="https://www.cdc.gov/nchs/hus/contents2017.htm#Table_091" title="View Table 91 from report"><em>Health, United States, 2017</em></a>.
             The "Statewide Total" is manually calculated by aggregating values from all available <a href="https://www.dshs.texas.gov/emstraumasystems/etrarac.shtm" title="Link to Regional Advisory Council website">trauma service areas</a> (TSAs). 
             This aggregation is incomplete for bed counts prior to May 29, 2020, because of fragmented reporting from TSA-F (Paris) and TSA-R (Galveston). 
             All data is incomplete between July 23 to July 28 <a href="https://www.kxan.com/news/coronavirus/hospitalizations/18-of-texas-hospitals-arent-reporting-complete-data-dshs-says/" title="KXAN article about hospital reporting issues">due to a transition in hospital reporting</a> to comply with new federal requirements. 
@@ -597,8 +606,6 @@
                 .classed("overlay", true)
                 .attr("width", width)
                 .attr("height", height);
-
-            return svg;
         }
 
         // Generate the total hospital bed chart
