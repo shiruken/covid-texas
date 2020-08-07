@@ -309,6 +309,8 @@
             width = 880 - margin.left - margin.right,
             height = 450 - margin.top - margin.bottom;
 
+        const n_sma = 7; // Simple Moving Average window size
+
         // Initialize charts
         createChartFramework("#chart-covid", "COVID-19 Inpatients", "COVID-19 ICU Inpatients");
         createChartFramework("#chart-bed-count", "Staffed Hospital Beds", "Total ICU Beds");
@@ -361,14 +363,14 @@
             let tsaIDs = Object.keys(data);
             tsaIDs.unshift(tsaIDs.splice(tsaIDs.indexOf("Total"), 1)[0]); // Statewide Total should be first
 
-            // Compute simple moving average (7-day) for all metrics by TSA
+            // Compute simple moving average for all metrics by TSA
             tsaIDs.forEach(function(tsa) {
                 for (let i = 0; i < data[tsa].length; i++) {
                     let slice = []
-                    if (i < 6)
+                    if (i < n_sma - 1)
                         slice = data[tsa].slice(0, i + 1);
                     else
-                        slice = data[tsa].slice(i - 6, i + 1);
+                        slice = data[tsa].slice(i - (n_sma - 1), i + 1);
 
                     data[tsa][i].percent_total_occupied_sma = d3.mean(slice, d => d.percent_total_occupied);
                     data[tsa][i].percent_total_covid_sma = d3.mean(slice, d => d.percent_total_covid);
@@ -529,7 +531,7 @@
             legend.append("text")
                 .attr("x", 25)
                 .attr("y", 58)
-                .text("Moving Average (7-day)");
+                .text("Moving Average (" + n_sma + "-day)");
 
             // Note indicating incomplete total data
             let note = svg.append("g")
