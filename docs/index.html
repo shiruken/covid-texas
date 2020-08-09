@@ -621,7 +621,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale));
+                .call(d3.axisBottom(xScale).ticks(d3.timeWeek.every(2)));
 
             // Update y-axis
             let yScale = d3.scaleLinear()
@@ -705,7 +705,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale));
+                .call(d3.axisBottom(xScale).ticks(d3.timeWeek.every(2)));
 
             // Update y-axis
             let yScale = d3.scaleLinear()
@@ -784,7 +784,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale));
+                .call(d3.axisBottom(xScale).ticks(d3.timeWeek.every(2)));
 
             // Update y-axis
             let yMax = d3.max(data, d => d.total_beds);
@@ -867,7 +867,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale));
+                .call(d3.axisBottom(xScale).ticks(d3.timeWeek.every(2)));
 
             // Update y-axis
             let yMax = d3.max(data, d => d.covid_inpatients);
