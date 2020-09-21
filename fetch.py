@@ -23,8 +23,8 @@ def fix_date_index(df):
     df.index.set_levels(date_index_fixed, level=2, inplace=True)
 
 
-# Load hospital capacity data
-url = 'https://www.dshs.state.tx.us/coronavirus/TexasHospitalCapacityoverTimebyTSA.xlsx'
+# Load combined hospital data
+url = 'https://www.dshs.state.tx.us/coronavirus/CombinedHospitalDataoverTimebyTSA.xlsx'
 df = pd.read_excel(url, sheet_name=None, header=2, index_col=[0, 1], nrows=23)
 
 # Parse total available beds
@@ -59,19 +59,15 @@ df_icu_beds_occupied = pd.DataFrame(df['ICU Beds Occupied'].stack())
 df_icu_beds_occupied.rename(columns = {0: 'icu_beds_occupied'}, inplace=True)
 fix_date_index(df_icu_beds_occupied)
 
-# Load COVID-19 hospital data
-url = 'https://www.dshs.state.tx.us/coronavirus/TexasCOVID-19HospitalizationsOverTimebyTSA.xlsx'
-df = pd.read_excel(url, sheet_name=None, header=2, index_col=[0, 1], nrows=23)
-
 # Parse total COVID-19 inpatients
-df['COVID-19 Hospitalizations'].loc['Total', 'Statewide Total'] = df['COVID-19 Hospitalizations'][:-1].sum()
-df_covid_inpatients = pd.DataFrame(df['COVID-19 Hospitalizations'].stack())
+df['COVID Hospitalizations'].loc['Total', 'Statewide Total'] = df['COVID Hospitalizations'][:-1].sum()
+df_covid_inpatients = pd.DataFrame(df['COVID Hospitalizations'].stack())
 df_covid_inpatients.rename(columns = {0: 'covid_inpatients'}, inplace=True)
 fix_date_index(df_covid_inpatients)
 
 # Parse ICU COVID-19 inpatients
-df['COVID-19 ICU'].loc['Total', 'Statewide Total'] = df['COVID-19 ICU'][:-1].sum()
-df_covid_icu_inpatients = pd.DataFrame(df['COVID-19 ICU'].stack())
+df['COVID in ICU'].loc['Total', 'Statewide Total'] = df['COVID in ICU'][:-1].sum()
+df_covid_icu_inpatients = pd.DataFrame(df['COVID in ICU'].stack())
 df_covid_icu_inpatients.rename(columns = {0: 'covid_icu_inpatients'}, inplace=True)
 fix_date_index(df_covid_icu_inpatients)
 
