@@ -157,7 +157,10 @@
             font-size: 0.8em;
             fill: #999999;
             white-space: pre;
-            text-anchor: end;
+        }
+
+        .note text {
+            text-anchor: end;;
         }
 
         .note-occupancy line {
@@ -167,7 +170,7 @@
         }
 
         .note-occupancy text {
-            text-anchor: middle;
+            text-anchor: end;
         }
 
         .legend line {
@@ -348,7 +351,7 @@
             .attr("y1", height * 0.4)
             .attr("y2", height * 0.4);
         note_occupancy.append("text")
-            .attr("x", width * 0.6)
+            .attr("x", width)
             .attr("y", height * 0.385)
             .text("Average annual occupancy rate (60%)");
 
@@ -517,7 +520,7 @@
                 .attr("height", height);
             warning.append("text")
                 .attr("y", 20)
-                .text("Data incomplete between July 23-28 ");
+                .text(" Data incomplete between July 23-28");
 
             svg.append("g")
                 .classed("yAxisGrid", true);
@@ -574,7 +577,7 @@
                 .style("opacity", 0);
             note.append("line");
             note.append("text")
-                .text("Data incomplete prior to May 29 ");
+                .text(" Data incomplete prior to May 29 ");
 
             // Chart data elements
             svg.append("g")
@@ -751,8 +754,8 @@
             // Update incomplete data note
             if (tsa === "Total") {
                 let x_note = xScale(parseDate('2020-05-29'));
-                let y_line_note = yScale(30);
-                let y_text_note = yScale(28);
+                let y_line_note = yScale(8);
+                let y_text_note = yScale(6);
                 updateNotePosition("#chart-icu-beds", x_note, y_line_note, y_text_note);
             }
             chart.select(".note")
@@ -933,9 +936,14 @@
                 .attr("y1", y_line)
                 .attr("y2", height);
 
+            let text_anchor = "end";
+            if (selector === "#chart-icu-beds")
+                text_anchor = "start";
+
             d3.select(selector).select(".note text")
                 .attr("x", x)
-                .attr("y", y_text);
+                .attr("y", y_text)
+                .style("text-anchor", text_anchor);
         }
 
         // Filter and format data into (x,y) for use with plot functions
@@ -1054,21 +1062,25 @@
                 
             let y = 20;
             if (selector === "#chart-icu-beds")
-                if (["I", "M", "N", "Q", "R", "T", "U", "V"].includes(tsa))
+                if (["D", "F", "G", "I", "M", "N", "P", "Q", "R", "T", "U", "V"].includes(tsa))
                     y = height - 20;
             
             if (selector === "#chart-bed-count")
-                if (["I", "R", "T"].includes(tsa))
+                if (["I", "Q", "T"].includes(tsa))
                     y = height - 20;
 
+            if (selector === "#chart-hospital-beds")
+                if (["T"].includes(tsa))
+                        y = height - 20;
+
             if (selector === "#chart-covid")
-                if (["E", "O", "Q"].includes(tsa))
+                if (["E"].includes(tsa))
                         y = height - 20;
 
             warning.select("text")
                 .transition()
                 .duration(duration)
-                .attr("x", x)
+                .attr("x", x + width)
                 .attr("y", y);
         }
 
@@ -1244,9 +1256,6 @@
                 case "I":
                     tform = "translate(20, 10)";
                     break;
-                case "J":
-                    tform = "translate(20, 30)";
-                    break;
                 case "L":
                     tform = "translate(20, 175)";
                     break;
@@ -1289,11 +1298,14 @@
             let tform;
 
             switch(TSA) {
-                case "B":
+                case "A":
                     tform = "translate(20, 10)";
                     break;
-                case "C":
+                case "B":
                     tform = "translate(20, 30)";
+                    break;
+                case "C":
+                    tform = "translate(20, 10)";
                     break;
                 case "F":
                     tform = "translate(20, 115)";
@@ -1303,9 +1315,6 @@
                     break;
                 case "H":
                     tform = "translate(20, 30)";
-                    break;
-                case "I":
-                    tform = "translate(20, 10)";
                     break;
                 case "J":
                     tform = "translate(20, 30)";

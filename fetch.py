@@ -175,5 +175,9 @@ df_merged.loc[(df_merged['tsa'] == 'U') & (df_merged['date'] == '2020-08-01'), '
 
 df_merged.loc[(df_merged['tsa'] == 'F') & (df_merged['date'] == '2020-08-02'), 'icu_beds_occupied'] = np.nan
 
+df_merged.loc[(df_merged['tsa'] == 'J') & (df_merged['date'] == '2020-10-09'), 'total_beds_occupied'] = np.nan
+
+df_merged.loc[(df_merged['tsa'] == 'K') & (df_merged['date'] == '2020-10-20'), ['total_beds_occupied', 'icu_beds_occupied']] = np.nan
+
 # Write cleaned data to CSV file
 df_merged.to_csv('docs/data.csv', index=False, float_format='%d', date_format='%Y-%m-%d')
