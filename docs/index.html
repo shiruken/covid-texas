@@ -328,7 +328,7 @@
     <script src="https://d3js.org/d3.v5.min.js" type="text/javascript"></script>
     <script type="text/javascript">
         
-        const margin = {top: 30, right: 15, bottom: 30, left: 55},
+        const margin = {top: 30, right: 17, bottom: 30, left: 55},
             width = 880 - margin.left - margin.right,
             height = 450 - margin.top - margin.bottom;
 
@@ -336,8 +336,8 @@
 
         // Initialize charts
         createChartFramework("#chart-covid", "COVID-19 Inpatients", "COVID-19 ICU Inpatients");
-        createChartFramework("#chart-bed-count", "Staffed Hospital Beds", "Total ICU Beds");
-        createChartFramework("#chart-hospital-beds", "Hospital Beds Used", "Used Beds with COVID-19");
+        createChartFramework("#chart-bed-count", "Staffed Inpatient Beds", "Total ICU Beds");
+        createChartFramework("#chart-hospital-beds", "Inpatient Beds Used", "Used Beds with COVID-19");
         createChartFramework("#chart-icu-beds", "ICU Beds Used", "Used ICU Beds with COVID-19");
 
         // Add average occupancy rate to hospital bed usage chart
@@ -624,7 +624,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale).ticks(d3.timeWeek.every(2)));
+                .call(d3.axisBottom(xScale).ticks(d3.timeWeek.every(3)));
 
             // Update y-axis
             let yScale = d3.scaleLinear()
@@ -708,7 +708,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale).ticks(d3.timeWeek.every(2)));
+                .call(d3.axisBottom(xScale).ticks(d3.timeWeek.every(3)));
 
             // Update y-axis
             let yScale = d3.scaleLinear()
@@ -787,7 +787,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale).ticks(d3.timeWeek.every(2)));
+                .call(d3.axisBottom(xScale).ticks(d3.timeWeek.every(3)));
 
             // Update y-axis
             let yMax = d3.max(data, d => d.total_beds);
@@ -870,7 +870,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale).ticks(d3.timeWeek.every(2)));
+                .call(d3.axisBottom(xScale).ticks(d3.timeWeek.every(3)));
 
             // Update y-axis
             let yMax = d3.max(data, d => d.covid_inpatients);
@@ -1193,6 +1193,9 @@
                 case "F":
                     tform = "translate(20, 85)";
                     break;
+                case "G":
+                    tform = "translate(20, 165)";
+                    break;
                 case "H":
                     tform = "translate(20, 165)";
                     break;
@@ -1300,9 +1303,6 @@
             switch(TSA) {
                 case "A":
                     tform = "translate(20, 10)";
-                    break;
-                case "B":
-                    tform = "translate(20, 30)";
                     break;
                 case "C":
                     tform = "translate(20, 10)";
