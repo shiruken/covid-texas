@@ -1062,11 +1062,11 @@
                 
             let y = 20;
             if (selector === "#chart-icu-beds")
-                if (["D", "F", "G", "I", "M", "N", "P", "Q", "R", "T", "U", "V"].includes(tsa))
+                if (["A", "B", "D", "E", "F", "G", "I", "M", "N", "P", "Q", "R", "T", "U", "V"].includes(tsa))
                     y = height - 20;
             
             if (selector === "#chart-bed-count")
-                if (["I", "Q", "T"].includes(tsa))
+                if (["I", "T"].includes(tsa))
                     y = height - 20;
 
             if (selector === "#chart-hospital-beds")
@@ -1074,7 +1074,7 @@
                         y = height - 20;
 
             if (selector === "#chart-covid")
-                if (["E"].includes(tsa))
+                if (["F"].includes(tsa))
                         y = height - 20;
 
             warning.select("text")
@@ -1190,9 +1190,6 @@
             let tform;
 
             switch(TSA) {
-                case "F":
-                    tform = "translate(20, 85)";
-                    break;
                 case "G":
                     tform = "translate(20, 165)";
                     break;
@@ -1242,16 +1239,13 @@
                     tform = "translate(100, 165)";
                     break;                    
                 case "C":
-                    tform = "translate(20, 2)";
+                    tform = "translate(20, 30)";
                     break;
                 case "D":
                     tform = "translate(20, 2)";
                     break;
                 case "E":
                     tform = "translate(20, 10)";
-                    break;
-                case "F":
-                    tform = "translate(20, 215)";
                     break;
                 case "G":
                     tform = "translate(20, 30)";
@@ -1260,22 +1254,19 @@
                     tform = "translate(20, 10)";
                     break;
                 case "L":
-                    tform = "translate(20, 175)";
+                    tform = "translate(20, 190)";
                     break;
                 case "M":
                     tform = "translate(20, 215)";
                     break;
                 case "N":
-                    tform = "translate(20, 175)";
+                    tform = "translate(20, 190)";
                     break;
                 case "O":
                     tform = "translate(20, 10)";
                     break;
                 case "P":
                     tform = "translate(20, 210)";
-                    break;
-                case "Q":
-                    tform = "translate(20, 180)";
                     break;
                 case "R":
                     tform = "translate(20, 10)";
@@ -1304,26 +1295,29 @@
                 case "A":
                     tform = "translate(20, 10)";
                     break;
+                case "B":
+                    tform = "translate(20, 10)";
+                    break;
                 case "C":
+                    tform = "translate(20, 30)";
+                    break;
+                case "D":
+                    tform = "translate(20, 10)";
+                    break;
+                case "E":
                     tform = "translate(20, 10)";
                     break;
                 case "F":
-                    tform = "translate(20, 115)";
-                    break;
-                case "G":
                     tform = "translate(20, 30)";
                     break;
                 case "H":
                     tform = "translate(20, 30)";
                     break;
                 case "I":
-                    tform = "translate(20, 10)";
+                    tform = "translate(20, 2)";
                     break;
                 case "J":
-                    tform = "translate(20, 30)";
-                    break;
-                case "K":
-                    tform = "translate(20, 30)";
+                    tform = "translate(20, 10)";
                     break;
                 case "L":
                     tform = "translate(20, 2)";

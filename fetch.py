@@ -132,7 +132,7 @@ df_merged.loc[(df_merged['tsa'] == 'Total') & (df_merged['date'] == '2020-07-26'
 df_merged.loc[(df_merged['tsa'] == 'A') & (df_merged['date'] == '2020-07-26'), ['icu_beds_occupied', 'covid_inpatients', 'covid_icu_inpatients']] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'B') & (df_merged['date'] == '2020-07-26'), 'icu_beds_occupied'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'E') & (df_merged['date'] == '2020-07-26'), 'total_beds_occupied'] = np.nan
-df_merged.loc[(df_merged['tsa'] == 'F') & (df_merged['date'] == '2020-07-26'), 'covid_icu_inpatients'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'F') & (df_merged['date'] == '2020-07-26'), ['covid_inpatients', 'covid_icu_inpatients']] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'G') & (df_merged['date'] == '2020-07-26'), 'total_beds_occupied'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'H') & (df_merged['date'] == '2020-07-26'), ['total_beds_occupied', 'icu_beds_occupied']] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'I') & (df_merged['date'] == '2020-07-26'), 'total_beds_occupied'] = np.nan
@@ -175,9 +175,15 @@ df_merged.loc[(df_merged['tsa'] == 'U') & (df_merged['date'] == '2020-08-01'), '
 
 df_merged.loc[(df_merged['tsa'] == 'F') & (df_merged['date'] == '2020-08-02'), 'icu_beds_occupied'] = np.nan
 
+df_merged.loc[(df_merged['tsa'] == 'P') & (df_merged['date'] == '2020-09-16'), 'total_beds_occupied'] = np.nan
+
 df_merged.loc[(df_merged['tsa'] == 'J') & (df_merged['date'] == '2020-10-09'), 'total_beds_occupied'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'K') & (df_merged['date'] == '2020-10-20'), ['total_beds_occupied', 'icu_beds_occupied']] = np.nan
+
+df_merged.loc[(df_merged['tsa'] == 'Q') & (df_merged['date'] == '2020-11-01'), 'total_beds_occupied'] = np.nan
+
+df_merged.loc[(df_merged['tsa'] == 'S') & (df_merged['date'] == '2020-11-02'), 'icu_beds_available'] = np.nan
 
 # Write cleaned data to CSV file
 df_merged.to_csv('docs/data.csv', index=False, float_format='%d', date_format='%Y-%m-%d')
