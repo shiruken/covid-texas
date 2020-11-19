@@ -690,7 +690,7 @@
             if (tsa === "Total")
                 title = "Statewide Hospital Bed Usage";
             else
-                title = "Hospital Bed Usage in " + data[0].location + " (TSA-" + tsa + ")";
+                title = "Hospital Bed Usage in TSA-" + tsa + " (" + data[0].location + ")";
             chart.select(".chartTitle").text(title);
 
         }
@@ -768,7 +768,7 @@
             if (tsa === "Total")
                 title = "Statewide ICU Bed Usage";
             else
-                title = "ICU Bed Usage in " + data[0].location + " (TSA-" + tsa + ")";
+                title = "ICU Bed Usage in TSA-" + tsa + " (" + data[0].location + ")";
             chart.select(".chartTitle").text(title);
 
             moveICULegend(tsa, duration);
@@ -851,7 +851,7 @@
             if (tsa === "Total")
                 title = "Statewide Total Hospital Resources";
             else
-                title = "Total Hospital Resources in " + data[0].location + " (TSA-" + tsa + ")";
+                title = "Total Hospital Resources in TSA-" + tsa + " (" + data[0].location + ")";
             chart.select(".chartTitle").text(title);
 
             moveCountLegend(tsa, duration);
@@ -922,7 +922,7 @@
             if (tsa === "Total")
                 title = "Statewide COVID-19 Hospitalizations";
             else
-                title = "COVID-19 Hospitalizations in " + data[0].location + " (TSA-" + tsa + ")";
+                title = "COVID-19 Hospitalizations in TSA-" + tsa + " (" + data[0].location + ")";
             chart.select(".chartTitle").text(title);
 
             moveCOVIDLegend(tsa, duration);
