@@ -117,10 +117,6 @@
             fill: #D95F02;
         }
 
-        .green circle, circle.green {
-            fill: #1b9e77;
-        }
-
         .data path {
             fill: none;
             stroke-width: 4;
@@ -133,10 +129,6 @@
 
         .orange path {
             stroke: #D95F02;
-        }
-
-        .green path {
-            stroke: #1b9e77;
         }
 
         line.hover-line {
@@ -663,14 +655,8 @@
             // Highlighted region delineating period of incomplete data
             let warning1 = g1.append("g")
                 .classed("warning", true);
-            // warning1.append("rect");
-            // warning1.append("text")
-            //     .attr("y", 20);
             let warning2 = g2.append("g")
                 .classed("warning", true)
-            // warning2.append("rect");
-            // warning2.append("text")
-            //     .attr("y", height*0.6 + 20);
 
             g1.append("g")
                 .classed("yAxisGrid", true)
@@ -849,7 +835,6 @@
             else
                 title = "Hospital Bed Usage in TSA-" + tsa + " (" + data[0].location + ")";
             chart.select(".chartTitle").text(title);
-
         }
 
         // Generate the ICU bed chart
@@ -1503,42 +1488,16 @@
 
         // Position ICU chart legend based on currently selected TSA
         function moveICULegend(TSA,duration) {
-            let tform;
+            let tform = "translate(20, 10)";
 
-            switch(TSA) {
-                case "G":
-                    tform = "translate(20, 165)";
-                    break;
-                case "H":
-                    tform = "translate(20, 165)";
-                    break;
-                case "I":
-                    tform = "translate(20, 165)";
-                    break;
-                case "L":
-                    tform = "translate(100, 165)";
-                    break;
-                case "M":
-                    tform = "translate(20, 245)";
-                    break;
-                case "Q":
-                    tform = "translate(20, 165)";
-                    break;
-                case "R":
-                    tform = "translate(20, 85)";
-                    break;
-                case "T":
-                    tform = "translate(20, 165)";
-                    break;
-                case "U":
-                    tform = "translate(20, 165)";
-                    break;
-                case "V":
-                    tform = "translate(20, 245)";
-                    break;
-                default:
-                    tform = "translate(20, 10)";
-            }
+            if (["R"].includes(TSA))
+                tform = "translate(20, 85)";
+                
+            if (["G", "H", "I", "L", "Q", "T", "U"].includes(TSA))
+                tform = "translate(20, 165)";
+
+            if (["M", "V"].includes(TSA))
+                tform = "translate(20, 245)";
 
             d3.select("#chart-icu-beds g.legend")
                 .transition()
@@ -1548,119 +1507,53 @@
 
         // Position count chart legend based on currently selected TSA
         function moveCountLegend(TSA,duration) {
-            let tform1;
-            let tform2;
 
-            switch(TSA) {
-                case "A":
-                    tform1 = "translate(20, 145)";
-                    break;
-                case "C":
-                    tform1 = "translate(20, 15)";
-                    break;
-                case "D":
-                    tform1 = "translate(20, 135)";
-                    break;
-                case "E":
-                    tform1 = "translate(20, 150)";
-                    break;
-                case "G":
-                    tform1 = "translate(20, 140)";
-                    break;
-                case "I":
-                    tform1 = "translate(20, 135)";
-                    break;
-                case "M":
-                    tform1 = "translate(20, 150)";
-                    break;
-                case "N":
-                    tform1 = "translate(20, 140)";
-                    break;
-                case "O":
-                    tform1 = "translate(20, 140)";
-                    break;
-                case "P":
-                    tform1 = "translate(20, 150)";
-                    break;
-                case "R":
-                    tform1 = "translate(20, 135)";
-                    break;
-                case "S":
-                    tform1 = "translate(20, 150)";
-                    break;
-                case "T":
-                    tform1 = "translate(20, 135)";
-                    break;
-                case "U":
-                    tform1 = "translate(20, 15)";
-                    break;
-                default:
-                    tform1 = "translate(20, 5)";
-            }
+            // Legend 1
+            let tform1 = "translate(20, 10)";
 
-            switch(TSA) {
-                case "A":
-                    tform2 = "translate(20, 245)";
-                    break;
-                case "B":
-                    tform2 = "translate(20, 372)";
-                    break;
-                case "C":
-                    tform2 = "translate(20, 240)";
-                    break;
-                case "D":
-                    tform2 = "translate(20, 240)";
-                    break;
-                case "E":
-                    tform2 = "translate(20, 370)";
-                    break;
-                case "F":
-                    tform2 = "translate(20, 245)";
-                    break;
-                case "G":
-                    tform2 = "translate(20, 360)";
-                    break;
-                case "I":
-                    tform2 = "translate(20, 245)";
-                    break;
-                case "J":
-                    tform2 = "translate(20, 240)";
-                    break;
-                case "K":
-                    tform2 = "translate(20, 245)";
-                    break;
-                case "M":
-                    tform2 = "translate(20, 385)";
-                    break;
-                case "N":
-                    tform2 = "translate(20, 375)";
-                    break;
-                case "P":
-                    tform2 = "translate(20, 380)";
-                    break;
-                case "Q":
-                    tform2 = "translate(20, 245)";
-                    break;
-                case "R":
-                    tform2 = "translate(20, 240)";
-                    break;
-                case "S":
-                    tform2 = "translate(20, 370)";
-                    break;
-                case "T":
-                    tform2 = "translate(20, 378)";
-                    break;
-                case "V":
-                    tform2 = "translate(20, 240)";
-                    break;
-                default:
-                    tform2 = "translate(20, 235)";
-            }
+            if (["B", "F", "H", "J", "K", "L", "Q", "V", "Total"].includes(TSA))
+                tform1 = "translate(20, 5)";
+
+            if (["C", "U"].includes(TSA))
+                tform1 = "translate(20, 15)";
+
+            if (["D", "I", "R", "T"].includes(TSA))
+                tform1 = "translate(20, 135)";
+
+            if (["A", "G", "N", "O"].includes(TSA))
+                tform1 = "translate(20, 145)";
+
+            if (["E", "M", "P", "S"].includes(TSA))
+                tform1 = "translate(20, 150)";
 
             d3.select("#chart-bed-count .stacked-top .legend")
                 .transition()
                 .duration(duration)
                 .attr("transform", tform1);
+
+            // Legend 2
+            let tform2 = "translate(20, 250)";
+
+            if (["H", "L", "O", "U", "Total"].includes(TSA))
+                tform2 = "translate(20, 235)";
+
+            if (["C", "D", "J", "R", "V"].includes(TSA))
+                tform2 = "translate(20, 240)";
+
+            if (["A", "F", "I", "K", "Q"].includes(TSA))
+                tform2 = "translate(20, 245)";
+
+            if (["G"].includes(TSA))
+                tform2 = "translate(20, 360)";
+
+            if (["B", "E", "N", "S"].includes(TSA))
+                tform2 = "translate(20, 372)";
+
+            if (["P", "T"].includes(TSA))
+                tform2 = "translate(20, 378)";
+
+            if (["M"].includes(TSA))
+                tform2 = "translate(20, 385)";
 
             d3.select("#chart-bed-count .stacked-bottom .legend")
                 .transition()
@@ -1670,64 +1563,16 @@
 
         // Position COVID-19 chart legend based on currently selected TSA
         function moveCOVIDLegend(TSA,duration) {
-            let tform1;
-            let tform2;
+            let tform = "translate(20, 10)";
 
-            switch(TSA) {
-                case "A":
-                    tform = "translate(20, 10)";
-                    break;
-                case "B":
-                    tform = "translate(20, 10)";
-                    break;
-                case "C":
-                    tform = "translate(20, 30)";
-                    break;
-                case "D":
-                    tform = "translate(20, 10)";
-                    break;
-                case "E":
-                    tform = "translate(20, 10)";
-                    break;
-                case "F":
-                    tform = "translate(20, 30)";
-                    break;
-                case "H":
-                    tform = "translate(20, 30)";
-                    break;
-                case "I":
-                    tform = "translate(20, 2)";
-                    break;
-                case "J":
-                    tform = "translate(20, 10)";
-                    break;
-                case "L":
-                    tform = "translate(20, 2)";
-                    break;
-                case "M":
-                    tform = "translate(20, 10)";
-                    break;
-                case "O":
-                    tform = "translate(20, 30)";
-                    break;
-                case "Q":
-                    tform = "translate(20, 30)";
-                    break;
-                case "R":
-                    tform = "translate(20, 30)";
-                    break;
-                case "T":
-                    tform = "translate(20, 30)";
-                    break;
-                case "U":
-                    tform = "translate(20, 30)";
-                    break;
-                case "Total":
-                    tform = "translate(20, 2)";
-                    break;
-                default:
-                    tform = "translate(20, 20)";
-            }
+            if (["I", "L", "Total"].includes(TSA))
+                tform = "translate(20, 2)";
+
+            if (["C", "F", "J", "P", "S", "V"].includes(TSA))
+                tform = "translate(20, 20)";
+
+            if (["D", "H", "O", "Q", "R", "T", "U"].includes(TSA))
+                tform = "translate(20, 30)";
 
             d3.select("#chart-covid g.legend")
                 .transition()
@@ -1737,98 +1582,44 @@
 
         // Position case/fatality chart legend based on currently selected TSA
         function moveCaseLegend(TSA,duration) {
-            let tform1
-            let tform2;
 
-            switch(TSA) {
-                case "A":
-                    tform1 = "translate(20, 15)";
-                    break;
-                case "B":
-                    tform1 = "translate(20, 30)";
-                    break;
-                case "C":
-                    tform1 = "translate(20, 10)";
-                    break;
-                case "E":
-                    tform1 = "translate(20, 55)";
-                    break;
-                case "F":
-                    tform1 = "translate(20, 20)";
-                    break;
-                case "G":
-                    tform1 = "translate(20, 10)";
-                    break;
-                case "H":
-                    tform1 = "translate(20, 20)";
-                    break;
-                case "K":
-                    tform1 = "translate(20, 20)";
-                    break;
-                case "O":
-                    tform1 = "translate(20, 10)";
-                    break;
-                case "Q":
-                    tform1 = "translate(20, 10)";
-                    break;
-                case "R":
-                    tform1 = "translate(20, 15)";
-                    break;
-                case "S":
-                    tform1 = "translate(20, 20)";
-                    break;
-                case "Total":
-                    tform1 = "translate(20, 15)";
-                    break;
-                default:
-                    tform1 = "translate(20, 5)";
-            }
+            // Legend 1
+            let tform1 = "translate(20, 10)";
 
-            switch(TSA) {
-                case "A":
-                    tform2 = "translate(20, 248)";
-                    break;
-                case "D":
-                    tform2 = "translate(20, 254)";
-                    break;
-                case "E":
-                    tform2 = "translate(20, 255)";
-                    break;
-                case "G":
-                    tform2 = "translate(20, 248)";
-                    break;
-                case "H":
-                    tform2 = "translate(20, 248)";
-                    break;
-                case "I":
-                    tform2 = "translate(20, 254)";
-                    break;
-                case "L":
-                    tform2 = "translate(20, 254)";
-                    break;
-                case "M":
-                    tform2 = "translate(20, 254)";
-                    break;
-                case "N":
-                    tform2 = "translate(20, 254)";
-                    break;
-                case "P":
-                    tform2 = "translate(20, 254)";
-                    break;
-                case "T":
-                    tform2 = "translate(20, 248)";
-                    break;
-                case "Total":
-                    tform2 = "translate(20, 250)";
-                    break;
-                default:
-                    tform2 = "translate(20, 240)"
-            }
+            if (["D", "I", "J", "L", "M", "N", "P", "T", "U", "V"].includes(TSA))
+                tform1 = "translate(20, 5)";
+
+            if (["A", "G", "O", "Q", "R", "Total"].includes(TSA))
+                tform1 = "translate(20, 15)";
+
+            if (["F", "H", "K", "S"].includes(TSA))
+                tform1 = "translate(20, 20)";
+
+            if (["B"].includes(TSA))
+                tform1 = "translate(20, 30)";
+
+            if (["E"].includes(TSA))
+                tform1 = "translate(20, 60)";
 
             d3.select("#chart-case .stacked-top .legend")
                 .transition()
                 .duration(duration)
                 .attr("transform", tform1);
+
+            // Legend 2
+            let tform2 = "translate(20, 250)";
+
+            if (["B", "C", "F", "J", "K", "O", "Q", "R", "S", "U", "V"].includes(TSA))
+                tform2 = "translate(20, 240)";
+
+            if (["A", "G", "H", "T", "Total"].includes(TSA))
+                tform2 = "translate(20, 248)";
+
+            if (["D", "I", "L", "M", "N", "P"].includes(TSA))
+                tform2 = "translate(20, 254)";
+
+            if (["E"].includes(TSA))
+                tform2 = "translate(20, 255)";
 
             d3.select("#chart-case .stacked-bottom .legend")
                 .transition()
