@@ -156,14 +156,10 @@
             stroke-dasharray: 2;
         }
 
-        .note text, .warning text, .note-occupancy text {
+        .warning text, .note-occupancy text {
             font-size: 0.8em;
             fill: #999999;
             white-space: pre;
-        }
-
-        .note text {
-            text-anchor: end;;
         }
 
         .note-occupancy line {
@@ -620,14 +616,6 @@
                 .attr("y", 58)
                 .text("Moving Average (" + n_sma + "-day)");
 
-            // Note indicating incomplete total data
-            let note = svg.append("g")
-                .classed("note", true)
-                .style("opacity", 0);
-            note.append("line");
-            note.append("text")
-                .text(" Data incomplete prior to May 29 ");
-
             // Chart data elements
             svg.append("g")
                 .classed("data", true)
@@ -848,18 +836,6 @@
             let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
             updateWarning("#chart-hospital-beds", tsa, x_warning, width_warning, duration);
 
-            // Update incomplete data note
-            if (tsa === "Total") {
-                let x_note = xScale(parseDate('2020-05-29'));
-                let y_line_note = yScale(15);
-                let y_text_note = yScale(13);
-                updateNotePosition("#chart-hospital-beds", x_note, y_line_note, y_text_note);
-            }                    
-            chart.select(".note")
-                .transition()
-                .duration(duration)
-                .style("opacity", tsa === "Total" ? 1 : 0);
-
             // Toggle visibility of average hospital occupancy note
             chart.select(".note-occupancy")
                 .transition()
@@ -931,18 +907,6 @@
             let x_warning = xScale(parseDate('2020-07-23'));
             let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
             updateWarning("#chart-icu-beds", tsa, x_warning, width_warning, duration);
-
-            // Update incomplete data note
-            if (tsa === "Total") {
-                let x_note = xScale(parseDate('2020-05-29'));
-                let y_line_note = yScale(8);
-                let y_text_note = yScale(6);
-                updateNotePosition("#chart-icu-beds", x_note, y_line_note, y_text_note);
-            }
-            chart.select(".note")
-                .transition()
-                .duration(duration)
-                .style("opacity", tsa === "Total" ? 1 : 0);
 
             // Update title
             let title = "";
@@ -1035,18 +999,6 @@
             let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
             updateWarning("#chart-bed-count .stacked-top", tsa, x_warning, width_warning, duration);
             updateWarning("#chart-bed-count .stacked-bottom", tsa, x_warning, width_warning, duration);
-
-            // Update incomplete data note
-            if (tsa === "Total") {
-                let x_note = xScale(parseDate('2020-05-29'));
-                let y_line_note = yScale1(15000);
-                let y_text_note = yScale1(14000);
-                updateNotePosition("#chart-bed-count", x_note, y_line_note, y_text_note);
-            }
-            chart.select(".note")
-                .transition()
-                .duration(duration)
-                .style("opacity", tsa === "Total" ? 1 : 0);
 
             // Update title
             let title = "";
@@ -1228,23 +1180,6 @@
             moveCaseLegend(tsa, duration);
         }
 
-        // Move note indicating incomplete total data prior to May 31 to new position
-        function updateNotePosition(selector, x, y_line, y_text) {
-            d3.select(selector).select(".note line")
-                .attr("x1", x)
-                .attr("x2", x)
-                .attr("y1", y_line)
-                .attr("y2", height);
-
-            let text_anchor = "end";
-            if (selector === "#chart-icu-beds")
-                text_anchor = "start";
-
-            d3.select(selector).select(".note text")
-                .attr("x", x)
-                .attr("y", y_text)
-                .style("text-anchor", text_anchor);
-        }
 
         // Filter and format data into (x,y) for use with plot functions
         function filterData(data, yProp, xScale, yScale) {
