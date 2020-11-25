@@ -86,10 +86,13 @@
             margin: 50px auto 75px auto;
         }
 
+        div.container.stacked {
+            height: 490px;
+        }
+
         div.chart {
             float: left;
             width: 880px;
-            height: 450px;
         }
 
         g.xAxis, g.yAxis {
@@ -183,6 +186,12 @@
             fill: #F2DEDE;
         }
 
+        dt.warning {
+            color: #999999;
+            font-style: italic;
+            padding-top: 20px;
+        }
+
         div.data {
             float: right;
             width: 220px;
@@ -221,6 +230,11 @@
         div#data-bed-count dl {
             margin-top: 10px;
             margin-bottom: 50px;
+        }
+
+        div#data-case dl {
+            margin-top: 10px;
+            margin-bottom: 120px;
         }
 
         div.data dt {
@@ -293,6 +307,10 @@
         <label for="tsa">Select Location:</label>
         <select name="tsa" id="tsaSelect"></select>
     </div>
+    <div class="container stacked">
+        <div id="chart-case" class="chart"></div>
+        <div id="data-case" class="data"></div>
+    </div>
     <div class="container">
         <div id="chart-covid" class="chart"></div>
         <div id="data-covid" class="data"></div>
@@ -335,6 +353,7 @@
         const n_sma = 7; // Simple Moving Average window size
 
         // Initialize charts
+        createStackedChartFramework("#chart-case", "Cases", "Fatalities");
         createChartFramework("#chart-covid", "COVID-19 Inpatients", "COVID-19 ICU Inpatients");
         createChartFramework("#chart-bed-count", "Staffed Inpatient Beds", "Total ICU Beds");
         createChartFramework("#chart-hospital-beds", "Inpatient Beds Used", "Used Beds with COVID-19");
@@ -367,6 +386,10 @@
                 icu_beds_occupied = parseValue(d.icu_beds_occupied),
                 covid_inpatients = parseValue(d.covid_inpatients),
                 covid_icu_inpatients = parseValue(d.covid_icu_inpatients),
+                cases = parseValue(d.cases),
+                cases_new = parseValue(d.cases_new),
+                deaths = parseValue(d.deaths),
+                deaths_new = parseValue(d.deaths_new),
                 percent_total_covid = 100 * covid_inpatients / total_beds_occupied,
                 percent_icu_covid = 100 * covid_icu_inpatients / icu_beds_occupied;
 
@@ -390,7 +413,11 @@
                 covid_inpatients: covid_inpatients,
                 covid_icu_inpatients: covid_icu_inpatients,
                 percent_total_covid: percent_total_covid,
-                percent_icu_covid: percent_icu_covid
+                percent_icu_covid: percent_icu_covid,
+                cases: cases,
+                cases_new: cases_new,
+                deaths: deaths,
+                deaths_new: deaths_new
             };
         }).then(function(data_csv) {
 
@@ -418,6 +445,8 @@
                     data[tsa][i].icu_beds_sma = d3.mean(slice, d => d.icu_beds);
                     data[tsa][i].covid_inpatients_sma = d3.mean(slice, d => d.covid_inpatients);
                     data[tsa][i].covid_icu_inpatients_sma = d3.mean(slice, d => d.covid_icu_inpatients);
+                    data[tsa][i].cases_new_sma = d3.mean(slice, d => d.cases_new);
+                    data[tsa][i].deaths_new_sma = d3.mean(slice, d => d.deaths_new);
                 }
             });
 
@@ -448,12 +477,14 @@
                 .property("selected", function(d){ return d === TSA; });
 
              // Initial display of charts
+            updateCaseChart(data[TSA], 0);
             updateCOVIDChart(data[TSA], 0);
             updateCountChart(data[TSA], 0);
             updateTotalBedChart(data[TSA], 0);
             updateICUBedChart(data[TSA], 0);   
 
             // Populate details sections
+            updateCaseDetails(data[TSA][N]);
             updateCOVIDDetails(data[TSA][N]);
             updateCountDetails(data[TSA][N]);
             updateTotalDetails(data[TSA][N]);
@@ -468,6 +499,7 @@
                     window.history.replaceState(null, null, "?tsa=" + TSA);
 
                 // Update charts
+                updateCaseChart(data[TSA], 500);
                 updateCOVIDChart(data[TSA], 500);
                 updateCountChart(data[TSA], 500);
                 updateTotalBedChart(data[TSA], 500);
@@ -475,6 +507,7 @@
 
                 // Update details
                 let N = data[TSA].length - 1;
+                updateCaseDetails(data[TSA][N]);
                 updateCOVIDDetails(data[TSA][N]);
                 updateCountDetails(data[TSA][N]);
                 updateTotalDetails(data[TSA][N]);
@@ -609,6 +642,133 @@
                 .classed("overlay", true)
                 .attr("width", width)
                 .attr("height", height);
+        }
+
+        // Create stacked chart structure under selector with given legend values     
+        function createStackedChartFramework(selector, legend1, legend2) {
+            let svg = d3.select(selector)
+                .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height*1.1 + margin.top + margin.bottom)
+                    .append("g")
+                        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            let g1 = svg.append("g").classed("stacked-top", true);
+            let g2 = svg.append("g").classed("stacked-bottom", true);
+    
+            // Highlighted incomplete recent death data
+            let warning = g2.append("g")
+                .classed("warning", true);
+            warning.append("rect")
+                .attr("height", height*0.5)
+                .attr("transform", "translate(0, " + height*0.6 + ")");
+
+            g1.append("g")
+                .classed("yAxisGrid", true)
+
+            g2.append("g")
+                .classed("yAxisGrid", true)
+
+            g1.append("g")
+                .classed("yAxis", true)
+
+            g2.append("g")
+                .classed("yAxis", true)
+
+            g2.append("g")
+                .classed("xAxis", true)
+                .attr("transform", "translate(0, " + height*1.1 + ")");
+
+            // Vertical line during mouse-over
+            g1.append("line")
+                .classed("hover-line", true)
+                .attr("y1", 0)
+                .attr("y2", height*0.5)
+                .style("opacity", 0);
+
+            g2.append("line")
+                .classed("hover-line", true)
+                .attr("y1", height*0.6)
+                .attr("y2", height*1.1)
+                .style("opacity", 0);
+
+            // Legends
+            let L1 = g1.append("g")
+                .classed("legend", true)
+                .attr("transform", "translate(20, 15)");
+            L1.append("circle")
+                .classed("purple", true)
+                .attr("cx", 8)
+                .attr("cy", 8)
+                .attr("r", 4);
+            L1.append("text")
+                .attr("x", 25)
+                .attr("y", 13)
+                .text(legend1);
+            L1.append("line")
+                .attr("x1", 0)
+                .attr("x2", 16)
+                .attr("y1", 30)
+                .attr("y2", 30)
+                .style("stroke", "7570B3");
+            L1.append("text")
+                .attr("x", 25)
+                .attr("y", 36)
+                .text("Moving Average (" + n_sma + "-day)");
+
+            let L2 = g2.append("g")
+                .classed("legend", true)
+                .attr("transform", "translate(20, 250)");
+            L2.append("circle")
+                .classed("orange", true)
+                .attr("cx", 8)
+                .attr("cy", 8)
+                .attr("r", 4)
+            L2.append("text")
+                .attr("x", 25)
+                .attr("y", 13)
+                .text(legend2);
+            L2.append("line")
+                .attr("x1", 0)
+                .attr("x2", 16)
+                .attr("y1", 30)
+                .attr("y2", 30)
+                .style("stroke", "D95F02");
+            L2.append("text")
+                .attr("x", 25)
+                .attr("y", 36)
+                .text("Moving Average (" + n_sma + "-day)");
+
+            // Chart data elements
+            g1.append("g")
+                .classed("data", true)
+                .classed("purple", true)
+            g2.append("g")
+                .classed("data", true)
+                .classed("orange", true);
+
+            // Focus indicators during mouseover
+            g1.append("circle")
+                .classed("focus", true)
+                .classed("purple", true)
+                .attr("r", 5)
+                .style("opacity", 0);
+            g2.append("circle")
+                .classed("focus", true)
+                .classed("orange", true)
+                .attr("r", 5)
+                .style("opacity", 0);
+
+            g1.append("text")
+                .classed("chartTitle", true)
+                .attr("x", (width / 2))
+                .attr("y", 0 - (margin.top / 2));
+
+            // Overlay for handling comparison-view mouseover
+            svg.append("rect")
+                .classed("overlay", true)
+                .attr("width", width)
+                .attr("height", height*1.1);
         }
 
         // Generate the total hospital bed chart
@@ -928,6 +1088,102 @@
             moveCOVIDLegend(tsa, duration);
         }
 
+        // Generate the COVID-19 case chart
+        function updateCaseChart(data, duration) {
+            let chart = d3.select("#chart-case");
+            let tsa = data[0].tsa;
+
+            // Update x-axis
+            let xExtent = getDateExtent(data, "cases_new");
+            let xScale = d3.scaleTime()
+                .domain(xExtent)
+                .range([0, width]);
+            chart.select(".xAxis")
+                .transition()
+                .duration(duration)
+                .call(d3.axisBottom(xScale).ticks(d3.timeWeek.every(3)));
+
+            // Update first chart y-axis
+            let yMax1 = d3.max(data, d => d.cases_new);
+            let yScale1 = d3.scaleLinear()
+                .domain([0, yMax1]).nice(4)
+                .range([height*0.5, 0]);
+            let yAxis1 = d3.axisLeft(yScale1)
+                .ticks(3);
+            chart.select(".stacked-top .yAxis")
+                .transition()
+                .duration(duration)
+                .call(yAxis1);
+            let yAxisGrid1 = d3.axisLeft(yScale1)
+                .ticks(3)
+                .tickFormat('')
+                .tickSize(-width);
+            chart.select(".stacked-top .yAxisGrid")
+                .transition()
+                .duration(duration)
+                .call(yAxisGrid1);
+
+            // Update second chart y-axis
+            let yMax2 = d3.max(data, d => d.deaths_new);
+            let yScale2 = d3.scaleLinear()
+                .domain([0, yMax2]).nice(4)
+                .range([height*1.1, height*0.6]);
+            let yAxis2 = d3.axisLeft(yScale2)
+                .ticks(3);
+            chart.select(".stacked-bottom .yAxis")
+                .transition()
+                .duration(duration)
+                .call(yAxis2);
+            let yAxisGrid2 = d3.axisLeft(yScale2)
+                .ticks(3)
+                .tickFormat('')
+                .tickSize(-width);
+            chart.select(".stacked-bottom .yAxisGrid")
+                .transition()
+                .duration(duration)
+                .call(yAxisGrid2);
+
+            // Daily New COVID-19 Cases
+            let filtered = filterData(data, "cases_new", xScale, yScale1);
+            drawScatterPlot("#chart-case .data.purple", filtered, duration);
+
+            // Daily New COVID-19 Cases - Simple Moving Average
+            filtered = filterData(data, "cases_new_sma", xScale, yScale1);
+            drawLinePlot("#chart-case .data.purple", filtered, duration);
+
+            // Daily New COVID-19 Deaths
+            filtered = filterData(data, "deaths_new", xScale, yScale2);
+            drawScatterPlot("#chart-case .data.orange", filtered, duration);
+
+            // Daily New COVID-19 Deaths - Simple Moving Average
+            filtered = filterData(data.slice(0, data.length - 20), "deaths_new_sma", xScale, yScale2);
+            drawLinePlot("#chart-case .data.orange", filtered, duration);
+
+            // Update overlay
+            updateStackedOverlay("#chart-case", data, "cases_new", "deaths_new",
+                xExtent, xScale, yScale1, yScale2, updateCaseDetails);
+
+            // Update warning region
+            let last_date = d3.max(data, d => d.date);
+            let warning_stop = xScale(last_date);
+            let warning_start = xScale(d3.timeDay.offset(last_date, -20));
+            chart.select(".warning rect")
+                .transition()
+                .duration(duration)
+                .attr("x", warning_start)
+                .attr("width", warning_stop - warning_start);
+
+            // Update title
+            let title = "";
+            if (tsa === "Total")
+                title = "Statewide Daily COVID-19 Cases and Fatalities";
+            else
+                title = "Daily COVID-19 Cases and Fatalities in TSA-" + tsa + " (" + data[0].location + ")";
+            chart.select(".chartTitle").text(title);
+
+            moveCaseLegend(tsa, duration);
+        }
+
         // Move note indicating incomplete total data prior to May 31 to new position
         function updateNotePosition(selector, x, y_line, y_text) {
             d3.select(selector).select(".note line")
@@ -1042,6 +1298,62 @@
                             
                     if (!isNaN(d[i][yProp1]) || !isNaN(d[i][yProp2])) {
                         hover_line
+                            .attr("x1", xScale(d[i]["date"]))
+                            .attr("x2", xScale(d[i]["date"]));
+                        updateDetailFnc(d[i]);
+                    }
+                });
+        }
+
+        // Draw and update overlay on stacked charts for controlling mouseover 
+        // functionality with highlighted data points and vertical hover line
+        function updateStackedOverlay(selector, data, yProp1, yProp2, xExtent, xScale, yScale1, yScale2, updateDetailFnc) {
+            let overlay = d3.select(selector).select(".overlay");
+            let focus_purple = d3.select(selector).select("circle.focus.purple");
+            let focus_orange = d3.select(selector).select("circle.focus.orange");
+            let hover_line1 = d3.select(selector).select(".stacked-top .hover-line");
+            let hover_line2 = d3.select(selector).select(".stacked-bottom .hover-line");
+
+            overlay.datum(data)
+                .on("mouseover", function() { 
+                    focus_purple.style("opacity", 1);
+                    focus_orange.style("opacity", 1);
+                    hover_line1.style("opacity", 1);
+                    hover_line2.style("opacity", 1);
+                })
+                .on("mouseout", function(d) {
+                    focus_purple.style("opacity", 0);
+                    focus_orange.style("opacity", 0);
+                    hover_line1.style("opacity", 0);
+                    hover_line2.style("opacity", 0);
+                    updateDetailFnc(d[d.length - 1]);
+                })
+                .on('mousemove', function(d) { 
+                    let offset = bisectDate(d, xExtent[0]);
+                    let x0 = xScale.invert(d3.mouse(this)[0]);
+                    let i = bisectDate(d, x0, offset, d.length - 1);
+
+                    if (isNaN(d[i][yProp1]))
+                        focus_purple.style("opacity", 0);
+                    else
+                        focus_purple
+                            .style("opacity", 1)
+                            .attr("cx", xScale(d[i]["date"]))
+                            .attr("cy", yScale1(d[i][yProp1]));                        
+
+                    if (isNaN(d[i][yProp2]))
+                        focus_orange.style("opacity", 0);
+                    else
+                        focus_orange
+                            .style("opacity", 1)
+                            .attr("cx", xScale(d[i]["date"]))
+                            .attr("cy", yScale2(d[i][yProp2]));
+                            
+                    if (!isNaN(d[i][yProp1]) || !isNaN(d[i][yProp2])) {
+                        hover_line1
+                            .attr("x1", xScale(d[i]["date"]))
+                            .attr("x2", xScale(d[i]["date"]));
+                        hover_line2
                             .attr("x1", xScale(d[i]["date"]))
                             .attr("x2", xScale(d[i]["date"]));
                         updateDetailFnc(d[i]);
@@ -1172,7 +1484,7 @@
             );
         }
 
-        // Update COVID-19 details
+        // Update COVID-19 hospitalization details
         function updateCOVIDDetails(data) {
             d3.select("#data-covid").html("" +
                 "<h4>" + formatDate(data.date) + "</h4>" +
@@ -1182,6 +1494,29 @@
                 "<h3>" + 
                     "<strong class='covid-number'>" + formatNumber(data.covid_icu_inpatients) + "</strong> COVID-19 ICU inpatients" +
                 "</h3>"
+            );
+        }
+
+        // Update case and death details
+        function updateCaseDetails(data) {
+            d3.select("#data-case").html("" +
+                "<h4>" + formatDate(data.date) + "</h4>" +
+                "<h3>" +
+                    "<strong class='bed-number'>" + formatNumber(data.cases_new) + "</strong> daily cases" + 
+                "</h3>" +
+                "<dl>" +
+                    "<dt>Cumulative Cases</dt>" +
+                    "<dd>" + formatNumber(data.cases) + "</dd>" +
+                "</dl>" +
+                "<h3>" + 
+                    "<strong class='covid-number'>" + formatNumber(data.deaths_new) + "</strong> daily fatalities" +
+                "</h3>" + 
+                "<dl>" +
+                    "<dt>Cumulative Fatalities</dt>" +
+                    "<dd>" + formatNumber(data.deaths) + "</dd>" +
+                    "<dt class='warning'>Data incomplete over past three weeks as fatalities are reported</dt>" +
+                "</dl>"
+
             );
         }
 
@@ -1351,6 +1686,107 @@
                 .transition()
                 .duration(duration)
                 .attr("transform", tform);
+        }
+
+        // Position case/fatality chart legend based on currently selected TSA
+        function moveCaseLegend(TSA,duration) {
+            let tform1
+            let tform2;
+
+            switch(TSA) {
+                case "A":
+                    tform1 = "translate(20, 15)";
+                    break;
+                case "B":
+                    tform1 = "translate(20, 30)";
+                    break;
+                case "C":
+                    tform1 = "translate(20, 10)";
+                    break;
+                case "E":
+                    tform1 = "translate(20, 55)";
+                    break;
+                case "F":
+                    tform1 = "translate(20, 20)";
+                    break;
+                case "G":
+                    tform1 = "translate(20, 10)";
+                    break;
+                case "H":
+                    tform1 = "translate(20, 20)";
+                    break;
+                case "K":
+                    tform1 = "translate(20, 20)";
+                    break;
+                case "O":
+                    tform1 = "translate(20, 10)";
+                    break;
+                case "Q":
+                    tform1 = "translate(20, 10)";
+                    break;
+                case "R":
+                    tform1 = "translate(20, 15)";
+                    break;
+                case "S":
+                    tform1 = "translate(20, 20)";
+                    break;
+                case "Total":
+                    tform1 = "translate(20, 15)";
+                    break;
+                default:
+                    tform1 = "translate(20, 5)";
+            }
+
+            switch(TSA) {
+                case "A":
+                    tform2 = "translate(20, 248)";
+                    break;
+                case "D":
+                    tform2 = "translate(20, 254)";
+                    break;
+                case "E":
+                    tform2 = "translate(20, 255)";
+                    break;
+                case "G":
+                    tform2 = "translate(20, 248)";
+                    break;
+                case "H":
+                    tform2 = "translate(20, 248)";
+                    break;
+                case "I":
+                    tform2 = "translate(20, 254)";
+                    break;
+                case "L":
+                    tform2 = "translate(20, 254)";
+                    break;
+                case "M":
+                    tform2 = "translate(20, 254)";
+                    break;
+                case "N":
+                    tform2 = "translate(20, 254)";
+                    break;
+                case "P":
+                    tform2 = "translate(20, 254)";
+                    break;
+                case "T":
+                    tform2 = "translate(20, 248)";
+                    break;
+                case "Total":
+                    tform2 = "translate(20, 250)";
+                    break;
+                default:
+                    tform2 = "translate(20, 240)"
+            }
+
+            d3.select("#chart-case .stacked-top .legend")
+                .transition()
+                .duration(duration)
+                .attr("transform", tform1);
+
+            d3.select("#chart-case .stacked-bottom .legend")
+                .transition()
+                .duration(duration)
+                .attr("transform", tform2);
         }
 
     </script>
