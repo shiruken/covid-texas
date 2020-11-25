@@ -258,6 +258,7 @@ df_merged.loc[(df_merged['tsa'] == 'T') & (df_merged['date'] == '2020-07-26'), [
 df_merged.loc[(df_merged['tsa'] == 'U') & (df_merged['date'] == '2020-07-26'), 'total_beds_occupied'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'V') & (df_merged['date'] == '2020-07-26'), ['total_beds_occupied', 'total_beds_available', 'icu_beds_available']] = np.nan
 
+df_merged.loc[(df_merged['tsa'] == 'B') & (df_merged['date'] == '2020-07-27'), 'icu_beds_occupied'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'H') & (df_merged['date'] == '2020-07-27'), 'total_beds_occupied'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'J') & (df_merged['date'] == '2020-07-27'), 'total_beds_available'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'K') & (df_merged['date'] == '2020-07-27'), 'covid_inpatients'] = np.nan

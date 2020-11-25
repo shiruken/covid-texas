@@ -229,7 +229,7 @@
 
         div#data-bed-count dl {
             margin-top: 10px;
-            margin-bottom: 50px;
+            margin-bottom: 80px;
         }
 
         div#data-case dl {
@@ -315,7 +315,7 @@
         <div id="chart-covid" class="chart"></div>
         <div id="data-covid" class="data"></div>
     </div>
-    <div class="container">
+    <div class="container stacked">
         <div id="chart-bed-count" class="chart"></div>
         <div id="data-bed-count" class="data"></div>
     </div>
@@ -355,9 +355,25 @@
         // Initialize charts
         createStackedChartFramework("#chart-case", "Cases", "Fatalities");
         createChartFramework("#chart-covid", "COVID-19 Inpatients", "COVID-19 ICU Inpatients");
-        createChartFramework("#chart-bed-count", "Staffed Inpatient Beds", "Total ICU Beds");
+        createStackedChartFramework("#chart-bed-count", "Staffed Inpatient Beds", "Total ICU Beds");
         createChartFramework("#chart-hospital-beds", "Inpatient Beds Used", "Used Beds with COVID-19");
         createChartFramework("#chart-icu-beds", "ICU Beds Used", "Used ICU Beds with COVID-19");
+
+        // Add warnings to hospital resource chart
+        d3.select("#chart-bed-count .stacked-top .warning").append("rect")
+            .attr("height", height*0.5);
+        d3.select("#chart-bed-count .stacked-top .warning").append("text")
+            .text(" Data incomplete between July 23-28");
+        d3.select("#chart-bed-count .stacked-bottom .warning").append("rect")
+            .attr("height", height*0.5)
+            .attr("transform", "translate(0, " + height*0.6 + ")")
+        d3.select("#chart-bed-count .stacked-bottom .warning").append("text")
+            .text(" Data incomplete between July 23-28");
+
+        // Add warning to fatalities chart
+        d3.select("#chart-case .stacked-bottom .warning").append("rect")
+            .attr("height", height*0.5)
+            .attr("transform", "translate(0, " + height*0.6 + ")")
 
         // Add average occupancy rate to hospital bed usage chart
         let note_occupancy = d3.select("#chart-hospital-beds g")
@@ -656,12 +672,17 @@
             let g1 = svg.append("g").classed("stacked-top", true);
             let g2 = svg.append("g").classed("stacked-bottom", true);
     
-            // Highlighted incomplete recent death data
-            let warning = g2.append("g")
+            // Highlighted region delineating period of incomplete data
+            let warning1 = g1.append("g")
                 .classed("warning", true);
-            warning.append("rect")
-                .attr("height", height*0.5)
-                .attr("transform", "translate(0, " + height*0.6 + ")");
+            // warning1.append("rect");
+            // warning1.append("text")
+            //     .attr("y", 20);
+            let warning2 = g2.append("g")
+                .classed("warning", true)
+            // warning2.append("rect");
+            // warning2.append("text")
+            //     .attr("y", height*0.6 + 20);
 
             g1.append("g")
                 .classed("yAxisGrid", true)
@@ -949,56 +970,77 @@
                 .duration(duration)
                 .call(d3.axisBottom(xScale).ticks(d3.timeWeek.every(3)));
 
-            // Update y-axis
-            let yMax = d3.max(data, d => d.total_beds);
-            let yScale = d3.scaleLinear()
-                .domain([0, yMax]).nice(4)
-                .range([height, 0]);
-            let yAxis = d3.axisLeft(yScale)
-                .ticks(4);
-            chart.select(".yAxis")
+            // Update first chart y-axis
+            let yMax1 = d3.max(data, d => d.total_beds);
+            let yScale1 = d3.scaleLinear()
+                .domain([0, yMax1]).nice(4)
+                .range([height*0.5, 0]);
+            let yAxis1 = d3.axisLeft(yScale1)
+                .ticks(3);
+            chart.select(".stacked-top .yAxis")
                 .transition()
                 .duration(duration)
-                .call(yAxis);
-            let yAxisGrid = d3.axisLeft(yScale)
+                .call(yAxis1);
+            let yAxisGrid1 = d3.axisLeft(yScale1)
+                .ticks(3)
+                .tickFormat('')
+                .tickSize(-width);
+            chart.select(".stacked-top .yAxisGrid")
+                .transition()
+                .duration(duration)
+                .call(yAxisGrid1);
+
+            // Update second chart y-axis
+            let yMax2 = d3.max(data, d => d.icu_beds);
+            let yScale2 = d3.scaleLinear()
+                .domain([0, yMax2]).nice(4)
+                .range([height*1.1, height*0.6]);
+            let yAxis2 = d3.axisLeft(yScale2)
+                .ticks(4);
+            chart.select(".stacked-bottom .yAxis")
+                .transition()
+                .duration(duration)
+                .call(yAxis2);
+            let yAxisGrid2 = d3.axisLeft(yScale2)
                 .ticks(4)
                 .tickFormat('')
                 .tickSize(-width);
-            chart.select(".yAxisGrid")
+            chart.select(".stacked-bottom .yAxisGrid")
                 .transition()
                 .duration(duration)
-                .call(yAxisGrid);
+                .call(yAxisGrid2);
 
             // Total Staffed Hospital Bed Count
-            let filtered = filterData(data, "total_beds", xScale, yScale);
+            let filtered = filterData(data, "total_beds", xScale, yScale1);
             drawScatterPlot("#chart-bed-count .data.purple", filtered, duration);
 
             // Total Staffed Hospital Bed Count - Simple Moving Average
-            filtered = filterData(data, "total_beds_sma", xScale, yScale);
+            filtered = filterData(data, "total_beds_sma", xScale, yScale1);
             drawLinePlot("#chart-bed-count .data.purple", filtered, duration);
 
             // Total ICU Bed Count
-            filtered = filterData(data, "icu_beds", xScale, yScale);
+            filtered = filterData(data, "icu_beds", xScale, yScale2);
             drawScatterPlot("#chart-bed-count .data.orange", filtered, duration);
 
             // Total ICU Bed Count - Simple Moving Average
-            filtered = filterData(data, "icu_beds_sma", xScale, yScale);
+            filtered = filterData(data, "icu_beds_sma", xScale, yScale2);
             drawLinePlot("#chart-bed-count .data.orange", filtered, duration);
 
             // Update overlay
-            updateOverlay("#chart-bed-count", data, "total_beds", "icu_beds",
-                            xExtent, xScale, yScale, updateCountDetails);
+            updateStackedOverlay("#chart-bed-count", data, "total_beds", "icu_beds",
+                xExtent, xScale, yScale1, yScale2, updateCountDetails);
 
             // Update warning region
             let x_warning = xScale(parseDate('2020-07-23'));
             let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
-            updateWarning("#chart-bed-count", tsa, x_warning, width_warning, duration);
+            updateWarning("#chart-bed-count .stacked-top", tsa, x_warning, width_warning, duration);
+            updateWarning("#chart-bed-count .stacked-bottom", tsa, x_warning, width_warning, duration);
 
             // Update incomplete data note
             if (tsa === "Total") {
                 let x_note = xScale(parseDate('2020-05-29'));
-                let y_line_note = yScale(15000);
-                let y_text_note = yScale(14000);
+                let y_line_note = yScale1(15000);
+                let y_text_note = yScale1(14000);
                 updateNotePosition("#chart-bed-count", x_note, y_line_note, y_text_note);
             }
             chart.select(".note")
@@ -1167,7 +1209,9 @@
             let last_date = d3.max(data, d => d.date);
             let warning_stop = xScale(last_date);
             let warning_start = xScale(d3.timeDay.offset(last_date, -20));
-            chart.select(".warning rect")
+            chart.select(".stacked-bottom .warning rect")
+                .attr("height", height*0.5)
+                .attr("transform", "translate(0, " + height*0.6 + ")")
                 .transition()
                 .duration(duration)
                 .attr("x", warning_start)
@@ -1377,9 +1421,11 @@
                 if (["A", "B", "D", "E", "F", "G", "I", "M", "N", "P", "Q", "R", "T", "U", "V"].includes(tsa))
                     y = height - 20;
             
-            if (selector === "#chart-bed-count")
-                if (["I", "T"].includes(tsa))
-                    y = height - 20;
+            if (selector === "#chart-bed-count .stacked-top") 
+                y = height*0.5 - 20;
+
+            if (selector === "#chart-bed-count .stacked-bottom") 
+                y = height*1.1 - 15;
 
             if (selector === "#chart-hospital-beds")
                 if (["T"].includes(tsa))
@@ -1567,64 +1613,130 @@
 
         // Position count chart legend based on currently selected TSA
         function moveCountLegend(TSA,duration) {
-            let tform;
+            let tform1;
+            let tform2;
 
             switch(TSA) {
                 case "A":
-                    tform = "translate(100, 165)";
-                    break;                    
+                    tform1 = "translate(20, 145)";
+                    break;
                 case "C":
-                    tform = "translate(20, 30)";
+                    tform1 = "translate(20, 15)";
                     break;
                 case "D":
-                    tform = "translate(20, 2)";
+                    tform1 = "translate(20, 135)";
                     break;
                 case "E":
-                    tform = "translate(20, 10)";
+                    tform1 = "translate(20, 150)";
                     break;
                 case "G":
-                    tform = "translate(20, 30)";
+                    tform1 = "translate(20, 140)";
                     break;
                 case "I":
-                    tform = "translate(20, 10)";
-                    break;
-                case "L":
-                    tform = "translate(20, 190)";
+                    tform1 = "translate(20, 135)";
                     break;
                 case "M":
-                    tform = "translate(20, 215)";
+                    tform1 = "translate(20, 150)";
                     break;
                 case "N":
-                    tform = "translate(20, 190)";
+                    tform1 = "translate(20, 140)";
                     break;
                 case "O":
-                    tform = "translate(20, 10)";
+                    tform1 = "translate(20, 140)";
                     break;
                 case "P":
-                    tform = "translate(20, 210)";
+                    tform1 = "translate(20, 150)";
                     break;
                 case "R":
-                    tform = "translate(20, 10)";
+                    tform1 = "translate(20, 135)";
+                    break;
+                case "S":
+                    tform1 = "translate(20, 150)";
                     break;
                 case "T":
-                    tform = "translate(20, 165)";
+                    tform1 = "translate(20, 135)";
                     break;
                 case "U":
-                    tform = "translate(20, 30)";
+                    tform1 = "translate(20, 15)";
                     break;
                 default:
-                    tform = "translate(20, 20)";
+                    tform1 = "translate(20, 5)";
             }
 
-            d3.select("#chart-bed-count g.legend")
+            switch(TSA) {
+                case "A":
+                    tform2 = "translate(20, 245)";
+                    break;
+                case "B":
+                    tform2 = "translate(20, 372)";
+                    break;
+                case "C":
+                    tform2 = "translate(20, 240)";
+                    break;
+                case "D":
+                    tform2 = "translate(20, 240)";
+                    break;
+                case "E":
+                    tform2 = "translate(20, 370)";
+                    break;
+                case "F":
+                    tform2 = "translate(20, 245)";
+                    break;
+                case "G":
+                    tform2 = "translate(20, 360)";
+                    break;
+                case "I":
+                    tform2 = "translate(20, 245)";
+                    break;
+                case "J":
+                    tform2 = "translate(20, 240)";
+                    break;
+                case "K":
+                    tform2 = "translate(20, 245)";
+                    break;
+                case "M":
+                    tform2 = "translate(20, 385)";
+                    break;
+                case "N":
+                    tform2 = "translate(20, 375)";
+                    break;
+                case "P":
+                    tform2 = "translate(20, 380)";
+                    break;
+                case "Q":
+                    tform2 = "translate(20, 245)";
+                    break;
+                case "R":
+                    tform2 = "translate(20, 240)";
+                    break;
+                case "S":
+                    tform2 = "translate(20, 370)";
+                    break;
+                case "T":
+                    tform2 = "translate(20, 378)";
+                    break;
+                case "V":
+                    tform2 = "translate(20, 240)";
+                    break;
+                default:
+                    tform2 = "translate(20, 235)";
+            }
+
+            d3.select("#chart-bed-count .stacked-top .legend")
                 .transition()
                 .duration(duration)
-                .attr("transform", tform);
+                .attr("transform", tform1);
+
+            d3.select("#chart-bed-count .stacked-bottom .legend")
+                .transition()
+                .duration(duration)
+                .attr("transform", tform2);
         }
 
         // Position COVID-19 chart legend based on currently selected TSA
         function moveCOVIDLegend(TSA,duration) {
-            let tform;
+            let tform1;
+            let tform2;
 
             switch(TSA) {
                 case "A":
