@@ -1493,11 +1493,14 @@
             if (["R"].includes(TSA))
                 tform = "translate(20, 85)";
                 
-            if (["G", "H", "I", "L", "Q", "T", "U"].includes(TSA))
+            if (["G", "I", "L", "Q", "T", "U"].includes(TSA))
                 tform = "translate(20, 165)";
 
             if (["M", "V"].includes(TSA))
                 tform = "translate(20, 245)";
+
+            if(TSA == "H")
+                tform = "translate(260, 320)";
 
             d3.select("#chart-icu-beds g.legend")
                 .transition()
@@ -1565,13 +1568,13 @@
         function moveCOVIDLegend(TSA,duration) {
             let tform = "translate(20, 10)";
 
-            if (["I", "L", "Total"].includes(TSA))
+            if (["I", "K", "L", "M", "Total"].includes(TSA))
                 tform = "translate(20, 2)";
 
-            if (["C", "F", "J", "P", "S", "V"].includes(TSA))
+            if (["C", "D", "F", "J", "P", "S", "V"].includes(TSA))
                 tform = "translate(20, 20)";
 
-            if (["D", "H", "O", "Q", "R", "T", "U"].includes(TSA))
+            if (["E", "H", "O", "Q", "R", "T", "U"].includes(TSA))
                 tform = "translate(20, 30)";
 
             d3.select("#chart-covid g.legend")
@@ -1586,20 +1589,17 @@
             // Legend 1
             let tform1 = "translate(20, 10)";
 
-            if (["D", "I", "J", "L", "M", "N", "P", "T", "U", "V"].includes(TSA))
+            if (["D", "G", "I", "M", "N", "O", "P", "Q", "U", "V", "Total"].includes(TSA))
                 tform1 = "translate(20, 5)";
 
-            if (["A", "G", "O", "Q", "R", "Total"].includes(TSA))
+            if (["A", "B", "C", "R", "T"].includes(TSA))
                 tform1 = "translate(20, 15)";
 
-            if (["F", "H", "K", "S"].includes(TSA))
+            if (["F", "H", "K", "L", "S"].includes(TSA))
                 tform1 = "translate(20, 20)";
 
-            if (["B"].includes(TSA))
+            if(["J"].includes(TSA))
                 tform1 = "translate(20, 30)";
-
-            if (["E"].includes(TSA))
-                tform1 = "translate(20, 60)";
 
             d3.select("#chart-case .stacked-top .legend")
                 .transition()
@@ -1609,16 +1609,16 @@
             // Legend 2
             let tform2 = "translate(20, 250)";
 
-            if (["B", "C", "F", "J", "K", "O", "Q", "R", "S", "U", "V"].includes(TSA))
+            if (["D", "F", "O", "Q", "R", "S", "U", "V"].includes(TSA))
                 tform2 = "translate(20, 240)";
 
-            if (["A", "G", "H", "T", "Total"].includes(TSA))
+            if (["A", "G", "H", "I", "M", "T", "Total"].includes(TSA))
                 tform2 = "translate(20, 248)";
 
-            if (["D", "I", "L", "M", "N", "P"].includes(TSA))
+            if (["B", "L", "N", "P"].includes(TSA))
                 tform2 = "translate(20, 254)";
 
-            if (["E"].includes(TSA))
+            if (["C", "E", "J"].includes(TSA))
                 tform2 = "translate(20, 255)";
 
             d3.select("#chart-case .stacked-bottom .legend")
