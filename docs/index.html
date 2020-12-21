@@ -1537,7 +1537,7 @@
             // Legend 2
             let tform2 = "translate(20, 250)";
 
-            if (["H", "L", "O", "U", "Total"].includes(TSA))
+            if (["H", "M", "U", "Total"].includes(TSA))
                 tform2 = "translate(20, 235)";
 
             if (["C", "D", "J", "R", "V"].includes(TSA))
@@ -1552,10 +1552,10 @@
             if (["B", "E", "N", "S"].includes(TSA))
                 tform2 = "translate(20, 372)";
 
-            if (["P", "T"].includes(TSA))
+            if (["O", "P", "T"].includes(TSA))
                 tform2 = "translate(20, 378)";
 
-            if (["M"].includes(TSA))
+            if (["L"].includes(TSA))
                 tform2 = "translate(20, 385)";
 
             d3.select("#chart-bed-count .stacked-bottom .legend")
@@ -1568,13 +1568,13 @@
         function moveCOVIDLegend(TSA,duration) {
             let tform = "translate(20, 10)";
 
-            if (["I", "K", "L", "M", "Total"].includes(TSA))
+            if (["I", "K", "Total"].includes(TSA))
                 tform = "translate(20, 2)";
 
-            if (["C", "D", "F", "J", "P", "S", "V"].includes(TSA))
+            if (["C", "D", "E", "F", "J", "L", "P", "S", "V"].includes(TSA))
                 tform = "translate(20, 20)";
 
-            if (["E", "H", "O", "Q", "R", "T", "U"].includes(TSA))
+            if (["H", "G", "O", "M", "Q", "R", "T", "U"].includes(TSA))
                 tform = "translate(20, 30)";
 
             d3.select("#chart-covid g.legend")
@@ -1589,16 +1589,16 @@
             // Legend 1
             let tform1 = "translate(20, 10)";
 
-            if (["D", "G", "I", "M", "N", "O", "P", "Q", "U", "V", "Total"].includes(TSA))
+            if (["D", "G", "I", "N", "O", "Q", "U", "V", "Total"].includes(TSA))
                 tform1 = "translate(20, 5)";
 
-            if (["A", "B", "C", "R", "T"].includes(TSA))
+            if (["A", "B", "C", "E", "R"].includes(TSA))
                 tform1 = "translate(20, 15)";
 
-            if (["F", "H", "K", "L", "S"].includes(TSA))
+            if (["F", "H", "K", "L", "M", "P", "S"].includes(TSA))
                 tform1 = "translate(20, 20)";
 
-            if(["J"].includes(TSA))
+            if(["J", "T"].includes(TSA))
                 tform1 = "translate(20, 30)";
 
             d3.select("#chart-case .stacked-top .legend")
@@ -1612,13 +1612,13 @@
             if (["D", "F", "O", "Q", "R", "S", "U", "V"].includes(TSA))
                 tform2 = "translate(20, 240)";
 
-            if (["A", "G", "H", "I", "M", "T", "Total"].includes(TSA))
+            if (["A", "D", "G", "H", "I", "M", "T", "Total"].includes(TSA))
                 tform2 = "translate(20, 248)";
 
-            if (["B", "L", "N", "P"].includes(TSA))
+            if (["B", "P"].includes(TSA))
                 tform2 = "translate(20, 254)";
 
-            if (["C", "E", "J"].includes(TSA))
+            if (["C"].includes(TSA))
                 tform2 = "translate(20, 255)";
 
             d3.select("#chart-case .stacked-bottom .legend")
