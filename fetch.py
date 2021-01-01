@@ -75,7 +75,7 @@ def map_county_to_tsa(county):
 
 # Load combined hospital data
 url = 'https://www.dshs.state.tx.us/coronavirus/CombinedHospitalDataoverTimebyTSA.xlsx'
-df = pd.read_excel(url, sheet_name=None, header=2, index_col=[0, 1], nrows=23, engine='openpyxl')
+df = pd.read_excel(url, sheet_name=None, header=2, index_col=[0, 1], nrows=23)
 
 # Parse total available beds
 df['Total Available Beds'].replace('--', np.nan, inplace=True)
@@ -123,7 +123,7 @@ fix_date_index(df_covid_icu_inpatients)
 
 # Load and parse total case count data
 url = 'https://www.dshs.state.tx.us/coronavirus/TexasCOVID19DailyCountyCaseCountData.xlsx'
-df = pd.read_excel(url, sheet_name='Cases by County', index_col=[0], header=2, nrows=255, engine='openpyxl')
+df = pd.read_excel(url, sheet_name='Cases by County', index_col=[0], header=2, nrows=255)
 df.columns = [pd.to_datetime(date[6:] + '-20') for date in df.columns]
 df = df.loc[:, df.columns > '2020-04-11']
 df.insert(0, 'TSA ID', [map_county_to_tsa(county) for county in df.index])
@@ -137,7 +137,7 @@ df_cases.rename(columns = {0: 'cases'}, inplace=True)
 
 # Load and parse daily case count data
 url = 'https://www.dshs.state.tx.us/coronavirus/TexasCOVID-19NewCasesOverTimebyCounty.xlsx'
-df = pd.read_excel(url, sheet_name='New Cases by County', index_col=[0], header=2, nrows=255, engine='openpyxl')
+df = pd.read_excel(url, sheet_name='New Cases by County', index_col=[0], header=2, nrows=255)
 df.columns = [pd.to_datetime(date[-5:] + '-20') for date in df.columns]
 df = df.loc[:, df.columns > '2020-04-11']
 df.insert(0, 'TSA ID', [map_county_to_tsa(county) for county in df.index])
@@ -150,7 +150,7 @@ df_cases_new.rename(columns = {0: 'cases_new'}, inplace=True)
 
 # Load and parse total death data
 url = 'https://www.dshs.state.tx.us/coronavirus/TexasCOVID19DailyCountyFatalityCountData.xlsx'
-df = pd.read_excel(url, sheet_name='Fatalities by County', index_col=[0], header=2, nrows=256, engine='openpyxl')
+df = pd.read_excel(url, sheet_name='Fatalities by County', index_col=[0], header=2, nrows=256)
 df.columns = [pd.to_datetime(date[11:] + '-20') for date in df.columns]
 df_new = df.diff(axis=1) # Extract daily death count
 df.drop(index='UNKNOWN', inplace=True)
