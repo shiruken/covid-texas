@@ -1,0 +1,623 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Texas COVID-19 Vaccine Tracker</title>
+    <meta name="description" content="Texas COVID-19 vaccine distribution tracker based on Department of State Health Services data.">
+    <meta name="keywords" content="COVID-19, coronavirus, SARS-CoV-2, Texas, Vaccine, mRNA-1273, Tozinameran, Pfizer, BioNTech, Moderna, DSHS, TSA, D3, D3.js, Cases, Outbreak, Pandemic">
+    <link rel="icon" type="image/png" href="../favicon.png">
+    <meta name="author" content="Colin Sullender">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:creator" content="@shiruken">
+    <meta name="twitter:title" content="Texas COVID-19 Vaccine Tracker">
+    <meta name="twitter:description" content="Texas COVID-19 vaccine distribution tracker based on Department of State Health Services data.">
+    <meta name="twitter:image" content="https://covid-texas.csullender.com/vaccine/social.png">
+    
+    <meta property="og:title" content="Texas COVID-19 Vaccine Tracker">
+    <meta property="og:description" content="Texas COVID-19 vaccine distribution tracker based on Department of State Health Services data.">
+    <meta property="og:image" content="https://covid-texas.csullender.com/vaccine/social.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="628">
+    <meta property="og:url" content="https://covid-texas.csullender.com/vaccine">
+    <meta property="og:type" content="website">
+
+    <meta name="viewport" content="width=1100">
+
+    <style>
+        body { 
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        header {
+            text-align: center;
+        }
+
+        header h1#title {
+            margin-bottom: 5px;
+        }
+
+        h2#subtitle {
+            font-size: 1em;
+            color: #999;
+            font-weight: normal;
+            margin-top: 5px;
+            min-height: 22px;
+        }
+
+        div#control {
+            text-align: center;
+            font-size: 1.2em;
+            margin-top: 50px;
+        }
+
+        select#countySelect {
+            font-size: 1em;
+            padding: 3px;
+            width: 175px;
+        }
+
+        div.container {
+            width: 1100px;
+            height: 450px;
+            margin: 50px auto 30px auto;
+        }
+
+        div.chart {
+            float: left;
+            width: 880px;
+        }
+
+        g.xAxis, g.yAxis {
+            font-size: 0.9em;
+        }
+
+        g.yAxisGrid {
+            color: #ccc;
+        }
+
+        text.chartTitle {
+            font-size: 1.1em;
+            font-weight: bold;
+            text-anchor: middle;
+        }
+
+        .data path {
+            fill: none;
+            stroke-width: 4;
+            stroke-linecap: round;
+        }
+
+        .purple path, line.purple {
+            stroke: #7570B3;
+        }
+
+        .orange path, line.orange {
+            stroke: #D95F02;
+        }
+
+        .green path, line.green {
+            stroke: #1b9e77;
+        }
+
+        .legend line {
+            stroke-width: 4;
+            stroke-linecap: round;
+        }
+
+        line.hover-line {
+            stroke: #999999;
+            stroke-width: 1px;
+            stroke-dasharray: 4;
+        }
+
+        rect.overlay {
+            fill: none;
+            pointer-events: all;
+        }
+
+        circle.purple {
+            fill: #7570B3;
+        }
+
+        circle.orange {
+            fill: #D95F02;
+        }
+
+        circle.green {
+            fill: #1b9e77;
+        }
+
+        div.data {
+            float: right;
+            width: 220px;
+            padding-top: 40px;
+        }
+
+        div.data h4 {
+            margin: 0px 20px;
+            font-style: italic;
+            font-weight: normal;
+        }
+
+        div.data h3 {
+            font-size: 1em;
+            font-weight: normal;
+            margin: 20px 10px 10px 20px;
+        }
+
+        div.data h3 strong {
+            font-size: 1.5em;
+        }
+
+        strong.total-doses_number {
+            color: #7570B3;
+        }
+
+        strong.one-dose_number {
+            color: #D95F02;
+        }
+
+        strong.vaccinated_number {
+            color: #1b9e77;
+        }
+
+        span.pct {
+            color: #666666;
+            font-size: 14px;
+        }
+
+        div.data dl {
+            font-size: 0.9em;
+            margin: 40px 10px 10px 20px;
+        }
+
+        div.data dt {
+            margin-top: 10px;
+        }
+
+        div.data dd {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin: 5px 0px;
+        }
+
+        footer {
+            width: 900px;
+            margin: 0px auto 30px auto;
+            text-align: center;
+            color: #999;
+            clear: both;
+        }
+
+        footer img {
+            width: 25%;
+            margin-bottom: 30px;
+        }
+
+        footer img:hover {
+            opacity: 0.5;
+        }
+
+        p#links a, p#links a:visited {
+            color: #999;
+            text-decoration: none;
+        }
+
+        p#links a:hover, p#links a:active {
+            border-bottom: 1px dotted #666666;
+            color: #666666;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1 id="title">Texas COVID-19 Vaccine Tracker</h1>
+        <h2 id="subtitle"></h2>
+    </header>
+
+    <div id="control">
+        <label for="county">Select County:</label>
+        <select name="county" id="countySelect"></select>
+    </div>
+
+    <div class="container">
+        <div id="chart-vaccination" class="chart"></div>
+        <div id="data-vaccination" class="data"></div>
+    </div>
+
+    <footer>
+
+        <a href="https://www.dshs.texas.gov/coronavirus/immunize/vaccine.aspx" title="Get information about the COVID-19 vaccine from Texas DSHS" target="_blank">
+            <img src="vaccinate.svg" alt="Come and Take It" />
+        </a>
+
+        <p id="links">
+            <a href="https://www.dshs.state.tx.us/coronavirus/additionaldata/" title="Link to Texas DSHS COVID-19 data">Data from Texas DSHS</a>
+            · 
+            <a href="https://github.com/shiruken/covid-texas" title="Link to website source code on GitHub">View on GitHub</a>
+        </p>
+    </footer>
+
+    <script src="https://d3js.org/d3.v5.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+
+        const margin = {top: 30, right: 25, bottom: 30, left: 75},
+            width = 880 - margin.left - margin.right,
+            height = 450 - margin.top - margin.bottom;
+
+        const parseDate = d3.timeParse("%Y-%m-%d");
+        const formatDate = d3.timeFormat("%B %e, %Y");
+        const bisectDate = d3.bisector(d => d.date).left;
+
+        createChartFramework();
+
+        // Load population data
+        let population = {}
+        d3.csv("population.csv").then(function(csv_data) {
+            csv_data.forEach(function(d) {
+                population[d.county] = +d.population;
+            });
+        });
+
+        // Load vaccination data
+        d3.csv("data.csv").then(function(csv_data) {
+
+            // Parse CSV
+            csv_data.forEach(function(d) {
+                d.date = parseDate(d.date);
+                d.total_doses = +d.total_doses;
+                d.one_dose = +d.one_dose;
+                d.vaccinated = +d.vaccinated;
+            });
+
+            // Group data by county
+            let data = d3.nest()
+                .key(function(d) { return d.county; })
+                .object(csv_data);
+            let countyNames = Object.keys(data);
+            countyNames.unshift(countyNames.splice(countyNames.indexOf("Statewide"), 1)[0]); // Statewide should be first
+
+            // Check for query string parameter defining the default county
+            let url = new URL(window.location.href);
+            let county = url.searchParams.get("county");
+            if (county === null || !countyNames.includes(county))
+                county = "Statewide"; // Default to Statewide
+
+            // Update subtitle
+            let N = data[county].length - 1;
+            d3.select("#subtitle").text("Data updated on "
+                + formatDate(data[county][N].date));
+
+            // Populate select menu and select default county
+            d3.select("#countySelect")
+                .selectAll('options')
+                .data(countyNames)
+                .enter()
+                .append('option')
+                .text(d => d)
+                .attr("value", function (d) { return d; })
+                .property("selected", function(d){ return d === county; });
+
+             // Initial display of charts
+             updateChart(data[county], 0);
+             updateDetails(data[county][N]);
+
+            // Update charts when different county is selected
+            d3.select("#countySelect").on("change", function(d) {
+                county = d3.select(this).property("value");
+                if (county === "Statewide")
+                    window.history.replaceState(null, null, window.location.pathname);
+                else
+                    window.history.replaceState(null, null, "?county=" + county);
+
+                // Update chart and details
+                updateChart(data[county], 500);
+                updateDetails(data[county][data[county].length - 1]);
+            });
+
+        });
+
+        function createChartFramework() {
+            let chart = d3.select("#chart-vaccination")
+                .append("svg")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+            chart.append("g")
+                .classed("yAxisGrid", true);
+
+            chart.append("g")
+                .classed("yAxis", true);
+
+            chart.append("g")
+                .classed("xAxis", true)
+                .attr("transform", "translate(0, " + height + ")");
+
+            // Vertical line during mouse-over
+            chart.append("line")
+                .classed("hover-line", true)
+                .attr("y1", 0)
+                .attr("y2", height)
+                .style("opacity", 0);
+
+            // Legend
+            let legend = chart.append("g")
+                .classed("legend", true)
+                .attr("transform", "translate(20, 15)");
+            legend.append("line")
+                .classed("purple", true)
+                .attr("x1", 0)
+                .attr("x2", 16)
+                .attr("y1", 4)
+                .attr("y2", 4);
+            legend.append("text")
+                .attr("x", 25)
+                .attr("y", 10)
+                .text("Vaccine Doses Administered");
+            legend.append("line")
+                .classed("orange", true)
+                .attr("x1", 0)
+                .attr("x2", 16)
+                .attr("y1", 30)
+                .attr("y2", 30);
+            legend.append("text")
+                .attr("x", 25)
+                .attr("y", 36)
+                .text("People Vaccinated with at least One Dose");
+            legend.append("line")
+                .classed("green", true)
+                .attr("x1", 0)
+                .attr("x2", 16)
+                .attr("y1", 56)
+                .attr("y2", 56);
+            legend.append("text")
+                .attr("x", 25)
+                .attr("y", 62)
+                .text("People Fully Vaccinated");
+
+            // Chart data elements
+            chart.append("g")
+                .classed("data", true)
+                .classed("purple", true);
+            chart.append("g")
+                .classed("data", true)
+                .classed("orange", true);
+            chart.append("g")
+                .classed("data", true)
+                .classed("green", true);
+
+            // Focus indicators during mouseover
+            chart.append("circle")
+                .classed("focus", true)
+                .classed("purple", true)
+                .attr("r", 5)
+                .style("opacity", 0);
+            chart.append("circle")
+                .classed("focus", true)
+                .classed("orange", true)
+                .attr("r", 5)
+                .style("opacity", 0);
+            chart.append("circle")
+                .classed("focus", true)
+                .classed("green", true)
+                .attr("r", 5)
+                .style("opacity", 0);
+
+            // Chart Title    
+            chart.append("text")
+                .classed("chartTitle", true)
+                .attr("x", (width / 2))
+                .attr("y", 0 - (margin.top / 2));
+
+            // Overlay for handling comparison-view mouseover
+            chart.append("rect")
+                .classed("overlay", true)
+                .attr("width", width)
+                .attr("height", height);
+        }
+
+        function updateChart(data, duration) {
+            let chart = d3.select("#chart-vaccination");
+            let county = data[0].county;
+
+            // Update x-axis
+            let xExtent = getDateExtent(data);
+            let xScale = d3.scaleTime()
+                .domain(xExtent)
+                .range([0, width]);
+            chart.select(".xAxis")
+                .transition()
+                .duration(duration)
+                .call(d3.axisBottom(xScale)); // .ticks(d3.timeDay));
+
+            // Update y-axis
+            let yMax = d3.max(data, d => d.total_doses);
+            let yScale = d3.scaleLinear()
+                .domain([0, yMax]).nice(4)
+                .range([height, 0]);
+            let yAxis = d3.axisLeft(yScale)
+                .ticks(4);
+            chart.select(".yAxis")
+                .transition()
+                .duration(duration)
+                .call(yAxis);
+            let yAxisGrid = d3.axisLeft(yScale)
+                .ticks(4)
+                .tickFormat('')
+                .tickSize(-width);
+            chart.select(".yAxisGrid")
+                .transition()
+                .duration(duration)
+                .call(yAxisGrid);
+
+            // Vaccine Doses Administered
+            filtered = filterData(data, "total_doses", xScale, yScale);
+            drawLinePlot("#chart-vaccination .data.purple", filtered, duration);
+
+            // People Vaccinated with at least One Dose
+            filtered = filterData(data, "one_dose", xScale, yScale);
+            drawLinePlot("#chart-vaccination .data.orange", filtered, duration);
+
+            // People Fully Vaccinated
+            filtered = filterData(data, "vaccinated", xScale, yScale);
+            drawLinePlot("#chart-vaccination .data.green", filtered, duration);
+
+            // Update overlay
+            updateOverlay(data, xExtent, xScale, yScale);
+
+            // Update title
+            let title = "";
+            if (county === "Statewide")
+                title = "Statewide COVID-19 Vaccinations in Texas";
+            else
+                title = "COVID-19 Vaccinations in " + county + " County, TX";
+            chart.select(".chartTitle").text(title);
+        }
+
+        // Return padded date extent for given key
+        function getDateExtent(data) {
+            let extent = d3.extent(data, d => d.date);
+            return [d3.timeDay.offset(extent[0], 0), d3.timeDay.offset(extent[1], 0)]
+        }
+
+        // Filter and format data into (x,y) for use with plot functions
+        function filterData(data, yProp, xScale, yScale) {
+            let filtered = data.filter(d => !isNaN(d[yProp]))
+                .map(d => ({ 
+                    x: xScale(d["date"]), 
+                    y: yScale(d[yProp])
+                }));
+            return filtered;
+        }
+        
+        function drawLinePlot(selector, data, duration) {
+            let path = d3.select(selector).select("path");
+
+            if (path.empty())
+                path = d3.select(selector).append("path");
+
+            path.datum(data)
+                .attr("d", d3.line()
+                    .x(d => d.x)
+                    .y(d => d.y)
+                );
+
+            // Transition by drawing path from left to right
+            let length = path.node().getTotalLength();
+            path
+                .attr("stroke-dasharray", length + " " + length)
+                .attr("stroke-dashoffset", length)
+                .transition()
+                .ease(d3.easeCubicIn)
+                .duration(duration)
+                .attr("stroke-dashoffset", 0);
+        }
+
+        function updateOverlay(data, xExtent, xScale, yScale) {
+            let overlay = d3.select("#chart-vaccination .overlay");
+            let focus_purple = d3.select("#chart-vaccination circle.focus.purple");
+            let focus_orange = d3.select("#chart-vaccination circle.focus.orange");
+            let focus_green = d3.select("#chart-vaccination circle.focus.green");
+            let hover_line = d3.select("#chart-vaccination .hover-line");
+
+            overlay.datum(data)
+                .on("mouseover", function() { 
+                    focus_purple.style("opacity", 1);
+                    focus_orange.style("opacity", 1);
+                    focus_green.style("opacity", 1);
+                    hover_line.style("opacity", 1);
+                })
+                .on("mouseout", function(d) {
+                    focus_purple.style("opacity", 0);
+                    focus_orange.style("opacity", 0);
+                    focus_green.style("opacity", 0);
+                    hover_line.style("opacity", 0);
+                    updateDetails(d[d.length - 1]);
+                })
+                .on('mousemove', function(d) { 
+                    let offset = bisectDate(d, xExtent[0]);
+                    let x0 = xScale.invert(d3.mouse(this)[0]);
+                    let i = bisectDate(d, x0, offset, d.length - 1);
+
+                    if (isNaN(d[i]["total_doses"]))
+                        focus_purple.style("opacity", 0);
+                    else
+                        focus_purple
+                            .style("opacity", 1)
+                            .attr("cx", xScale(d[i]["date"]))
+                            .attr("cy", yScale(d[i]["total_doses"]));                        
+
+                    if (isNaN(d[i]["one_dose"]))
+                        focus_orange.style("opacity", 0);
+                    else
+                        focus_orange
+                            .style("opacity", 1)
+                            .attr("cx", xScale(d[i]["date"]))
+                            .attr("cy", yScale(d[i]["one_dose"]));
+
+                    if (isNaN(d[i]["vaccinated"]))
+                        focus_green.style("opacity", 0);
+                    else
+                        focus_green
+                            .style("opacity", 1)
+                            .attr("cx", xScale(d[i]["date"]))
+                            .attr("cy", yScale(d[i]["vaccinated"]));
+                            
+                    if (!isNaN(d[i]["total_doses"]) || !isNaN(d[i]["one_dose"]) || !isNaN(d[i]["vaccinated"])) {
+                        hover_line
+                            .attr("x1", xScale(d[i]["date"]))
+                            .attr("x2", xScale(d[i]["date"]));
+                        updateDetails(d[i]);
+                    }
+                });
+        }
+
+        function updateDetails(data) {
+
+            let two_decimal = {style:'percent', minimumFractionDigits:2};
+            let one_decimal = {style:'percent', minimumFractionDigits:1};
+
+            let pct_onedose = data.one_dose / population[data.county];
+            pct_onedose = pct_onedose.toLocaleString(undefined, (pct_onedose < 0.1) ? two_decimal : one_decimal);
+
+            let pct_vaccinated = data.vaccinated / population[data.county];
+            pct_vaccinated = pct_vaccinated.toLocaleString(undefined, (pct_vaccinated < 0.1) ? two_decimal : one_decimal);
+
+            d3.select("#data-vaccination").html("" +
+                "<h4>" + formatDate(data.date) + "</h4>" +
+                "<h3 title='Total number of doses given to people by a COVID-19 vaccine provider'>" +
+                    "<strong class='total-doses_number'>" + data.total_doses.toLocaleString() + "</strong> vaccine doses administered" + 
+                "</h3>" +
+                "<h3 title='Number of people who have received at least one dose of COVID-19 vaccine'>" + 
+                    "<strong class='one-dose_number'>" + data.one_dose.toLocaleString() + "</strong> people with one dose " +
+                    "<span class='pct'>(" + pct_onedose + ")</span>" +
+                "</h3>" +
+                "<h3 title='Number of people who have completed the full series (2 doses of Moderna or Pfizer products)'>" + 
+                    "<strong class='vaccinated_number'>" + data.vaccinated.toLocaleString() + "</strong> people fully vaccinated " + 
+                    "<span class='pct'>(" + pct_vaccinated + ")</span>" +
+                "</h3>" +
+                "<dl>" +
+                    "<dt>Population (16+)</dt>" +
+                    "<dd>" + population[data.county].toLocaleString() + "</dd>" +
+                "</dl>"
+            );
+        }
+    </script>
+
+    <!-- <script async src="https://www.googletagmanager.com/gtag/js?id=UA-26412009-1"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+
+        gtag('config', 'UA-26412009-1');
+    </script> -->
+
+</body>
+</html>
