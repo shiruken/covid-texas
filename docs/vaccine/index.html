@@ -29,6 +29,30 @@
             font-family: Arial, Helvetica, sans-serif;
         }
 
+        a#badge {
+            display: block;
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 125px;
+            height: 36px;
+            padding: 10px 5px 10px 50px;
+            color: #000000;
+            font-weight: bold;
+            text-decoration: none;
+            text-align: center;
+            border: 1px solid #000000;
+            border-radius: 10px;
+            background: url(../favicon.png) 10px no-repeat;
+            background-size: 40px;
+            transition-duration: 250ms;
+        }
+        
+        a#badge:hover {
+            color: #FFFFFF;
+            background-color: #000000;
+        }
+
         header {
             text-align: center;
         }
@@ -213,6 +237,8 @@
 </head>
 
 <body>
+
+    <a id="badge" href="../">Texas Hospital Tracker</a>
 
     <header>
         <h1 id="title">Texas COVID-19 Vaccine Tracker</h1>
