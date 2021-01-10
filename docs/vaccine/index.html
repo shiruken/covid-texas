@@ -87,7 +87,7 @@
             margin: 50px auto 30px auto;
         }
 
-        div.chart {
+        div#chart {
             float: left;
             width: 880px;
         }
@@ -106,7 +106,7 @@
             text-anchor: middle;
         }
 
-        .data path {
+        g.data path {
             fill: none;
             stroke-width: 4;
             stroke-linecap: round;
@@ -152,37 +152,37 @@
             fill: #1b9e77;
         }
 
-        div.data {
+        div#data {
             float: right;
             width: 220px;
-            padding-top: 40px;
+            padding-top: 30px;
         }
 
-        div.data h4 {
+        div#data h4#date {
             margin: 0px 20px;
             font-style: italic;
             font-weight: normal;
         }
 
-        div.data h3 {
+        div#data h3 {
             font-size: 1em;
             font-weight: normal;
             margin: 20px 10px 10px 20px;
         }
 
-        div.data h3 strong {
+        div#data h3 strong {
             font-size: 1.5em;
         }
 
-        strong.total-doses_number {
+        h3#doses strong {
             color: #7570B3;
         }
 
-        strong.one-dose_number {
+        h3#one-dose strong {
             color: #D95F02;
         }
 
-        strong.vaccinated_number {
+        h3#two-dose strong {
             color: #1b9e77;
         }
 
@@ -191,16 +191,16 @@
             font-size: 14px;
         }
 
-        div.data dl {
+        div#data dl {
             font-size: 0.9em;
             margin: 40px 10px 10px 20px;
         }
 
-        div.data dt {
+        div#data dt {
             margin-top: 10px;
         }
 
-        div.data dd {
+        div#data dd {
             font-size: 1.1em;
             font-weight: bold;
             margin: 5px 0px;
@@ -251,8 +251,25 @@
     </div>
 
     <div class="container">
-        <div id="chart-vaccination" class="chart"></div>
-        <div id="data-vaccination" class="data"></div>
+        <div id="chart"></div>
+        <div id="data">
+            <h4 id="date"></h4>
+            <h3 id="doses" title="Total number of doses given to people by a COVID-19 vaccine provider">
+                <strong></strong> vaccine doses administered
+            </h3>
+            <h3 id="one-dose" title="Number of people who have received at least one dose of COVID-19 vaccine">
+                <strong></strong> people with one dose
+                <span class="pct"></span>
+            </h3>
+            <h3 id="two-dose" title="Number of people who have completed the full series (2 doses of Moderna or Pfizer products)">
+                <strong></strong> people fully vaccinated
+                <span class="pct"></span>
+            </h3>
+            <dl>
+                <dt>Population (16+)</dt>
+                <dd id="population"></dd>
+            </dl>
+        </div>
     </div>
 
     <footer>
@@ -349,7 +366,7 @@
         });
 
         function createChartFramework() {
-            let chart = d3.select("#chart-vaccination")
+            let chart = d3.select("#chart")
                 .append("svg")
                     .attr("width", width + margin.left + margin.right)
                     .attr("height", height + margin.top + margin.bottom)
@@ -450,7 +467,7 @@
         }
 
         function updateChart(data, duration) {
-            let chart = d3.select("#chart-vaccination");
+            let chart = d3.select("#chart");
             let county = data[0].county;
 
             // Update x-axis
@@ -485,15 +502,15 @@
 
             // Vaccine Doses Administered
             filtered = filterData(data, "total_doses", xScale, yScale);
-            drawLinePlot("#chart-vaccination .data.purple", filtered, duration);
+            drawLinePlot("#chart g.data.purple", filtered, duration);
 
             // People Vaccinated with at least One Dose
             filtered = filterData(data, "one_dose", xScale, yScale);
-            drawLinePlot("#chart-vaccination .data.orange", filtered, duration);
+            drawLinePlot("#chart g.data.orange", filtered, duration);
 
             // People Fully Vaccinated
             filtered = filterData(data, "vaccinated", xScale, yScale);
-            drawLinePlot("#chart-vaccination .data.green", filtered, duration);
+            drawLinePlot("#chart g.data.green", filtered, duration);
 
             // Update overlay
             updateOverlay(data, xExtent, xScale, yScale);
@@ -547,11 +564,11 @@
         }
 
         function updateOverlay(data, xExtent, xScale, yScale) {
-            let overlay = d3.select("#chart-vaccination .overlay");
-            let focus_purple = d3.select("#chart-vaccination circle.focus.purple");
-            let focus_orange = d3.select("#chart-vaccination circle.focus.orange");
-            let focus_green = d3.select("#chart-vaccination circle.focus.green");
-            let hover_line = d3.select("#chart-vaccination .hover-line");
+            let overlay = d3.select("#chart .overlay");
+            let focus_purple = d3.select("#chart circle.focus.purple");
+            let focus_orange = d3.select("#chart circle.focus.orange");
+            let focus_green = d3.select("#chart circle.focus.green");
+            let hover_line = d3.select("#chart .hover-line");
 
             overlay.datum(data)
                 .on("mouseover", function() { 
@@ -610,31 +627,25 @@
             let two_decimal = {style:'percent', minimumFractionDigits:2};
             let one_decimal = {style:'percent', minimumFractionDigits:1};
 
+            d3.select("h4#date").text(formatDate(data.date));
+            d3.select("dd#population").text(population[data.county].toLocaleString());
+
+            // Doses Administered
+            d3.select("h3#doses strong").text(data.total_doses.toLocaleString());
+
+            // People with One Dose
             let pct_onedose = data.one_dose / population[data.county];
             pct_onedose = pct_onedose.toLocaleString(undefined, (pct_onedose < 0.1) ? two_decimal : one_decimal);
+            d3.select("h3#one-dose strong").text(data.one_dose.toLocaleString());
+            d3.select("h3#one-dose span").text("(" + pct_onedose + ")");
 
+            // People Fully Vaccinated
             let pct_vaccinated = data.vaccinated / population[data.county];
             pct_vaccinated = pct_vaccinated.toLocaleString(undefined, (pct_vaccinated < 0.1) ? two_decimal : one_decimal);
-
-            d3.select("#data-vaccination").html("" +
-                "<h4>" + formatDate(data.date) + "</h4>" +
-                "<h3 title='Total number of doses given to people by a COVID-19 vaccine provider'>" +
-                    "<strong class='total-doses_number'>" + data.total_doses.toLocaleString() + "</strong> vaccine doses administered" + 
-                "</h3>" +
-                "<h3 title='Number of people who have received at least one dose of COVID-19 vaccine'>" + 
-                    "<strong class='one-dose_number'>" + data.one_dose.toLocaleString() + "</strong> people with one dose " +
-                    "<span class='pct'>(" + pct_onedose + ")</span>" +
-                "</h3>" +
-                "<h3 title='Number of people who have completed the full series (2 doses of Moderna or Pfizer products)'>" + 
-                    "<strong class='vaccinated_number'>" + data.vaccinated.toLocaleString() + "</strong> people fully vaccinated " + 
-                    "<span class='pct'>(" + pct_vaccinated + ")</span>" +
-                "</h3>" +
-                "<dl>" +
-                    "<dt>Population (16+)</dt>" +
-                    "<dd>" + population[data.county].toLocaleString() + "</dd>" +
-                "</dl>"
-            );
+            d3.select("h3#two-dose strong").text(data.vaccinated.toLocaleString());
+            d3.select("h3#two-dose span").text("(" + pct_vaccinated + ")");
         }
+
     </script>
 
     <script async src="https://www.googletagmanager.com/gtag/js?id=UA-26412009-1"></script>
