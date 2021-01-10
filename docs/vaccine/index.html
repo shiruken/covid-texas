@@ -281,18 +281,19 @@
 
         createChartFramework();
 
-        // Load population data
+        // Load data from file
         let population = {}
-        d3.csv("population.csv").then(function(csv_data) {
-            csv_data.forEach(function(d) {
+        Promise.all([
+            d3.csv("data.csv"),
+            d3.csv("population.csv"),
+        ]).then(([csv_data, csv_population]) => {
+
+            // Parse population data
+            csv_population.forEach(function(d) {
                 population[d.county] = +d.population;
             });
-        });
 
-        // Load vaccination data
-        d3.csv("data.csv").then(function(csv_data) {
-
-            // Parse CSV
+            // Parse vaccine data
             csv_data.forEach(function(d) {
                 d.date = parseDate(d.date);
                 d.total_doses = +d.total_doses;
