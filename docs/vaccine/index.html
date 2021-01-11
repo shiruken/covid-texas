@@ -258,6 +258,22 @@
             color: #666666;
         }
 
+        p#data-desc {
+            font-size: 0.8em;
+        }
+
+        p#data-desc a, p#data-desc a:visited {
+            color: #999999;
+        }
+
+        p#data-desc a:hover, p#data-desc a:active {
+            color: #666666;
+        }
+
+        p#data-desc {
+            max-height: 999999px;
+        }
+
     </style>
 </head>
 
@@ -304,15 +320,20 @@
     </div>
 
     <footer>
-
         <a href="https://www.dshs.texas.gov/coronavirus/immunize/vaccine.aspx" title="Get information about the COVID-19 vaccine from Texas DSHS" target="_blank">
             <img src="vaccinate.svg" alt="Come and Take It" />
         </a>
-
         <p id="links">
             <a href="https://www.dshs.state.tx.us/coronavirus/additionaldata/" title="Link to Texas DSHS COVID-19 data">Data from Texas DSHS</a>
             · 
             <a href="https://github.com/shiruken/covid-texas" title="Link to website source code on GitHub">View on GitHub</a>
+        </p>
+        <p id="data-desc">
+            Vaccination data <a href="https://tabexternal.dshs.texas.gov/t/THD/views/COVID-19VaccineinTexasDashboard/Summary" title="View Texas DSHS COVID-19 Vaccination Dashboard">reported daily</a> by the Texas Department of Health State Services are used for all metrics.
+            The number of vaccine doses administered, number of people vaccinated with one dose, and number of people fully vaccinated are aggregated by the <em>recipient's county of residence</em>.
+            Health care providers have 24 hours after a dose is administered to enter information into the Texas Immunization Registry (ImmTrac2).
+            The daily data comes from vaccination records submitted by health care providers as of 11:59 PM the previous night.
+            Population numbers are based on 2019 estimates from the <a href="https://demographics.texas.gov/Data/TPEPP/Estimates/" title="Visit the Texas Demographic Center website">Texas Demographic Center</a>.
         </p>
     </footer>
 
