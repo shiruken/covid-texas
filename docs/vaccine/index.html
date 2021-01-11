@@ -121,7 +121,7 @@
         }
 
         .green path, line.green {
-            stroke: #1b9e77;
+            stroke: #1B9E77;
         }
 
         .legend line {
@@ -149,25 +149,31 @@
         }
 
         circle.green {
-            fill: #1b9e77;
+            fill: #1B9E77;
         }
 
         div#data {
             float: right;
-            width: 220px;
-            padding-top: 30px;
+            width: 200px;
+            margin-top: 30px;
+            margin-left: 20px;
         }
 
         div#data h4#date {
-            margin: 0px 20px;
             font-style: italic;
             font-weight: normal;
+            margin-top: 0px;
         }
 
         div#data h3 {
             font-size: 1em;
             font-weight: normal;
-            margin: 20px 10px 10px 20px;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        div#data h3#one-dose {
+            margin-top: 60px;
         }
 
         div#data h3 strong {
@@ -183,7 +189,7 @@
         }
 
         h3#two-dose strong {
-            color: #1b9e77;
+            color: #1B9E77;
         }
 
         span.pct {
@@ -191,9 +197,28 @@
             font-size: 14px;
         }
 
+        div.progress-bg {
+            width: 180px;
+            border: 1px solid #666666;
+            background-color: #EEEEEE;
+        }
+
+        div.progress-fg {
+            height: 20px;
+            width: 0%;
+        }
+
+        div#progress-fg-one-dose {
+            background-color:#D95F02;
+        }
+
+        div#progress-fg-two-dose {
+            background-color: #1B9E77;
+        }
+
         div#data dl {
             font-size: 0.9em;
-            margin: 40px 10px 10px 20px;
+            margin: 20px 10px 10px 0px;
         }
 
         div#data dt {
@@ -255,16 +280,22 @@
         <div id="data">
             <h4 id="date"></h4>
             <h3 id="doses" title="Total number of doses given to people by a COVID-19 vaccine provider">
-                <strong></strong> vaccine doses administered
+                <strong></strong> doses administered
             </h3>
             <h3 id="one-dose" title="Number of people who have received at least one dose of COVID-19 vaccine">
                 <strong></strong> people with one dose
                 <span class="pct"></span>
             </h3>
+            <div class="progress-bg" id="progress-bg-one-dose" title="Fraction of population (16+) that has received at least one dose of COVID-19 vaccine">
+                <div class="progress-fg" id="progress-fg-one-dose"></div>
+            </div>
             <h3 id="two-dose" title="Number of people who have completed the full series (2 doses of Moderna or Pfizer products)">
                 <strong></strong> people fully vaccinated
                 <span class="pct"></span>
             </h3>
+            <div class="progress-bg" id="progress-bg-two-dose" title="Fraction of population (16+) that has completed the full vaccination series">
+                <div class="progress-fg" id="progress-fg-two-dose"></div>
+            </div>
             <dl>
                 <dt>Population (16+)</dt>
                 <dd id="population"></dd>
@@ -644,6 +675,12 @@
             pct_vaccinated = pct_vaccinated.toLocaleString(undefined, (pct_vaccinated < 0.1) ? two_decimal : one_decimal);
             d3.select("h3#two-dose strong").text(data.vaccinated.toLocaleString());
             d3.select("h3#two-dose span").text("(" + pct_vaccinated + ")");
+
+            // Update progress bars
+            d3.select("div#progress-fg-one-dose")
+                .style("width", pct_onedose);
+            d3.select("div#progress-fg-two-dose")
+                .style("width", pct_vaccinated);
         }
 
     </script>
