@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <title>Texas COVID-19 Vaccine Tracker</title>
-    <meta name="description" content="Texas COVID-19 vaccine distribution tracker based on Department of State Health Services data.">
+    <meta name="description" content="Texas COVID-19 vaccine distribution tracker based on Department of State Health Services data with county-level detail.">
     <meta name="keywords" content="COVID-19, coronavirus, SARS-CoV-2, Texas, Vaccine, mRNA-1273, Tozinameran, Pfizer, BioNTech, Moderna, DSHS, TSA, D3, D3.js, Cases, Outbreak, Pandemic">
     <link rel="icon" type="image/png" href="../favicon.png">
     <meta name="author" content="Colin Sullender">
@@ -11,11 +11,11 @@
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:creator" content="@shiruken">
     <meta name="twitter:title" content="Texas COVID-19 Vaccine Tracker">
-    <meta name="twitter:description" content="Texas COVID-19 vaccine distribution tracker based on Department of State Health Services data.">
+    <meta name="twitter:description" content="Texas COVID-19 vaccine distribution tracker based on Department of State Health Services data with county-level detail.">
     <meta name="twitter:image" content="https://covid-texas.csullender.com/vaccine/social.png">
     
     <meta property="og:title" content="Texas COVID-19 Vaccine Tracker">
-    <meta property="og:description" content="Texas COVID-19 vaccine distribution tracker based on Department of State Health Services data.">
+    <meta property="og:description" content="Texas COVID-19 vaccine distribution tracker based on Department of State Health Services data with county-level detail.">
     <meta property="og:image" content="https://covid-texas.csullender.com/vaccine/social.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="628">
@@ -163,17 +163,17 @@
             font-style: italic;
             font-weight: normal;
             margin-top: 0px;
+            margin-bottom: 15px;
         }
 
         div#data h3 {
             font-size: 1em;
             font-weight: normal;
-            margin-right: 10px;
-            margin-bottom: 10px;
+            margin: 10px 10px 5px 0px;
         }
 
         div#data h3#one-dose {
-            margin-top: 60px;
+            margin-top: 35px;
         }
 
         div#data h3 strong {
@@ -204,8 +204,12 @@
         }
 
         div.progress-fg {
-            height: 20px;
+            height: 18px;
             width: 0%;
+        }
+
+        div#progress-fg-doses {
+            background-color:#7570B3;
         }
 
         div#progress-fg-one-dose {
@@ -218,7 +222,7 @@
 
         div#data dl {
             font-size: 0.9em;
-            margin: 20px 10px 10px 0px;
+            margin: 10px 10px 10px 0px;
         }
 
         div#data dt {
@@ -297,7 +301,15 @@
             <h4 id="date"></h4>
             <h3 id="doses" title="Total number of doses given to people by a COVID-19 vaccine provider">
                 <strong></strong> doses administered
+                <span class="pct allocated"></span>
             </h3>
+            <div class="progress-bg allocated" id="progress-bg-doses" title="Fraction of allocated doses that have been administered">
+                <div class="progress-fg" id="progress-fg-doses"></div>
+            </div>
+            <dl class="allocated" title="Total number of doses allocated to COVID-19 providers through the current week">
+                <dt>Doses Allocated</dt>
+                <dd id="allocated"></dd>
+            </dl>
             <h3 id="one-dose" title="Number of people who have received at least one dose of COVID-19 vaccine">
                 <strong></strong> people with one dose
                 <span class="pct"></span>
@@ -312,7 +324,7 @@
             <div class="progress-bg" id="progress-bg-two-dose" title="Fraction of population (16+) that has completed the full vaccination series">
                 <div class="progress-fg" id="progress-fg-two-dose"></div>
             </div>
-            <dl>
+            <dl title="Estimated population age 16 and older">
                 <dt>Population (16+)</dt>
                 <dd id="population"></dd>
             </dl>
@@ -329,8 +341,9 @@
             <a href="https://github.com/shiruken/covid-texas" title="Link to website source code on GitHub">View on GitHub</a>
         </p>
         <p id="data-desc">
-            Vaccination data <a href="https://tabexternal.dshs.texas.gov/t/THD/views/COVID-19VaccineinTexasDashboard/Summary" title="View Texas DSHS COVID-19 Vaccination Dashboard">reported daily</a> by the Texas Department of Health State Services are used for all metrics.
+            Vaccination data <a href="https://tabexternal.dshs.texas.gov/t/THD/views/COVID-19VaccineinTexasDashboard/Summary" title="View Texas DSHS COVID-19 Vaccination Dashboard">reported daily</a> by the <a href="https://dshs.texas.gov/" title="Visit the Texas DSHS website">Texas Department of Health State Services</a> are used for all metrics.
             The number of vaccine doses administered, number of people vaccinated with one dose, and number of people fully vaccinated are aggregated by the <em>recipient's county of residence</em>.
+            The number of doses allocated is aggregated by <em>provider county</em> and includes doses that will be delivered during the following week.
             Health care providers have 24 hours after a dose is administered to enter information into the Texas Immunization Registry (ImmTrac2).
             The daily data comes from vaccination records submitted by health care providers as of 11:59 PM the previous night.
             Population numbers are based on 2019 estimates from the <a href="https://demographics.texas.gov/Data/TPEPP/Estimates/" title="Visit the Texas Demographic Center website">Texas Demographic Center</a>.
@@ -368,6 +381,7 @@
                 d.total_doses = +d.total_doses;
                 d.one_dose = +d.one_dose;
                 d.vaccinated = +d.vaccinated;
+                d.allocated = +d.allocated;
             });
 
             // Group data by county
@@ -530,7 +544,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale)); // .ticks(d3.timeDay));
+                .call(d3.axisBottom(xScale).ticks(d3.timeDay.every(4)));
 
             // Update y-axis
             let yMax = d3.max(data, d => d.total_doses);
@@ -679,6 +693,7 @@
             let two_decimal = {style:'percent', minimumFractionDigits:2};
             let one_decimal = {style:'percent', minimumFractionDigits:1};
 
+            // Update details
             d3.select("h4#date").text(formatDate(data.date));
             d3.select("dd#population").text(population[data.county].toLocaleString());
 
@@ -698,10 +713,20 @@
             d3.select("h3#two-dose span").text("(" + pct_vaccinated + ")");
 
             // Update progress bars
-            d3.select("div#progress-fg-one-dose")
-                .style("width", pct_onedose);
-            d3.select("div#progress-fg-two-dose")
-                .style("width", pct_vaccinated);
+            d3.select("div#progress-fg-one-dose").style("width", pct_onedose);
+            d3.select("div#progress-fg-two-dose").style("width", pct_vaccinated);
+
+            // Update allocation data when available and valid
+            if (data.allocated >= data.total_doses) {
+                d3.selectAll(".allocated").style("visibility", "visible");
+                d3.select("dd#allocated").text((data.allocated).toLocaleString());
+                let pct_doses = data.total_doses / data.allocated;
+                pct_doses = pct_doses.toLocaleString(undefined, (pct_doses < 0.1) ? two_decimal : one_decimal);
+                d3.select("div#progress-fg-doses").style("width", pct_doses);
+                d3.select("h3#doses span").text("(" + pct_doses + ")");
+            } else {
+                d3.selectAll(".allocated").style("visibility", "hidden");
+            }
         }
 
     </script>
