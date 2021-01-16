@@ -25,8 +25,15 @@ def fix_date_index(df):
 
 def generate_date_range(index):
     """Generate DatetimeIndex using first and last dates from index column"""
-    start = index[0][-5:] + '-20'
-    end = index[-1][-5:] + '-21'
+    start = index[0].split()[-1]
+    end = index[-1].split()[-1]
+
+    if len(start) == 5:
+        start = start + "-20"
+
+    if len(end) == 5:
+        end = end + "-21"
+
     return pd.date_range(start=start, end=end)
 
 
