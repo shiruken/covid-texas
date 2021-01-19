@@ -1,6 +1,10 @@
 import pandas as pd
 import urllib.request
 from datetime import date
+import requests
+from bs4 import BeautifulSoup
+import json
+import re
 
 # Load new data from Texas DSHS
 url = "https://www.dshs.state.tx.us/immunize/covid19/COVID-19-Vaccine-Data-by-County.xls"
@@ -33,6 +37,15 @@ df_new.rename(columns={
     'Total Doses Allocated': 'allocated'
 }, inplace=True)
 
+# Scrapes shipped doses metric from Tableau dashboard
+url = "https://tabexternal.dshs.texas.gov/t/THD/views/COVID-19VaccineinTexasDashboard/Summary"
+r = requests.get(url, params={":embed": "y"})
+soup = BeautifulSoup(r.text, "html.parser")
+tableauData = json.loads(soup.find("textarea", {"id": "tsConfigContainer"}).text)
+dataUrl = f'https://tabexternal.dshs.texas.gov{tableauData["vizql_root"]}/bootstrapSession/sessions/{tableauData["sessionid"]}'
+r = requests.post(dataUrl, data={"sheet_id": tableauData["sheetId"]})
+shipped = re.findall("Doses Shipped  (\d{1,}(?:\,?\d{3})*)", r.text)
+df_new.loc["Statewide", "distributed"] = int(shipped[0].replace(",", ""))
 
 # Load existing data and append today's data
 filename = "docs/vaccine/data.csv"

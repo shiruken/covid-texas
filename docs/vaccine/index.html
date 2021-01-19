@@ -303,12 +303,12 @@
                 <strong></strong> doses administered
                 <span class="pct allocated"></span>
             </h3>
-            <div class="progress-bg allocated" id="progress-bg-doses" title="Fraction of allocated doses that have been administered">
+            <div class="progress-bg allocated" id="progress-bg-doses">
                 <div class="progress-fg" id="progress-fg-doses"></div>
             </div>
-            <dl class="allocated" title="Total number of doses allocated to COVID-19 providers through the current week">
-                <dt>Doses Allocated</dt>
-                <dd id="allocated"></dd>
+            <dl class="allocated" id="allocated-list">
+                <dt id="allocated-title"></dt>
+                <dd id="allocated-number"></dd>
             </dl>
             <h3 id="one-dose" title="Number of people who have received at least one dose of COVID-19 vaccine">
                 <strong></strong> people with one dose
@@ -343,10 +343,11 @@
         <p id="data-desc">
             Vaccination data <a href="https://tabexternal.dshs.texas.gov/t/THD/views/COVID-19VaccineinTexasDashboard/Summary" title="View Texas DSHS COVID-19 Vaccination Dashboard">reported daily</a> by the <a href="https://dshs.texas.gov/" title="Visit the Texas DSHS website">Texas Department of Health State Services</a> are used for all metrics.
             The number of vaccine doses administered, number of people vaccinated with one dose, and number of people fully vaccinated are aggregated by the <em>recipient's county of residence</em>.
-            The number of doses allocated is aggregated by <em>provider county</em> and includes doses that will be delivered during the following week.
+            The number of doses shipped and number of doses allocated are aggregated by <em>provider county</em>.
+            The number of doses allocated is updated weekly and includes doses that will be delivered during the upcoming week.
             Health care providers have 24 hours after a dose is administered to enter information into the Texas Immunization Registry (ImmTrac2).
             The daily data comes from vaccination records submitted by health care providers as of 11:59 PM the previous night.
-            Population numbers are based on 2019 estimates from the <a href="https://demographics.texas.gov/Data/TPEPP/Estimates/" title="Visit the Texas Demographic Center website">Texas Demographic Center</a>.
+            Population numbers are based on the 2019 estimates from the <a href="https://demographics.texas.gov/Data/TPEPP/Estimates/" title="Visit the Texas Demographic Center website">Texas Demographic Center</a>.
         </p>
     </footer>
 
@@ -382,6 +383,7 @@
                 d.one_dose = +d.one_dose;
                 d.vaccinated = +d.vaccinated;
                 d.allocated = +d.allocated;
+                d.distributed = +d.distributed;
             });
 
             // Group data by county
@@ -716,16 +718,31 @@
             d3.select("div#progress-fg-one-dose").style("width", pct_onedose);
             d3.select("div#progress-fg-two-dose").style("width", pct_vaccinated);
 
-            // Update allocation data when available and valid
-            if (data.allocated >= data.total_doses) {
+            // Update distribution/allocation data when available and valid
+            if (data.county == "Statewide") {
                 d3.selectAll(".allocated").style("visibility", "visible");
-                d3.select("dd#allocated").text((data.allocated).toLocaleString());
-                let pct_doses = data.total_doses / data.allocated;
+                d3.select("dt#allocated-title").text("Doses Shipped");
+                d3.select("dl#allocated-list").attr("title", "Total number of doses shipped to COVID-19 providers");
+                d3.select("dd#allocated-number").text((data.distributed).toLocaleString());
+                let pct_doses = data.total_doses / data.distributed;
                 pct_doses = pct_doses.toLocaleString(undefined, (pct_doses < 0.1) ? two_decimal : one_decimal);
                 d3.select("div#progress-fg-doses").style("width", pct_doses);
                 d3.select("h3#doses span").text("(" + pct_doses + ")");
+                d3.select("div#progress-bg-doses").attr("title", "Fraction of shipped doses that have been administered");
             } else {
-                d3.selectAll(".allocated").style("visibility", "hidden");
+                if (data.allocated >= data.total_doses) {
+                    d3.selectAll(".allocated").style("visibility", "visible");
+                    d3.select("dt#allocated-title").text("Doses Allocated");
+                    d3.select("dl#allocated-list").attr("title", "Total number of doses allocated to COVID-19 providers through the current week");
+                    d3.select("dd#allocated-number").text((data.allocated).toLocaleString());
+                    let pct_doses = data.total_doses / data.allocated;
+                    pct_doses = pct_doses.toLocaleString(undefined, (pct_doses < 0.1) ? two_decimal : one_decimal);
+                    d3.select("div#progress-fg-doses").style("width", pct_doses);
+                    d3.select("h3#doses span").text("(" + pct_doses + ")");
+                    d3.select("div#progress-bg-doses").attr("title", "Fraction of allocated doses that have been administered");
+                } else {
+                    d3.selectAll(".allocated").style("visibility", "hidden");
+                }
             }
         }
 
