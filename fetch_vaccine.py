@@ -9,7 +9,8 @@ output_filename = f"data_vaccine/{today_date_fmt}.xlsx"
 urllib.request.urlretrieve(url, output_filename);
 
 df = pd.read_excel(output_filename, sheet_name="By County", index_col=[0], engine='openpyxl')
-df.drop(df.tail(1).index, inplace=True) # Drop the unknown county row
+df.drop('Federal Long-Term Care Vaccination Program', inplace=True) # Drop the federal data
+df.drop('*Other', inplace=True) # Drop the unknown county data
 df.rename(index={"Texas": "Statewide"}, inplace=True)
 df.index.names = ['county']
 
