@@ -1579,10 +1579,10 @@
             if (["I", "K"].includes(TSA))
                 tform = "translate(20, 2)";
 
-            if (["C", "G", "H", "J", "M", "N", "O", "P", "S", "V"].includes(TSA))
+            if (["C", "G", "H", "J", "N", "O", "P", "S", "V"].includes(TSA))
                 tform = "translate(20, 20)";
 
-            if (["Q", "R", "T", "U", "Total"].includes(TSA))
+            if (["L", "Q", "R", "T", "U", "Total"].includes(TSA))
                 tform = "translate(20, 30)";
 
             d3.select("#chart-covid g.legend")
@@ -1597,16 +1597,16 @@
             // Legend 1
             let tform1 = "translate(20, 10)";
 
-            if (["C", "D", "I", "K", "M", "P", "U", "V"].includes(TSA))
+            if (["C", "D", "I", "K", "M", "N", "Q", "T", "U", "V"].includes(TSA))
                 tform1 = "translate(20, 5)";
 
-            if (["A", "B", "E", "G", "Q"].includes(TSA))
+            if (["A", "B", "E", "G"].includes(TSA))
                 tform1 = "translate(20, 15)";
 
-            if (["H", "N", "S"].includes(TSA))
+            if (["H", "P", "S"].includes(TSA))
                 tform1 = "translate(20, 20)";
 
-            if(["J", "L", "T"].includes(TSA))
+            if(["J", "L"].includes(TSA))
                 tform1 = "translate(20, 30)";
 
             d3.select("#chart-case .stacked-top .legend")
@@ -1617,13 +1617,13 @@
             // Legend 2
             let tform2 = "translate(20, 250)";
 
-            if (["A", "D", "F", "H", "I", "J", "L", "M", "O", "Q", "R", "S", "U", "V"].includes(TSA))
+            if (["A", "D", "F", "G", "I", "J", "K", "L", "O", "Q", "R", "S", "U", "V"].includes(TSA))
                 tform2 = "translate(20, 240)";
 
-            if (["G", "K", "T", "Total"].includes(TSA))
+            if (["C", "T", "Total"].includes(TSA))
                 tform2 = "translate(20, 248)";
 
-            if (["B", "C", "P"].includes(TSA))
+            if (["B", "H", "M", "P"].includes(TSA))
                 tform2 = "translate(20, 254)";
 
             d3.select("#chart-case .stacked-bottom .legend")
