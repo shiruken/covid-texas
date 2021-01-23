@@ -1,5 +1,4 @@
 import pandas as pd
-import urllib.request
 from datetime import date
 import requests
 from bs4 import BeautifulSoup
@@ -8,11 +7,7 @@ import re
 
 # Load new data from Texas DSHS
 url = "https://www.dshs.state.tx.us/immunize/covid19/COVID-19-Vaccine-Data-by-County.xls"
-today_date_fmt = date.today().strftime("%Y-%m-%d")
-output_filename = f"data_vaccine/{today_date_fmt}.xlsx"
-urllib.request.urlretrieve(url, output_filename);
-
-df = pd.read_excel(output_filename, sheet_name="By County", index_col=[0], engine='openpyxl')
+df = pd.read_excel(url, sheet_name="By County", index_col=[0], engine='openpyxl')
 df.drop('Federal Long-Term Care Vaccination Program', inplace=True) # Drop the federal data
 df.drop('*Other', inplace=True) # Drop the unknown county data
 df.rename(index={"Texas": "Statewide"}, inplace=True)
