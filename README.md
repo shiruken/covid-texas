@@ -27,6 +27,7 @@ https://covid-texas.csullender.com/vaccine/
 ## Sources
 
 * Vaccination data from [Texas DSHS](https://www.dshs.state.tx.us/coronavirus/additionaldata/)
+  * Archive of daily Excel spreadsheets available [here](https://github.com/shiruken/covid-texas-data/tree/main/AccessibleVaccineDashboardData)
 * Population data from [Texas Demographic Center](https://demographics.texas.gov/Data/TPEPP/Estimates/)
 
 ## About the Data
