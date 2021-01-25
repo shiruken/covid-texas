@@ -130,6 +130,7 @@ fix_date_index(df_covid_icu_inpatients)
 # Load and parse total case count data
 url = 'https://www.dshs.state.tx.us/coronavirus/TexasCOVID19DailyCountyCaseCountData.xlsx'
 df = pd.read_excel(url, sheet_name='Cases by County', index_col=[0], header=2, nrows=255)
+df.dropna(axis=1, how='all', inplace=True)
 new_date_range = generate_date_range(df.columns)
 new_date_range = new_date_range.drop([pd.Timestamp('2020-03-07'), pd.Timestamp('2020-03-08'), pd.Timestamp('2020-03-14')])
 df.columns = new_date_range
@@ -146,6 +147,7 @@ df_cases.rename(columns = {0: 'cases'}, inplace=True)
 # Load and parse daily case count data
 url = 'https://www.dshs.state.tx.us/coronavirus/TexasCOVID-19NewCasesOverTimebyCounty.xlsx'
 df = pd.read_excel(url, sheet_name='New Cases by County', index_col=[0], header=2, nrows=255)
+df.dropna(axis=1, how='all', inplace=True)
 new_date_range = generate_date_range(df.columns)
 new_date_range = new_date_range.drop([pd.Timestamp('2020-03-07'), pd.Timestamp('2020-03-08'), pd.Timestamp('2020-03-14')])
 df.columns = new_date_range
@@ -161,6 +163,7 @@ df_cases_new.rename(columns = {0: 'cases_new'}, inplace=True)
 # Load and parse total death data
 url = 'https://www.dshs.state.tx.us/coronavirus/TexasCOVID19DailyCountyFatalityCountData.xlsx'
 df = pd.read_excel(url, sheet_name='Fatalities by County', index_col=[0], header=2, nrows=256)
+df.dropna(axis=1, how='all', inplace=True)
 new_date_range = generate_date_range(df.columns)
 df.columns = new_date_range
 df_new = df.diff(axis=1) # Extract daily death count
