@@ -2,16 +2,11 @@ import numpy as np
 import pandas as pd
 
 
-def read_date(date):
+def parse_date(date):
     """Convert date to datetime with handling for Excel date numbers"""
     try:
         date = int(date)
-
-        # Manually handle weird date value in spreadsheet for August 8
-        if date == 39668:
-            return pd.to_datetime('2020-08-08')
-        else:
-            return pd.to_datetime('1899-12-30') + pd.to_timedelta(date, 'D')
+        return pd.to_datetime('1899-12-30') + pd.to_timedelta(date, 'D')
     except:
         return pd.to_datetime(date[0:10])
 
@@ -19,14 +14,14 @@ def read_date(date):
 def fix_date_index(df):
     """Convert date index strings to datetime objects"""
     date_index = df.index.levels[2].to_series()
-    date_index_fixed = date_index.apply(read_date) + pd.DateOffset(1)
+    date_index_fixed = date_index.apply(parse_date) + pd.DateOffset(1)
     df.index.set_levels(date_index_fixed, level=2, inplace=True)
 
 
 def generate_date_range(index):
     """Generate DatetimeIndex using first and last dates from index column"""
-    start = index[0].split(" ")[-1]
-    end = index[-1].split(" ")[-1]
+    start = parse_date(index[0].split(" ")[-1])
+    end = parse_date(index[-1].split(" ")[-1])
     return pd.date_range(start=start, end=end)
 
 tsa_county_map = {
