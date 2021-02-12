@@ -790,7 +790,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale).ticks(d3.timeMonth));
+                .call(d3.axisBottom(xScale));
 
             // Update y-axis
             let yScale = d3.scaleLinear()
@@ -861,7 +861,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale).ticks(d3.timeMonth));
+                .call(d3.axisBottom(xScale));
 
             // Update y-axis
             let yScale = d3.scaleLinear()
@@ -928,7 +928,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale).ticks(d3.timeMonth));
+                .call(d3.axisBottom(xScale));
 
             // Update first chart y-axis
             let yMax1 = d3.max(data, d => d.total_beds);
@@ -1020,7 +1020,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale).ticks(d3.timeMonth));
+                .call(d3.axisBottom(xScale));
 
             // Update y-axis
             let yMax = d3.max(data, d => d.covid_inpatients);
@@ -1091,7 +1091,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale).ticks(d3.timeMonth));
+                .call(d3.axisBottom(xScale));
 
             // Update first chart y-axis
             let yMax1 = d3.max(data, d => d.cases_new);
@@ -1597,17 +1597,14 @@
             // Legend 1
             let tform1 = "translate(20, 10)";
 
-            if (["C", "D", "I", "K", "M", "N", "Q", "T", "U", "V"].includes(TSA))
+            if (["C", "D", "I", "K", "O", "Q", "T", "U", "V"].includes(TSA))
                 tform1 = "translate(20, 5)";
 
-            if (["A", "B", "E", "G"].includes(TSA))
+            if (["A", "B", "E", "G", "N", "Total"].includes(TSA))
                 tform1 = "translate(20, 15)";
 
-            if (["H", "P", "S"].includes(TSA))
+            if (["H", "L", "M", "P", "S"].includes(TSA))
                 tform1 = "translate(20, 20)";
-
-            if(["J", "L"].includes(TSA))
-                tform1 = "translate(20, 30)";
 
             d3.select("#chart-case .stacked-top .legend")
                 .transition()
@@ -1617,13 +1614,13 @@
             // Legend 2
             let tform2 = "translate(20, 250)";
 
-            if (["A", "D", "F", "G", "I", "J", "K", "L", "O", "Q", "R", "S", "U", "V"].includes(TSA))
+            if (["A", "D", "J", "K", "N", "Q", "R", "S", "U", "V", "Total"].includes(TSA))
                 tform2 = "translate(20, 240)";
 
-            if (["C", "T", "Total"].includes(TSA))
+            if (["C", "E", "H", "L", "M", "O", "T"].includes(TSA))
                 tform2 = "translate(20, 248)";
 
-            if (["B", "H", "M", "P"].includes(TSA))
+            if (["B", "F", "G", "I", "P"].includes(TSA))
                 tform2 = "translate(20, 254)";
 
             d3.select("#chart-case .stacked-bottom .legend")

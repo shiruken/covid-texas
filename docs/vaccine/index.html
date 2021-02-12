@@ -461,7 +461,7 @@
             // Legend
             let legend = chart.append("g")
                 .classed("legend", true)
-                .attr("transform", "translate(20, 22)");
+                .attr("transform", "translate(20, 20)");
             legend.append("line")
                 .classed("purple", true)
                 .attr("x1", 0)
@@ -546,7 +546,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale).ticks(d3.timeDay.every(4)));
+                .call(d3.axisBottom(xScale));
 
             // Update y-axis
             let yMax = d3.max(data, d => d.total_doses);
