@@ -169,7 +169,7 @@
         div#data h3 {
             font-size: 1em;
             font-weight: normal;
-            margin: 10px 10px 5px 0px;
+            margin: 10px 5px 5px 0px;
         }
 
         div#data h3#one-dose {
@@ -311,13 +311,13 @@
                 <dd id="allocated-number"></dd>
             </dl>
             <h3 id="one-dose" title="Number of people who have received at least one dose of COVID-19 vaccine">
-                <strong></strong> people with one dose
+                <strong></strong> people with at least one dose
                 <span class="pct"></span>
             </h3>
             <div class="progress-bg" id="progress-bg-one-dose" title="Fraction of population (16+) that has received at least one dose of COVID-19 vaccine">
                 <div class="progress-fg" id="progress-fg-one-dose"></div>
             </div>
-            <h3 id="two-dose" title="Number of people who have completed the full series (2 doses of Moderna or Pfizer products)">
+            <h3 id="two-dose" title="Number of people who have completed the full series (2 doses of Moderna or Pfizer or 1 dose of Janssen)">
                 <strong></strong> people fully vaccinated
                 <span class="pct"></span>
             </h3>
@@ -462,7 +462,7 @@
             // Legend
             let legend = chart.append("g")
                 .classed("legend", true)
-                .attr("transform", "translate(20, 10)");
+                .attr("transform", "translate(20, 15)");
             legend.append("line")
                 .classed("purple", true)
                 .attr("x1", 0)
