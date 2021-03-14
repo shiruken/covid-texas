@@ -355,7 +355,7 @@
     <script src="https://d3js.org/d3.v5.min.js" type="text/javascript"></script>
     <script type="text/javascript">
 
-        const margin = {top: 30, right: 25, bottom: 30, left: 75},
+        const margin = {top: 30, right: 25, bottom: 30, left: 82},
             width = 880 - margin.left - margin.right,
             height = 450 - margin.top - margin.bottom;
 
@@ -462,7 +462,7 @@
             // Legend
             let legend = chart.append("g")
                 .classed("legend", true)
-                .attr("transform", "translate(20, 15)");
+                .attr("transform", "translate(20, 10)");
             legend.append("line")
                 .classed("purple", true)
                 .attr("x1", 0)
