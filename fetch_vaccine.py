@@ -40,7 +40,7 @@ soup = BeautifulSoup(r.text, "html.parser")
 tableauData = json.loads(soup.find("textarea", {"id": "tsConfigContainer"}).text)
 dataUrl = f'https://tabexternal.dshs.texas.gov{tableauData["vizql_root"]}/bootstrapSession/sessions/{tableauData["sessionid"]}'
 r = requests.post(dataUrl, data={"sheet_id": tableauData["sheetId"]})
-shipped = re.findall("Doses Shipped  (\d{1,}(?:\,?\d{3})*)", r.text)
+shipped = re.findall("Doses Shipped\s*(\d{1,}(?:\,?\d{3})*)", r.text)
 df_new.loc["Statewide", "distributed"] = int(shipped[0].replace(",", ""))
 
 # Load existing data and append today's data
