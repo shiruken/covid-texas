@@ -778,6 +778,13 @@
                 .attr("height", height*1.1);
         }
 
+        function xTickFormat(date) {
+            if (d3.timeYear(date) < date)
+                return d3.timeFormat("%b")(date);
+            else
+                return d3.timeFormat("%Y")(date);
+        }
+
         // Generate the total hospital bed chart
         function updateTotalBedChart(data, duration) {
             let chart = d3.select("#chart-hospital-beds");
@@ -791,7 +798,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale));
+                .call(d3.axisBottom(xScale).tickFormat(xTickFormat));
 
             // Update y-axis
             let yScale = d3.scaleLinear()
@@ -862,7 +869,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale));
+                .call(d3.axisBottom(xScale).tickFormat(xTickFormat));
 
             // Update y-axis
             let yScale = d3.scaleLinear()
@@ -929,7 +936,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale));
+                .call(d3.axisBottom(xScale).tickFormat(xTickFormat));
 
             // Update first chart y-axis
             let yMax1 = d3.max(data, d => d.total_beds);
@@ -1021,7 +1028,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale));
+                .call(d3.axisBottom(xScale).tickFormat(xTickFormat));
 
             // Update y-axis
             let yMax = d3.max(data, d => d.covid_inpatients);
@@ -1092,7 +1099,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale));
+                .call(d3.axisBottom(xScale).tickFormat(xTickFormat));
 
             // Update first chart y-axis
             let yMax1 = d3.max(data, d => d.cases_new);
@@ -1601,7 +1608,7 @@
             if (["C", "D", "I", "K", "O", "Q", "T", "U", "V"].includes(TSA))
                 tform1 = "translate(20, 5)";
 
-            if (["A", "B", "E", "G", "N", "Total"].includes(TSA))
+            if (["A", "B", "E", "F", "G", "N", "Total"].includes(TSA))
                 tform1 = "translate(20, 15)";
 
             if (["H", "L", "M", "P", "S"].includes(TSA))
@@ -1618,10 +1625,10 @@
             if (["A", "D", "J", "K", "N", "Q", "R", "S", "U", "V", "Total"].includes(TSA))
                 tform2 = "translate(20, 240)";
 
-            if (["C", "E", "H", "L", "M", "O", "T"].includes(TSA))
+            if (["C", "E", "H", "L", "M", "O", "P", "T"].includes(TSA))
                 tform2 = "translate(20, 248)";
 
-            if (["B", "F", "G", "I", "P"].includes(TSA))
+            if (["B", "F", "G", "I"].includes(TSA))
                 tform2 = "translate(20, 254)";
 
             d3.select("#chart-case .stacked-bottom .legend")

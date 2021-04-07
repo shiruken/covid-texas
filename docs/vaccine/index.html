@@ -462,7 +462,7 @@
             // Legend
             let legend = chart.append("g")
                 .classed("legend", true)
-                .attr("transform", "translate(20, 10)");
+                .attr("transform", "translate(20, 30)");
             legend.append("line")
                 .classed("purple", true)
                 .attr("x1", 0)
@@ -547,7 +547,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale));
+                .call(d3.axisBottom(xScale).ticks(d3.timeWeek.every(2)));
 
             // Update y-axis
             let yMax = d3.max(data, d => d.total_doses);
