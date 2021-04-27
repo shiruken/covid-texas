@@ -63,7 +63,7 @@ tsa_county_map = {
     'U.': ['Aransas', 'Bee', 'Brooks', 'Duval', 'Jim Wells', 'Kenedy', 'Kleberg', 'Live Oak', 
           'Mcmullen', 'Nueces', 'Refugio', 'San Patricio'],
     'V.': ['Cameron', 'Hidalgo', 'Starr', 'Willacy'],
-    'Total': ['Total']
+    'Total': ['Total', 'Grand Total']
 }
 
 
