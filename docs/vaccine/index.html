@@ -124,10 +124,15 @@
             stroke: #1B9E77;
         }
 
-        #pcts text {
+        #pct-vaccinated text {
             font-size: 9pt;
             fill: #1B9E77;
             font-weight: bold;
+        }
+
+        #pct-vaccinated line {
+            stroke-width: 1pt;
+            stroke: #1B9E77;
         }
 
         .legend line {
@@ -499,6 +504,27 @@
                 .attr("x", 25)
                 .attr("y", 62)
                 .text("People Fully Vaccinated");
+            
+            // Percent vaccinated indicators
+            let pcts = chart.append("g")
+                .attr("id", "pct-vaccinated");
+            for(const pct of [40, 50, 60, 70, 80, 90, 100]) {
+                let this_pct = pcts.append("g")
+                    .attr("id", "pct" + pct)
+                this_pct.append("line")
+                    .style("opacity", 0)
+                    .attr("x1", width - 10)
+                    .attr("x2", width)
+                    .attr("y1", 0)
+                    .attr("y2", 0);
+                this_pct.append("text")
+                    .attr("x", width + 4)
+                    .attr("y", 5)
+                    .style("opacity", 0)
+                    .text(pct + "%")
+                    .append("svg:title")
+                        .text("Threshold for " + pct + "% of eligible people fully vaccinated");
+            }
 
             // Chart data elements
             chart.append("g")
@@ -510,19 +536,6 @@
             chart.append("g")
                 .classed("data", true)
                 .classed("green", true);
-
-            // Percent vaccinated indicators
-            let pcts = chart.append("g")
-                .attr("id", "pcts");
-            for(const pct of [50, 60, 70, 80, 90]) {
-                pcts.append("text")
-                    .attr("id", "pct" + pct)
-                    .attr("x", 4)
-                    .attr("y", 5)
-                    .text(pct + "%")
-                    .append("svg:title")
-                        .text("Threshold for " + pct + "% of eligible people fully vaccinated");
-            }
 
             // Focus indicators during mouseover
             chart.append("circle")
@@ -601,16 +614,25 @@
             drawLinePlot("#chart g.data.green", filtered, duration);
 
             // Update percentage indicators
-            for(const pct of [50, 60, 70, 80, 90]) {
+            for(const pct of [40, 50, 60, 70, 80, 90, 100]) {
                 pct_yScale = yScale(pct / 100 * population[county]);
                 if (pct_yScale >= 0) {
-                    d3.select("text#pct" + pct)
+                    d3.select("#pct" + pct + " line")
+                        .transition()
+                        .style("opacity", 0.5)
+                        .attr("transform", "translate(0, " + pct_yScale + ")")
+                        .duration(duration);
+                    d3.select("#pct" + pct + " text")
                         .transition()
                         .style("opacity", 1)
-                        .attr("transform", "translate(" + width + ", " + pct_yScale + ")")
+                        .attr("transform", "translate(0, " + pct_yScale + ")")
                         .duration(duration);
                 } else {
-                    d3.select("text#pct" + pct)
+                    d3.select("#pct" + pct + " line")
+                        .transition()
+                        .style("opacity", 0)
+                        .duration(duration);
+                    d3.select("#pct" + pct + " text")
                         .transition()
                         .style("opacity", 0)
                         .duration(duration);
