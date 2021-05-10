@@ -312,7 +312,7 @@
             <div class="progress-bg allocated" id="progress-bg-doses">
                 <div class="progress-fg" id="progress-fg-doses"></div>
             </div>
-            <dl class="allocated" id="allocated-list">
+            <dl id="allocated-list">
                 <dt id="allocated-title"></dt>
                 <dd id="allocated-number"></dd>
             </dl>
@@ -767,11 +767,12 @@
                 d3.select("h3#doses span").text("(" + pct_doses + ")");
                 d3.select("div#progress-bg-doses").attr("title", "Fraction of shipped doses that have been administered");
             } else {
+                d3.select("dt#allocated-title").text("Doses Allocated");
+                d3.select("dl#allocated-list").attr("title", "Total number of doses allocated to COVID-19 providers through the current week");
+                d3.select("dd#allocated-number").text((data.allocated).toLocaleString());
+
                 if (data.allocated >= data.total_doses) {
                     d3.selectAll(".allocated").style("visibility", "visible");
-                    d3.select("dt#allocated-title").text("Doses Allocated");
-                    d3.select("dl#allocated-list").attr("title", "Total number of doses allocated to COVID-19 providers through the current week");
-                    d3.select("dd#allocated-number").text((data.allocated).toLocaleString());
                     let pct_doses = data.total_doses / data.allocated;
                     pct_doses = pct_doses.toLocaleString(undefined, (pct_doses < 0.1) ? two_decimal : one_decimal);
                     d3.select("div#progress-fg-doses").style("width", pct_doses);
