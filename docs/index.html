@@ -828,6 +828,8 @@
             else
                 title = "Hospital Bed Usage in TSA-" + tsa + " (" + data[0].location + ")";
             chart.select(".chartTitle").text(title);
+
+            moveTotalBedLegend(tsa, duration);
         }
 
         // Generate the ICU bed chart
@@ -1426,21 +1428,46 @@
             );
         }
 
-        // Position ICU chart legend based on currently selected TSA
-        function moveICULegend(TSA,duration) {
+        // Position total hospital bed chart legend based on currently selected TSA
+        function moveTotalBedLegend(TSA,duration) {
             let tform = "translate(20, 10)";
 
-            if (["R"].includes(TSA))
-                tform = "translate(20, 85)";
-                
-            if (["G", "I", "L", "Q", "T", "U"].includes(TSA))
+            if (["E", "G"].includes(TSA))
                 tform = "translate(20, 165)";
 
-            if (["M", "V"].includes(TSA))
-                tform = "translate(20, 245)";
+            if (["O", "P", "Q", "R", "V"].includes(TSA))
+                tform = "translate(575, 165)";
 
-            if(TSA == "H")
-                tform = "translate(260, 320)";
+            if (["S", "U"].includes(TSA))
+                tform = "translate(575, 10)";
+
+            if (TSA == "T")
+                tform = "translate(180, 320)";
+
+            d3.select("#chart-hospital-beds g.legend")
+                .transition()
+                .duration(duration)
+                .attr("transform", tform);
+        }
+
+        // Position ICU chart legend based on currently selected TSA
+        function moveICULegend(TSA,duration) {
+            let tform = "translate(360, 320)";
+
+            if (["E", "L", "O", "P", "Q", "R", "Total"].includes(TSA))
+                tform = "translate(550, 85)";
+
+            if (["C", "H", "N"].includes(TSA))
+                tform = "translate(420, 320)";
+
+            if (TSA == "K")
+                tform = "translate(550, 10)";
+
+            if (TSA == "S")
+                tform = "translate(450, 320)";
+
+            if (TSA == "U")
+                tform = "translate(550, 165)";
 
             d3.select("#chart-icu-beds g.legend")
                 .transition()
@@ -1452,22 +1479,13 @@
         function moveCountLegend(TSA,duration) {
 
             // Legend 1
-            let tform1 = "translate(20, 10)";
-
-            if (["F", "G", "V"].includes(TSA))
-                tform1 = "translate(20, 5)";
-
-            if (["C", "U"].includes(TSA))
-                tform1 = "translate(20, 15)";
+            let tform1 = "translate(20, 150)";
 
             if (["D", "I", "R", "T"].includes(TSA))
                 tform1 = "translate(20, 135)";
 
-            if (["A", "N", "O"].includes(TSA))
+            if (["A", "N", "O", "U"].includes(TSA))
                 tform1 = "translate(20, 145)";
-
-            if (["B", "E", "H", "J", "K", "L", "M", "Q", "P", "S", "Total"].includes(TSA))
-                tform1 = "translate(20, 150)";
 
             d3.select("#chart-bed-count .stacked-top .legend")
                 .transition()
@@ -1475,25 +1493,19 @@
                 .attr("transform", tform1);
 
             // Legend 2
-            let tform2 = "translate(20, 250)";
+            let tform2 = "translate(20, 378)";
 
-            if (["U"].includes(TSA))
-                tform2 = "translate(20, 235)";
-
-            if (["C", "D", "J", "V"].includes(TSA))
+            if (["D"].includes(TSA))
                 tform2 = "translate(20, 240)";
 
-            if (["F", "I", "K"].includes(TSA))
-                tform2 = "translate(20, 245)";
+            if (["B", "E", "M", "R", "S", "Total"].includes(TSA))
+                tform2 = "translate(20, 372)";                
 
-            if (["B", "E", "H", "M", "S", "Total"].includes(TSA))
-                tform2 = "translate(20, 372)";
-
-            if (["A", "O", "P", "Q", "T"].includes(TSA))
-                tform2 = "translate(20, 378)";
-
-            if (["G", "L", "N", "R"].includes(TSA))
+            if (["C", "G", "J", "L", "N", "V"].includes(TSA))
                 tform2 = "translate(20, 385)";
+
+            if (TSA == "U")
+                tform2 = "translate(20, 390)";
 
             d3.select("#chart-bed-count .stacked-bottom .legend")
                 .transition()
@@ -1511,8 +1523,11 @@
             if (["C", "G", "H", "J", "N", "O", "P", "S", "V"].includes(TSA))
                 tform = "translate(20, 20)";
 
-            if (["L", "Q", "R", "T", "U", "Total"].includes(TSA))
+            if (["L", "T", "U", "Total"].includes(TSA))
                 tform = "translate(20, 30)";
+
+            if (["Q", "R", "S"].includes(TSA))
+                tform = "translate(280, 30)";
 
             d3.select("#chart-covid g.legend")
                 .transition()
