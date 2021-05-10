@@ -124,6 +124,12 @@
             stroke: #1B9E77;
         }
 
+        #pcts text {
+            font-size: 8pt;
+            fill: #1B9E77;
+            font-weight: bold;
+        }
+
         .legend line {
             stroke-width: 4;
             stroke-linecap: round;
@@ -505,6 +511,19 @@
                 .classed("data", true)
                 .classed("green", true);
 
+            // Percent vaccinated indicators
+            let pcts = chart.append("g")
+                .attr("id", "pcts");
+            for(const pct of [50, 60, 70, 80, 90]) {
+                pcts.append("text")
+                    .attr("id", "pct" + pct)
+                    .attr("x", 3)
+                    .attr("y", 4)
+                    .text(pct + "%")
+                    .append("svg:title")
+                        .text("Threshold for " + pct + "% of eligible people fully vaccinated");
+            }
+
             // Focus indicators during mouseover
             chart.append("circle")
                 .classed("focus", true)
@@ -580,6 +599,23 @@
             // People Fully Vaccinated
             filtered = filterData(data, "vaccinated", xScale, yScale);
             drawLinePlot("#chart g.data.green", filtered, duration);
+
+            // Update percentage indicators
+            for(const pct of [50, 60, 70, 80, 90]) {
+                pct_yScale = yScale(pct / 100 * population[county]);
+                if (pct_yScale >= 0) {
+                    d3.select("text#pct" + pct)
+                        .transition()
+                        .style("opacity", 1)
+                        .attr("transform", "translate(" + width + ", " + pct_yScale + ")")
+                        .duration(duration);
+                } else {
+                    d3.select("text#pct" + pct)
+                        .transition()
+                        .style("opacity", 0)
+                        .duration(duration);
+                }
+            }
 
             // Update overlay
             updateOverlay(data, xExtent, xScale, yScale);
