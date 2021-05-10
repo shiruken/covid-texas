@@ -359,19 +359,9 @@
         createChartFramework("#chart-hospital-beds", "Inpatient Beds Used", "Used Beds with COVID-19");
         createChartFramework("#chart-icu-beds", "ICU Beds Used", "Used ICU Beds with COVID-19");
 
-        // Add warnings to hospital resource chart
-        d3.select("#chart-bed-count .stacked-top .warning").append("rect")
-            .attr("height", height*0.5);
-        d3.select("#chart-bed-count .stacked-top .warning").append("text")
-            .text(" Data incomplete between July 23-28");
-        d3.select("#chart-bed-count .stacked-bottom .warning").append("rect")
-            .attr("height", height*0.5)
-            .attr("transform", "translate(0, " + height*0.6 + ")")
-        d3.select("#chart-bed-count .stacked-bottom .warning").append("text")
-            .text(" Data incomplete between July 23-28");
-
         // Add warning to fatalities chart
-        d3.select("#chart-case .stacked-bottom .warning").append("rect")
+        d3.select("#chart-case .stacked-bottom .warning")
+            .append("rect")
             .attr("height", height*0.5)
             .attr("transform", "translate(0, " + height*0.6 + ")")
 
@@ -562,15 +552,6 @@
                 .append("g")
                     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-            // Highlighted region delineating period of incomplete data
-            let warning = svg.append("g")
-                .classed("warning", true);
-            warning.append("rect")
-                .attr("height", height);
-            warning.append("text")
-                .attr("y", 20)
-                .text(" Data incomplete between July 23-28");
-
             svg.append("g")
                 .classed("yAxisGrid", true);
 
@@ -664,10 +645,8 @@
             let g1 = svg.append("g").classed("stacked-top", true);
             let g2 = svg.append("g").classed("stacked-bottom", true);
     
-            // Highlighted region delineating period of incomplete data
-            let warning1 = g1.append("g")
-                .classed("warning", true);
-            let warning2 = g2.append("g")
+            // Append layer for highlighting warnings
+            g2.append("g")
                 .classed("warning", true)
 
             g1.append("g")
@@ -835,11 +814,6 @@
             // Update overlay
             updateOverlay("#chart-hospital-beds", data, "percent_total_occupied", "percent_total_covid",
                             xExtent, xScale, yScale, updateTotalDetails);
-                
-            // Update warning region
-            let x_warning = xScale(parseDate('2020-07-23'));
-            let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
-            updateWarning("#chart-hospital-beds", tsa, x_warning, width_warning, duration);
 
             // Toggle visibility of average hospital occupancy note
             chart.select(".note-occupancy")
@@ -906,11 +880,6 @@
             // Update overlay
             updateOverlay("#chart-icu-beds", data, "percent_icu_occupied", "percent_icu_covid",
                             xExtent, xScale, yScale, updateICUDetails);
-
-            // Update warning region
-            let x_warning = xScale(parseDate('2020-07-23'));
-            let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
-            updateWarning("#chart-icu-beds", tsa, x_warning, width_warning, duration);
 
             // Update title
             let title = "";
@@ -998,12 +967,6 @@
             updateStackedOverlay("#chart-bed-count", data, "total_beds", "icu_beds",
                 xExtent, xScale, yScale1, yScale2, updateCountDetails);
 
-            // Update warning region
-            let x_warning = xScale(parseDate('2020-07-23'));
-            let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
-            updateWarning("#chart-bed-count .stacked-top", tsa, x_warning, width_warning, duration);
-            updateWarning("#chart-bed-count .stacked-bottom", tsa, x_warning, width_warning, duration);
-
             // Update title
             let title = "";
             if (tsa === "Total")
@@ -1069,11 +1032,6 @@
             // Update overlay
             updateOverlay("#chart-covid", data, "covid_inpatients", "covid_icu_inpatients",
                             xExtent, xScale, yScale, updateCOVIDDetails);
-
-            // Update warning region
-            let x_warning = xScale(parseDate('2020-07-23'));
-            let width_warning = xScale(parseDate('2020-07-28')) - xScale(parseDate('2020-07-23'));
-            updateWarning("#chart-covid", tsa, x_warning, width_warning, duration);
 
             // Update title
             let title = "";
@@ -1342,43 +1300,6 @@
                         updateDetailFnc(d[i]);
                     }
                 });
-        }
-
-        // Draw and update the position of the highlighted region 
-        // delineating the period of incomplete data between July 23-28
-        function updateWarning(selector, tsa, x, width, duration) {
-            let warning = d3.select(selector).select(".warning");
-
-            warning.select("rect")
-                .transition()
-                .duration(duration)
-                .attr("x", x)
-                .attr("width", width);
-                
-            let y = 20;
-            if (selector === "#chart-icu-beds")
-                if (["A", "B", "D", "E", "F", "G", "I", "M", "N", "P", "Q", "R", "T", "U", "V"].includes(tsa))
-                    y = height - 20;
-            
-            if (selector === "#chart-bed-count .stacked-top") 
-                y = height*0.5 - 20;
-
-            if (selector === "#chart-bed-count .stacked-bottom") 
-                y = height*1.1 - 15;
-
-            if (selector === "#chart-hospital-beds")
-                if (["T"].includes(tsa))
-                        y = height - 20;
-
-            if (selector === "#chart-covid")
-                if (["F"].includes(tsa))
-                        y = height - 20;
-
-            warning.select("text")
-                .transition()
-                .duration(duration)
-                .attr("x", x + width)
-                .attr("y", y);
         }
 
         // Format valid numbers to local string
