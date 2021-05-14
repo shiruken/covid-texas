@@ -23,14 +23,12 @@ df_new = df.loc[:, [
     'Vaccine Doses Administered', 
     'People Vaccinated with at least One Dose', 
     'People Fully Vaccinated',
-    'Total Doses Allocated'
 ]]
 
 df_new.rename(columns={
     'Vaccine Doses Administered': 'total_doses',
     'People Vaccinated with at least One Dose': 'one_dose',
     'People Fully Vaccinated': 'vaccinated',
-    'Total Doses Allocated': 'allocated'
 }, inplace=True)
 
 # Scrapes shipped doses metric from Tableau dashboard
