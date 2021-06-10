@@ -126,9 +126,7 @@ fix_date_index(df_covid_icu_inpatients)
 url = 'https://www.dshs.state.tx.us/coronavirus/TexasCOVID19DailyCountyCaseCountData.xlsx'
 df = pd.read_excel(url, sheet_name='Cases by County', index_col=[0], header=2, nrows=255)
 df.dropna(axis=1, how='all', inplace=True)
-new_date_range = generate_date_range(df.columns)
-new_date_range = new_date_range.drop([pd.Timestamp('2020-03-07'), pd.Timestamp('2020-03-08'), pd.Timestamp('2020-03-14')])
-df.columns = new_date_range
+df.columns = generate_date_range(df.columns)
 df = df.loc[:, df.columns > '2020-04-11']
 df.insert(0, 'TSA ID', [map_county_to_tsa(county) for county in df.index])
 df = df.groupby(['TSA ID']).sum()
@@ -143,9 +141,7 @@ df_cases.rename(columns = {0: 'cases'}, inplace=True)
 url = 'https://www.dshs.state.tx.us/coronavirus/TexasCOVID-19NewCasesOverTimebyCounty.xlsx'
 df = pd.read_excel(url, sheet_name='New Cases by County', index_col=[0], header=2, nrows=255)
 df.dropna(axis=1, how='all', inplace=True)
-new_date_range = generate_date_range(df.columns)
-new_date_range = new_date_range.drop([pd.Timestamp('2020-03-07'), pd.Timestamp('2020-03-08'), pd.Timestamp('2020-03-14')])
-df.columns = new_date_range
+df.columns = generate_date_range(df.columns)
 df = df.loc[:, df.columns > '2020-04-11']
 df.insert(0, 'TSA ID', [map_county_to_tsa(county) for county in df.index])
 df = df.groupby(['TSA ID']).sum()
@@ -159,8 +155,7 @@ df_cases_new.rename(columns = {0: 'cases_new'}, inplace=True)
 url = 'https://www.dshs.state.tx.us/coronavirus/TexasCOVID19DailyCountyFatalityCountData.xlsx'
 df = pd.read_excel(url, sheet_name='Fatalities by County', index_col=[0], header=2, nrows=256)
 df.dropna(axis=1, how='all', inplace=True)
-new_date_range = generate_date_range(df.columns)
-df.columns = new_date_range
+df.columns = generate_date_range(df.columns)
 df_new = df.diff(axis=1) # Extract daily death count
 df.drop(index='UNKNOWN', inplace=True)
 df = df.loc[:, df.columns > '2020-04-11']
