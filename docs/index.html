@@ -1452,13 +1452,10 @@
 
         // Position ICU chart legend based on currently selected TSA
         function moveICULegend(TSA,duration) {
-            let tform = "translate(360, 320)";
+            let tform = "translate(300, 320)";
 
             if (["E", "L", "O", "P", "Q", "R", "Total"].includes(TSA))
                 tform = "translate(550, 85)";
-
-            if (["C", "H", "N"].includes(TSA))
-                tform = "translate(420, 320)";
 
             if (TSA == "K")
                 tform = "translate(550, 10)";
@@ -1495,7 +1492,7 @@
             // Legend 2
             let tform2 = "translate(20, 378)";
 
-            if (["D"].includes(TSA))
+            if (["D", "O"].includes(TSA))
                 tform2 = "translate(20, 240)";
 
             if (["B", "E", "M", "R", "S", "Total"].includes(TSA))
