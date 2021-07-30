@@ -396,8 +396,8 @@
                 cases_new = parseValue(d.cases_new),
                 deaths = parseValue(d.deaths),
                 deaths_new = parseValue(d.deaths_new),
-                percent_total_covid = 100 * covid_inpatients / total_beds_occupied,
-                percent_icu_covid = 100 * covid_icu_inpatients / icu_beds_occupied;
+                percent_total_covid = 100 * covid_inpatients / (total_beds_occupied + total_beds_available),
+                percent_icu_covid = 100 * covid_icu_inpatients / (icu_beds_occupied + icu_beds_available);
 
                 if (!isFinite(percent_total_covid))
                     percent_total_covid = NaN;
@@ -1329,7 +1329,7 @@
                     "<strong class='bed-number'>" + formatPercent(data.percent_total_occupied) + "</strong> of beds used" + 
                 "</h3>" +
                 "<h3>" + 
-                    "<strong class='covid-number'>" + formatPercent(data.percent_total_covid) + "</strong> of used beds have COVID-19 patients" +
+                    "<strong class='covid-number'>" + formatPercent(data.percent_total_covid) + "</strong> of beds used for COVID-19" +
                 "</h3>" + 
                 "<dl>" +
                     "<dt>Staffed Hospital Beds</dt>" +
@@ -1352,7 +1352,7 @@
                     "<strong class='bed-number'>" + formatPercent(data.percent_icu_occupied) + "</strong> of ICU beds used" + 
                 "</h3>" +
                 "<h3>" + 
-                    "<strong class='covid-number'>" + formatPercent(data.percent_icu_covid) + "</strong> of used ICU beds have COVID-19 patients" +
+                    "<strong class='covid-number'>" + formatPercent(data.percent_icu_covid) + "</strong> of beds used for COVID-19" +
                 "</h3>" + 
                 "<dl>" +
                     "<dt>Total ICU Beds</dt>" +
