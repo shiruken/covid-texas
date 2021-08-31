@@ -117,8 +117,8 @@ df_covid_inpatients.rename(columns = {0: 'covid_inpatients'}, inplace=True)
 fix_date_index(df_covid_inpatients)
 
 # Parse ICU COVID-19 inpatients
-df['Adult COVID-19 ICU'].loc['Total', 'Statewide Total'] = df['Adult COVID-19 ICU'][:-1].sum()
-df_covid_icu_inpatients = pd.DataFrame(df['Adult COVID-19 ICU'].stack())
+df['COVID-19 ICU'].loc['Total', 'Statewide Total'] = df['COVID-19 ICU'][:-1].sum()
+df_covid_icu_inpatients = pd.DataFrame(df['COVID-19 ICU'].stack())
 df_covid_icu_inpatients.rename(columns = {0: 'covid_icu_inpatients'}, inplace=True)
 fix_date_index(df_covid_icu_inpatients)
 
