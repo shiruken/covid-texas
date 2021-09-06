@@ -95,10 +95,10 @@ df_total_beds_occupied.rename(columns = {0: 'total_beds_occupied'}, inplace=True
 fix_date_index(df_total_beds_occupied)
 
 # Parse available ICU beds
-df['ICU Beds Available'].replace('--', np.nan, inplace=True)
-df['ICU Beds Available'] = df['ICU Beds Available'].apply(pd.to_numeric)
-df['ICU Beds Available'].loc['Total', 'Statewide Total'] = df['ICU Beds Available'][:-1].sum()
-df_icu_beds_available = pd.DataFrame(df['ICU Beds Available'].stack())
+df['Adult ICU Beds Available'].replace('--', np.nan, inplace=True)
+df['Adult ICU Beds Available'] = df['Adult ICU Beds Available'].apply(pd.to_numeric)
+df['Adult ICU Beds Available'].loc['Total', 'Statewide Total'] = df['Adult ICU Beds Available'][:-1].sum()
+df_icu_beds_available = pd.DataFrame(df['Adult ICU Beds Available'].stack())
 df_icu_beds_available.rename(columns = {0: 'icu_beds_available'}, inplace=True)
 fix_date_index(df_icu_beds_available)
 
@@ -117,8 +117,8 @@ df_covid_inpatients.rename(columns = {0: 'covid_inpatients'}, inplace=True)
 fix_date_index(df_covid_inpatients)
 
 # Parse ICU COVID-19 inpatients
-df['COVID-19 ICU'].loc['Total', 'Statewide Total'] = df['COVID-19 ICU'][:-1].sum()
-df_covid_icu_inpatients = pd.DataFrame(df['COVID-19 ICU'].stack())
+df['Adult COVID-19 ICU'].loc['Total', 'Statewide Total'] = df['Adult COVID-19 ICU'][:-1].sum()
+df_covid_icu_inpatients = pd.DataFrame(df['Adult COVID-19 ICU'].stack())
 df_covid_icu_inpatients.rename(columns = {0: 'covid_icu_inpatients'}, inplace=True)
 fix_date_index(df_covid_icu_inpatients)
 
