@@ -351,6 +351,8 @@ df_merged.loc[(df_merged['tsa'] == 'O') & (df_merged['date'] == '2021-05-12'), [
 df_merged.loc[(df_merged['tsa'] == 'L') & (df_merged['date'] == '2021-07-12'), 'icu_beds_occupied'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'Total') & (df_merged['date'] == '2021-07-12'), 'icu_beds_occupied'] = np.nan
 
+df_merged.loc[(df_merged['tsa'] == 'I') & (df_merged['date'] == '2021-11-28'), 'icu_beds_occupied'] = np.nan
+
 # Eliminate negative values from cases_new
 df_merged.loc[df_merged['cases_new'] < 0, 'cases_new'] = np.nan
 
