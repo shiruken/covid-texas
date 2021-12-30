@@ -126,6 +126,9 @@ fix_date_index(df_covid_icu_inpatients)
 url = 'https://www.dshs.state.tx.us/coronavirus/TexasCOVID19DailyCountyCaseCountData.xlsx'
 df = pd.read_excel(url, sheet_name='Cases by County', index_col=[0], header=2, nrows=255)
 df.dropna(axis=1, how='all', inplace=True)
+total = df.sum()
+total.name = "Total"
+df = df.append(total.transpose())
 df.columns = generate_date_range(df.columns)
 df = df.loc[:, df.columns > '2020-04-11']
 df.insert(0, 'TSA ID', [map_county_to_tsa(county) for county in df.index])
@@ -343,10 +346,14 @@ df_merged.loc[(df_merged['tsa'] == 'C') & (df_merged['date'] == '2021-01-11'), '
 df_merged.loc[(df_merged['tsa'] == 'G') & (df_merged['date'] == '2021-01-11'), ['total_beds_occupied', 'icu_beds_occupied']] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'J') & (df_merged['date'] == '2021-01-11'), 'total_beds_occupied'] = np.nan
 
-df_merged.loc[(df_merged['tsa'] == 'J') & (df_merged['date'] == '2021-06-29'), 'icu_beds_occupied'] = np.nan
-df_merged.loc[(df_merged['tsa'] == 'T') & (df_merged['date'] == '2021-06-29'), 'icu_beds_occupied'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'F') & (df_merged['date'] == '2021-01-27'), 'cases_new'] = np.nan
+
+df_merged.loc[(df_merged['tsa'] == 'N') & (df_merged['date'] == '2021-02-01'), 'cases_new'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'O') & (df_merged['date'] == '2021-05-12'), ['covid_inpatients', 'covid_icu_inpatients']] = np.nan
+
+df_merged.loc[(df_merged['tsa'] == 'J') & (df_merged['date'] == '2021-06-29'), 'icu_beds_occupied'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'T') & (df_merged['date'] == '2021-06-29'), 'icu_beds_occupied'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'L') & (df_merged['date'] == '2021-07-12'), 'icu_beds_occupied'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'Total') & (df_merged['date'] == '2021-07-12'), 'icu_beds_occupied'] = np.nan
