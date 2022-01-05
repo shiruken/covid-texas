@@ -1552,14 +1552,17 @@
             // Legend 1
             let tform1 = "translate(20, 10)";
 
-            if (["C", "D", "I", "K", "O", "R", "T", "U", "V"].includes(TSA))
+            if (["D", "I", "K", "Q", "R", "T", "U", "V"].includes(TSA))
                 tform1 = "translate(20, 5)";
 
-            if (["A", "B", "E", "F", "G", "J", "M", "N", "Total"].includes(TSA))
+            if (["A", "B", "E", "F", "G", "J", "M", "N", "O"].includes(TSA))
                 tform1 = "translate(20, 15)";
 
-            if (["H", "L", "Q", "P", "S"].includes(TSA))
+            if (["C", "H", "S", "Total"].includes(TSA))
                 tform1 = "translate(20, 20)";
+
+            if (["C", "L", "P"].includes(TSA))
+                tform1 = "translate(20, 25)";
 
             d3.select("#chart-case .stacked-top .legend")
                 .transition()
@@ -1569,13 +1572,13 @@
             // Legend 2
             let tform2 = "translate(20, 250)";
 
-            if (["A", "D", "J", "K", "M", "Q", "S", "U", "V", "Total"].includes(TSA))
+            if (["A", "D", "G", "J", "K", "M", "Q", "V", "Total"].includes(TSA))
                 tform2 = "translate(20, 240)";
 
             if (["C", "E", "H", "L", "N", "O", "P", "T"].includes(TSA))
                 tform2 = "translate(20, 248)";
 
-            if (["B", "F", "G", "I"].includes(TSA))
+            if (["B", "F", "I", "S", "U"].includes(TSA))
                 tform2 = "translate(20, 254)";
 
             d3.select("#chart-case .stacked-bottom .legend")
