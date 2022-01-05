@@ -124,6 +124,10 @@
             stroke: #1B9E77;
         }
 
+        .pink path, line.pink {
+            stroke: #E7298A;
+        }
+
         #pct-vaccinated text {
             font-size: 9pt;
             fill: #1B9E77;
@@ -133,6 +137,10 @@
         #pct-vaccinated line {
             stroke-width: 1pt;
             stroke: #1B9E77;
+        }
+
+        .legend text {
+            font-size: 11pt; 
         }
 
         .legend line {
@@ -163,6 +171,10 @@
             fill: #1B9E77;
         }
 
+        circle.pink {
+            fill: #E7298A;
+        }
+
         div#data {
             float: right;
             width: 210px;
@@ -174,7 +186,7 @@
             font-style: italic;
             font-weight: normal;
             margin-top: 0px;
-            margin-bottom: 30px;
+            margin-bottom: 10px;
         }
 
         div#data h3 {
@@ -184,7 +196,7 @@
         }
 
         div#data h3#one-dose {
-            margin-top: 30px;
+            margin-top: 25px;
         }
 
         div#data h3 strong {
@@ -201,6 +213,10 @@
 
         h3#two-dose strong {
             color: #1B9E77;
+        }
+        
+        h3#boosted strong {
+            color: #E7298A;
         }
 
         span.pct {
@@ -231,9 +247,13 @@
             background-color: #1B9E77;
         }
 
+        div#progress-fg-boosted {
+            background-color: #E7298A;
+        }
+
         div#data dl {
             font-size: 0.9em;
-            margin: 10px 10px 10px 0px;
+            margin: 25px 10px 10px 0px;
         }
 
         div#data dt {
@@ -327,6 +347,13 @@
             <div class="progress-bg" id="progress-bg-two-dose" title="Fraction of population (5+) that has completed the full vaccination series">
                 <div class="progress-fg" id="progress-fg-two-dose"></div>
             </div>
+            <h3 id="boosted" title="Number of residents who are fully vaccinated and received a booster dose">
+                <strong></strong> people with booster dose
+                <span class="pct"></span>
+            </h3>
+            <div class="progress-bg" id="progress-bg-boosted" title="Fraction of population (5+) that has received a booster dose">
+                <div class="progress-fg" id="progress-fg-boosted"></div>
+            </div>
             <dl title="Estimated population age 5 and older">
                 <dt>Population (5+)</dt>
                 <dd id="population"></dd>
@@ -348,7 +375,7 @@
         <p id="data-desc">
             Vaccination data <a href="https://tabexternal.dshs.texas.gov/t/THD/views/COVID-19VaccineinTexasDashboard/Summary" title="View Texas DSHS COVID-19 Vaccination Dashboard">reported daily</a> by the <a href="https://dshs.texas.gov/" title="Visit the Texas DSHS website">Texas Department of Health State Services</a> are used for all metrics.
             Raw historical data are <a href="https://github.com/shiruken/covid-texas-data/" title="View my Texas COVID-19 data archive">aggregated here</a>.
-            The number of vaccine doses administered, number of people vaccinated with at least one dose, and number of people fully vaccinated are aggregated by the <em>recipient's county of residence</em>.            
+            The number of vaccine doses administered, number of people vaccinated with at least one dose, number of people fully vaccinated, and number of people with booster doses are aggregated by the <em>recipient's county of residence</em>.            
             Weekly allocations/shipments to each county were stopped on the week of May 3, 2021, due to there being a sufficient supply of vaccine. These metrics have been removed from the tracker.
             Health care providers have 24 hours after a dose is administered to enter information into the Texas Immunization Registry (ImmTrac2).
             The daily data comes from vaccination records submitted by health care providers as of 11:59 PM the previous night.
@@ -387,6 +414,7 @@
                 d.total_doses = +d.total_doses;
                 d.one_dose = +d.one_dose;
                 d.vaccinated = +d.vaccinated;
+                d.boosted = (d.boosted === "") ? NaN : +d.boosted;
             });
 
             // Group data by county
@@ -464,7 +492,7 @@
             // Legend
             let legend = chart.append("g")
                 .classed("legend", true)
-                .attr("transform", "translate(20, 20)");
+                .attr("transform", "translate(20, 10)");
             legend.append("line")
                 .classed("purple", true)
                 .attr("x1", 0)
@@ -479,23 +507,33 @@
                 .classed("orange", true)
                 .attr("x1", 0)
                 .attr("x2", 16)
-                .attr("y1", 30)
-                .attr("y2", 30);
+                .attr("y1", 26)
+                .attr("y2", 26);
             legend.append("text")
                 .attr("x", 25)
-                .attr("y", 36)
+                .attr("y", 32)
                 .text("People Vaccinated with at least One Dose");
             legend.append("line")
                 .classed("green", true)
                 .attr("x1", 0)
                 .attr("x2", 16)
-                .attr("y1", 56)
-                .attr("y2", 56);
+                .attr("y1", 48)
+                .attr("y2", 48);
             legend.append("text")
                 .attr("x", 25)
-                .attr("y", 62)
+                .attr("y", 54)
                 .text("People Fully Vaccinated");
-            
+            legend.append("line")
+                .classed("pink", true)
+                .attr("x1", 0)
+                .attr("x2", 16)
+                .attr("y1", 70)
+                .attr("y2", 70);
+            legend.append("text")
+                .attr("x", 25)
+                .attr("y", 76)
+                .text("People Vaccinated with Booster");
+                
             // Percent vaccinated indicators
             let pcts = chart.append("g")
                 .attr("id", "pct-vaccinated");
@@ -527,6 +565,9 @@
             chart.append("g")
                 .classed("data", true)
                 .classed("green", true);
+            chart.append("g")
+                .classed("data", true)
+                .classed("pink", true);
 
             // Focus indicators during mouseover
             chart.append("circle")
@@ -542,6 +583,11 @@
             chart.append("circle")
                 .classed("focus", true)
                 .classed("green", true)
+                .attr("r", 5)
+                .style("opacity", 0);
+            chart.append("circle")
+                .classed("focus", true)
+                .classed("pink", true)
                 .attr("r", 5)
                 .style("opacity", 0);
 
@@ -603,6 +649,10 @@
             // People Fully Vaccinated
             filtered = filterData(data, "vaccinated", xScale, yScale);
             drawLinePlot("#chart g.data.green", filtered, duration);
+
+            // People Vaccinated with Booster
+            filtered = filterData(data, "boosted", xScale, yScale);
+            drawLinePlot("#chart g.data.pink", filtered, duration);
 
             // Update percentage indicators
             for(const pct of [40, 50, 60, 70, 80, 90, 100]) {
@@ -686,6 +736,7 @@
             let focus_purple = d3.select("#chart circle.focus.purple");
             let focus_orange = d3.select("#chart circle.focus.orange");
             let focus_green = d3.select("#chart circle.focus.green");
+            let focus_pink = d3.select("#chart circle.focus.pink");
             let hover_line = d3.select("#chart .hover-line");
 
             overlay.datum(data)
@@ -693,12 +744,14 @@
                     focus_purple.style("opacity", 1);
                     focus_orange.style("opacity", 1);
                     focus_green.style("opacity", 1);
+                    focus_pink.style("opacity", 1);
                     hover_line.style("opacity", 1);
                 })
                 .on("mouseout", function(d) {
                     focus_purple.style("opacity", 0);
                     focus_orange.style("opacity", 0);
                     focus_green.style("opacity", 0);
+                    focus_pink.style("opacity", 0);
                     hover_line.style("opacity", 0);
                     updateDetails(d[d.length - 1]);
                 })
@@ -731,7 +784,15 @@
                             .attr("cx", xScale(d[i]["date"]))
                             .attr("cy", yScale(d[i]["vaccinated"]));
                             
-                    if (!isNaN(d[i]["total_doses"]) || !isNaN(d[i]["one_dose"]) || !isNaN(d[i]["vaccinated"])) {
+                    if (isNaN(d[i]["boosted"]))
+                        focus_pink.style("opacity", 0);
+                    else
+                        focus_pink
+                            .style("opacity", 1)
+                            .attr("cx", xScale(d[i]["date"]))
+                            .attr("cy", yScale(d[i]["boosted"]));
+
+                    if (!isNaN(d[i]["total_doses"]) || !isNaN(d[i]["one_dose"]) || !isNaN(d[i]["vaccinated"]) || !isNaN(d[i]["boosted"])) {
                         hover_line
                             .attr("x1", xScale(d[i]["date"]))
                             .attr("x2", xScale(d[i]["date"]));
@@ -763,6 +824,20 @@
             pct_vaccinated = pct_vaccinated.toLocaleString(undefined, (pct_vaccinated < 0.1) ? two_decimal : one_decimal);
             d3.select("h3#two-dose strong").text(data.vaccinated.toLocaleString());
             d3.select("h3#two-dose span").text("(" + pct_vaccinated + ")");
+
+            // People Vaccinated with Booster
+            if (isNaN(data.boosted)) {
+                d3.select("h3#boosted").style("opacity", 0);
+                d3.select("div#progress-bg-boosted").style("opacity", 0);
+            } else {
+                d3.select("h3#boosted").style("opacity", 1);
+                d3.select("div#progress-bg-boosted").style("opacity", 1);
+                let pct_boosted = data.boosted / population[data.county];
+                pct_boosted = pct_boosted.toLocaleString(undefined, (pct_boosted < 0.1) ? two_decimal : one_decimal);
+                d3.select("h3#boosted strong").text(data.boosted.toLocaleString());
+                d3.select("h3#boosted span").text("(" + pct_boosted + ")");
+                d3.select("div#progress-fg-boosted").style("width", pct_boosted);
+            }
 
             // Update progress bars
             d3.select("div#progress-fg-one-dose").style("width", pct_onedose);
