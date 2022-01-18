@@ -20,9 +20,15 @@ def fix_date_index(df):
 
 def generate_date_range(index):
     """Generate DatetimeIndex using first and last dates from index column"""
-    start = parse_date(index[0].split(" ")[-1])
-    end = parse_date(index[-1].split(" ")[-1])
+    if type(index[0]) == str:
+        start = parse_date(index[0].split(" ")[-1])
+        end = parse_date(index[-1].split(" ")[-1])
+    else:
+        start = index[0]
+        end = index[-1]
+    
     return pd.date_range(start=start, end=end)
+
 
 tsa_county_map = {
     'A.': ['Armstrong', 'Briscoe', 'Carson', 'Childress', 'Collingsworth', 'Dallam', 'Deaf Smith', 
@@ -124,11 +130,9 @@ fix_date_index(df_covid_icu_inpatients)
 
 # Load and parse total case count data
 url = 'https://www.dshs.state.tx.us/coronavirus/TexasCOVID19DailyCountyCaseCountData.xlsx'
-df = pd.read_excel(url, sheet_name='Cases by County', index_col=[0], header=2, nrows=255)
-df.dropna(axis=1, how='all', inplace=True)
-total = df.sum()
-total.name = "Total"
-df = df.append(total.transpose())
+df = pd.read_excel(url, sheet_name=None, index_col=[0], header=2, nrows=256)
+df = pd.concat(df, axis=1).droplevel(0, axis=1)
+df.drop(columns=["Unknown Date", "2020 Total"], inplace=True)
 df.columns = generate_date_range(df.columns)
 df = df.loc[:, df.columns > '2020-04-11']
 df.insert(0, 'TSA ID', [map_county_to_tsa(county) for county in df.index])
@@ -142,13 +146,13 @@ df_cases.rename(columns = {0: 'cases'}, inplace=True)
 
 # Load and parse daily case count data
 url = 'https://www.dshs.state.tx.us/coronavirus/TexasCOVID-19NewCasesOverTimebyCounty.xlsx'
-df = pd.read_excel(url, sheet_name='New Cases by County', index_col=[0], header=2, nrows=255)
-df.dropna(axis=1, how='all', inplace=True)
+df = pd.read_excel(url, sheet_name=None, index_col=[0], header=2, nrows=256)
+df = pd.concat(df, axis=1).droplevel(0, axis=1)
+df.drop(columns=["Unknown Date", "Total"], inplace=True)
 df.columns = generate_date_range(df.columns)
 df = df.loc[:, df.columns > '2020-04-11']
 df.insert(0, 'TSA ID', [map_county_to_tsa(county) for county in df.index])
 df = df.groupby(['TSA ID']).sum()
-df.loc['Total'] = df.sum(axis=0) # Add total category
 df['TSA AREA'] = [tsa_location_map[tsa] for tsa in df.index]
 df.set_index('TSA AREA', append=True, inplace=True)
 df_cases_new = pd.DataFrame(df.stack())
@@ -156,11 +160,11 @@ df_cases_new.rename(columns = {0: 'cases_new'}, inplace=True)
 
 # Load and parse total death data
 url = 'https://www.dshs.state.tx.us/coronavirus/TexasCOVID19DailyCountyFatalityCountData.xlsx'
-df = pd.read_excel(url, sheet_name='Fatalities by County', index_col=[0], header=2, nrows=256)
-df.dropna(axis=1, how='all', inplace=True)
-df.columns = generate_date_range(df.columns)
+df = pd.read_excel(url, sheet_name=None, index_col=[0], header=2, nrows=256)
+df = pd.concat(df, axis=1).droplevel(0, axis=1)
+new_date_range = generate_date_range(df.columns)
+df.columns = new_date_range
 df_new = df.diff(axis=1) # Extract daily death count
-df.drop(index='UNKNOWN', inplace=True)
 df = df.loc[:, df.columns > '2020-04-11']
 df.insert(0, 'TSA ID', [map_county_to_tsa(county) for county in df.index])
 df = df.groupby(['TSA ID']).sum()
@@ -196,18 +200,17 @@ df_merged.to_csv('data.csv', index=False, float_format='%d', date_format='%Y-%m-
 # Manual removals of extreme values
 df_merged.loc[(df_merged['tsa'] == 'N') & (df_merged['date'] == '2020-04-28'), 'total_beds_occupied'] = np.nan
 
-df_merged.loc[(df_merged['tsa'] == 'A') & (df_merged['date'] == '2020-05-16'), 'cases_new'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'A') & (df_merged['date'] == '2020-05-15'), 'cases_new'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'I') & (df_merged['date'] == '2020-05-31'), 'icu_beds_occupied'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'C') & (df_merged['date'] == '2020-06-07'), ['total_beds_occupied', 'icu_beds_occupied']] = np.nan
 
-df_merged.loc[(df_merged['tsa'] == 'G') & (df_merged['date'] == '2020-06-16'), 'cases_new'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'O') & (df_merged['date'] == '2020-06-26'), 'cases_new'] = np.nan
 
-df_merged.loc[(df_merged['tsa'] == 'K') & (df_merged['date'] == '2020-07-14'), 'cases_new'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'K') & (df_merged['date'] == '2020-06-17'), 'cases_new'] = np.nan
 
-df_merged.loc[(df_merged['tsa'] == 'P') & (df_merged['date'] == '2020-07-17'), 'cases_new'] = np.nan
-df_merged.loc[(df_merged['tsa'] == 'Total') & (df_merged['date'] == '2020-07-17'), 'cases_new'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'K') & (df_merged['date'] == '2020-07-17'), 'cases_new'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'Total') & (df_merged['date'] == '2020-07-23'), ['total_beds_occupied', 'icu_beds_occupied', 'covid_inpatients']] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'B') & (df_merged['date'] == '2020-07-23'), ['total_beds_occupied', 'icu_beds_occupied']] = np.nan
@@ -270,7 +273,6 @@ df_merged.loc[(df_merged['tsa'] == 'H') & (df_merged['date'] == '2020-07-27'), '
 df_merged.loc[(df_merged['tsa'] == 'J') & (df_merged['date'] == '2020-07-27'), 'total_beds_available'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'K') & (df_merged['date'] == '2020-07-27'), 'covid_inpatients'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'M') & (df_merged['date'] == '2020-07-27'), ['total_beds_occupied', 'icu_beds_occupied']] = np.nan
-df_merged.loc[(df_merged['tsa'] == 'N') & (df_merged['date'] == '2020-07-27'), 'cases_new'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'O') & (df_merged['date'] == '2020-07-27'), 'icu_beds_occupied'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'R') & (df_merged['date'] == '2020-07-27'), 'total_beds_occupied'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'V') & (df_merged['date'] == '2020-07-27'), ['total_beds_occupied', 'total_beds_available', 'icu_beds_available']] = np.nan
@@ -292,42 +294,49 @@ df_merged.loc[(df_merged['tsa'] == 'Q') & (df_merged['date'] == '2020-07-31'), '
 df_merged.loc[(df_merged['tsa'] == 'Total') & (df_merged['date'] == '2020-07-31'), 'covid_inpatients'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'G') & (df_merged['date'] == '2020-08-01'), 'icu_beds_occupied'] = np.nan
-df_merged.loc[(df_merged['tsa'] == 'J') & (df_merged['date'] == '2020-08-01'), 'cases_new'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'K') & (df_merged['date'] == '2020-08-01'), 'icu_beds_occupied'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'M') & (df_merged['date'] == '2020-08-01'), 'icu_beds_occupied'] = np.nan
-df_merged.loc[(df_merged['tsa'] == 'U') & (df_merged['date'] == '2020-08-01'), ['icu_beds_occupied', 'cases_new']] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'U') & (df_merged['date'] == '2020-08-01'), 'icu_beds_occupied'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'F') & (df_merged['date'] == '2020-08-02'), 'icu_beds_occupied'] = np.nan
+
+df_merged.loc[(df_merged['tsa'] == 'S') & (df_merged['date'] == '2020-08-08'), 'cases_new'] = np.nan
+
+df_merged.loc[(df_merged['tsa'] == 'D') & (df_merged['date'] == '2020-08-09'), 'cases_new'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'P') & (df_merged['date'] == '2020-08-19'), 'icu_beds_occupied'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'D') & (df_merged['date'] == '2020-08-28'), 'total_beds_available'] = np.nan
 
+df_merged.loc[(df_merged['tsa'] == 'B') & (df_merged['date'] == '2020-09-12'), 'cases_new'] = np.nan
+
 df_merged.loc[(df_merged['tsa'] == 'P') & (df_merged['date'] == '2020-09-16'), 'total_beds_occupied'] = np.nan
 
-df_merged.loc[(df_merged['tsa'] == 'A') & (df_merged['date'] == '2020-09-30'), 'cases_new'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'A') & (df_merged['date'] == '2020-09-28'), 'cases_new'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'J') & (df_merged['date'] == '2020-10-09'), 'total_beds_occupied'] = np.nan
+
+df_merged.loc[(df_merged['tsa'] == 'L') & (df_merged['date'] == '2020-10-18'), 'cases_new'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'K') & (df_merged['date'] == '2020-10-20'), ['total_beds_occupied', 'icu_beds_occupied']] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'A') & (df_merged['date'] == '2020-10-21'), 'icu_beds_occupied'] = np.nan
+
+df_merged.loc[(df_merged['tsa'] == 'V') & (df_merged['date'] == '2020-10-28'), 'cases_new'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'Q') & (df_merged['date'] == '2020-11-01'), 'total_beds_occupied'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'Total') & (df_merged['date'] == '2020-11-01'), 'covid_inpatients'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'S') & (df_merged['date'] == '2020-11-02'), 'icu_beds_available'] = np.nan
 
-df_merged.loc[(df_merged['tsa'] == 'D') & (df_merged['date'] == '2020-11-11'), 'cases_new'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'D') & (df_merged['date'] == '2020-11-08'), 'cases_new'] = np.nan
 
-df_merged.loc[(df_merged['tsa'] == 'K') & (df_merged['date'] == '2020-11-17'), 'cases_new'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'L') & (df_merged['date'] == '2020-11-17'), 'icu_beds_available'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'A') & (df_merged['date'] == '2020-11-27'), 'icu_beds_occupied'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'R') & (df_merged['date'] == '2020-12-10'), 'total_beds_occupied'] = np.nan
 
-df_merged.loc[(df_merged['tsa'] == 'J') & (df_merged['date'] == '2020-12-17'), 'cases_new'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'R') & (df_merged['date'] == '2020-12-17'), 'total_beds_occupied'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'H') & (df_merged['date'] == '2020-12-18'), 'icu_beds_occupied'] = np.nan
@@ -346,6 +355,8 @@ df_merged.loc[(df_merged['tsa'] == 'C') & (df_merged['date'] == '2021-01-11'), '
 df_merged.loc[(df_merged['tsa'] == 'G') & (df_merged['date'] == '2021-01-11'), ['total_beds_occupied', 'icu_beds_occupied']] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'J') & (df_merged['date'] == '2021-01-11'), 'total_beds_occupied'] = np.nan
 
+df_merged.loc[(df_merged['tsa'] == 'T') & (df_merged['date'] == '2021-01-14'), 'cases_new'] = np.nan
+
 df_merged.loc[(df_merged['tsa'] == 'F') & (df_merged['date'] == '2021-01-27'), 'cases_new'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'N') & (df_merged['date'] == '2021-02-01'), 'cases_new'] = np.nan
@@ -357,6 +368,8 @@ df_merged.loc[(df_merged['tsa'] == 'T') & (df_merged['date'] == '2021-06-29'), '
 
 df_merged.loc[(df_merged['tsa'] == 'L') & (df_merged['date'] == '2021-07-12'), 'icu_beds_occupied'] = np.nan
 df_merged.loc[(df_merged['tsa'] == 'Total') & (df_merged['date'] == '2021-07-12'), 'icu_beds_occupied'] = np.nan
+
+df_merged.loc[(df_merged['tsa'] == 'T') & (df_merged['date'] == '2021-08-10'), 'cases_new'] = np.nan
 
 df_merged.loc[(df_merged['tsa'] == 'I') & (df_merged['date'] == '2021-11-28'), 'icu_beds_occupied'] = np.nan
 
