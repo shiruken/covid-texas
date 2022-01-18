@@ -1446,13 +1446,10 @@
         function moveTotalBedLegend(TSA,duration) {
             let tform = "translate(20, 10)";
 
-            if (["E", "G"].includes(TSA))
-                tform = "translate(20, 165)";
-
-            if (["O", "P", "Q", "R", "T", "V"].includes(TSA))
+            if (["E", "G", "I", "L", "O", "P", "Q", "R", "T", "U", "V"].includes(TSA))
                 tform = "translate(575, 165)";
 
-            if (["S", "U"].includes(TSA))
+            if (["S"].includes(TSA))
                 tform = "translate(575, 10)";
 
             d3.select("#chart-hospital-beds g.legend")
@@ -1472,13 +1469,13 @@
                 tform = "translate(20, 10)";
 
             if (TSA == "K")
-                tform = "translate(550, 10)";
+                tform = "translate(300, 10)";
 
             if (TSA == "S")
                 tform = "translate(450, 320)";
 
             if (TSA == "U")
-                tform = "translate(550, 165)";
+                tform = "translate(300, 165)";
 
             d3.select("#chart-icu-beds g.legend")
                 .transition()
@@ -1531,7 +1528,7 @@
             if (["I", "K"].includes(TSA))
                 tform = "translate(20, 2)";
 
-            if (["C", "H", "J", "L", "N", "Q", "O", "P", "R", "S", "V"].includes(TSA))
+            if (["C", "H", "J", "L", "N", "Q", "O", "P", "R", "S"].includes(TSA))
                 tform = "translate(20, 20)";
 
             if (["T", "U", "Total"].includes(TSA))
@@ -1552,16 +1549,16 @@
             // Legend 1
             let tform1 = "translate(20, 10)";
 
-            if (["D", "E", "K", "Q", "R", "T", "U"].includes(TSA))
+            if (["D", "E", "F", "Q", "R", "S", "T", "Total"].includes(TSA))
                 tform1 = "translate(20, 5)";
 
-            if (["A", "B", "F", "G", "J", "M", "N", "O", "Total"].includes(TSA))
+            if (["B", "G", "J", "M", "N", "O", "P", "U"].includes(TSA))
                 tform1 = "translate(20, 15)";
 
-            if (["C", "H", "I", "S", "V"].includes(TSA))
+            if (["H", "I", "K", "V"].includes(TSA))
                 tform1 = "translate(20, 20)";
 
-            if (["C", "L", "P"].includes(TSA))
+            if (["A", "C", "L"].includes(TSA))
                 tform1 = "translate(20, 25)";
 
             d3.select("#chart-case .stacked-top .legend")
