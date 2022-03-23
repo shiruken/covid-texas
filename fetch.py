@@ -373,6 +373,23 @@ df_merged.loc[(df_merged['tsa'] == 'T') & (df_merged['date'] == '2021-08-10'), '
 
 df_merged.loc[(df_merged['tsa'] == 'I') & (df_merged['date'] == '2021-11-28'), 'icu_beds_occupied'] = np.nan
 
+df_merged.loc[(df_merged['tsa'] == 'J') & (df_merged['date'] == '2022-03-03'), 'total_beds_occupied'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'J') & (df_merged['date'] == '2022-03-04'), 'total_beds_occupied'] = np.nan
+
+df_merged.loc[(df_merged['tsa'] == 'Total') & (df_merged['date'] == '2022-03-07'), 'covid_icu_inpatients'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'E') & (df_merged['date'] == '2022-03-07'), 'covid_icu_inpatients'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'G') & (df_merged['date'] == '2022-03-07'), 'covid_icu_inpatients'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'I') & (df_merged['date'] == '2022-03-07'), 'covid_icu_inpatients'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'J') & (df_merged['date'] == '2022-03-07'), 'covid_icu_inpatients'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'L') & (df_merged['date'] == '2022-03-07'), 'covid_icu_inpatients'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'O') & (df_merged['date'] == '2022-03-07'), 'covid_icu_inpatients'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'P') & (df_merged['date'] == '2022-03-07'), 'covid_icu_inpatients'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'Q') & (df_merged['date'] == '2022-03-07'), 'covid_icu_inpatients'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'R') & (df_merged['date'] == '2022-03-07'), 'covid_icu_inpatients'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'S') & (df_merged['date'] == '2022-03-07'), 'covid_icu_inpatients'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'U') & (df_merged['date'] == '2022-03-07'), 'covid_icu_inpatients'] = np.nan
+df_merged.loc[(df_merged['tsa'] == 'V') & (df_merged['date'] == '2022-03-07'), 'covid_icu_inpatients'] = np.nan
+
 # Eliminate negative values from cases_new
 df_merged.loc[df_merged['cases_new'] < 0, 'cases_new'] = np.nan
 
