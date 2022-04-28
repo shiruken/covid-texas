@@ -19,14 +19,14 @@ df_new = df.loc[:, [
     'Vaccine Doses Administered', 
     'People Vaccinated with at least One Dose', 
     'People Fully Vaccinated',
-    'People Vaccinated with Booster Dose'
+    'People Vaccinated with at least One Booster Dose'
 ]]
 
 df_new.rename(columns={
     'Vaccine Doses Administered': 'total_doses',
     'People Vaccinated with at least One Dose': 'one_dose',
     'People Fully Vaccinated': 'vaccinated',
-    'People Vaccinated with Booster Dose': 'boosted'
+    'People Vaccinated with at least One Booster Dose': 'boosted'
 }, inplace=True)
 
 # Load existing data and append today's data
