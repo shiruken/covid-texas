@@ -37,4 +37,7 @@ df_merged = pd.concat([df, df_new])
 df_merged = df_merged[~df_merged.index.duplicated(keep='last')]
 df_merged.sort_index(inplace=True)
 
+cols = df_merged.columns
+df_merged[cols] = df_merged[cols].apply(pd.to_numeric)
+
 df_merged.to_csv(filename, float_format='%d', date_format='%Y-%m-%d')
