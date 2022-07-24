@@ -337,25 +337,25 @@
                 <strong></strong> people with at least one dose
                 <span class="pct"></span>
             </h3>
-            <div class="progress-bg" id="progress-bg-one-dose" title="Fraction of population (5+) that has received at least one dose of COVID-19 vaccine">
+            <div class="progress-bg" id="progress-bg-one-dose" title="Fraction of population (6Mo+) that has received at least one dose of COVID-19 vaccine">
                 <div class="progress-fg" id="progress-fg-one-dose"></div>
             </div>
             <h3 id="two-dose" title="Number of residents who have completed the full vaccination series (2 doses of Pfizer/Moderna or 1 dose of Janssen)">
                 <strong></strong> people fully vaccinated
                 <span class="pct"></span>
             </h3>
-            <div class="progress-bg" id="progress-bg-two-dose" title="Fraction of population (5+) that has completed the full vaccination series">
+            <div class="progress-bg" id="progress-bg-two-dose" title="Fraction of population (6Mo+) that has completed the full vaccination series">
                 <div class="progress-fg" id="progress-fg-two-dose"></div>
             </div>
             <h3 id="boosted" title="Number of residents who are fully vaccinated and received a booster dose">
                 <strong></strong> people with booster dose
                 <span class="pct"></span>
             </h3>
-            <div class="progress-bg" id="progress-bg-boosted" title="Fraction of population (5+) that has received a booster dose">
+            <div class="progress-bg" id="progress-bg-boosted" title="Fraction of population (6Mo+) that has received a booster dose">
                 <div class="progress-fg" id="progress-fg-boosted"></div>
             </div>
-            <dl title="Estimated population age 5 and older">
-                <dt>Population (5+)</dt>
+            <dl title="Estimated population age 6 months and older">
+                <dt>Population (6Mo+)</dt>
                 <dd id="population"></dd>
             </dl>
         </div>
@@ -616,7 +616,7 @@
             chart.select(".xAxis")
                 .transition()
                 .duration(duration)
-                .call(d3.axisBottom(xScale).ticks(d3.timeWeek.every(5)));
+                .call(d3.axisBottom(xScale).ticks(d3.timeMonth.every(2)));
 
             // Update y-axis
             let yMax = d3.max(data, d => d.total_doses);
