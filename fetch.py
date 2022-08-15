@@ -15,7 +15,7 @@ def fix_date_index(df):
     """Convert date index strings to datetime objects"""
     date_index = df.index.levels[2].to_series()
     date_index_fixed = date_index.apply(parse_date) + pd.DateOffset(1)
-    df.index.set_levels(date_index_fixed, level=2, inplace=True)
+    df.index = df.index.set_levels(date_index_fixed, level=2)
 
 
 def generate_date_range(index):
