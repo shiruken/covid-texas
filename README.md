@@ -2,7 +2,7 @@
 
 # Texas COVID-19 Hospital Resource Usage
 
-### _This website is no longer being updated as of August 24, 2022, after Texas DSHS ended its daily data releases._
+### _This website is no longer being regularly updated as of August 24, 2022, after Texas DSHS ended its daily data releases. Manual record requests may be used to intermittently update the data._
 
 Regional COVID-19 hospital resource usage in Texas based on [Department of State Health Services](https://dshs.texas.gov/) data. Powered by [D3.js](https://d3js.org/). Hosted on [GitHub Pages](https://pages.github.com/).
 
