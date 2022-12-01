@@ -24,6 +24,8 @@ The "average annual occupancy rate" shown on the Statewide Hospital Bed Usage ch
 
 # Texas COVID-19 Vaccine Tracker
 
+### _This website is no longer being updated as of December 1, 2022, after Texas DSHS ended data releases._
+
 Texas COVID-19 vaccine distribution tracker based on [Department of State Health Services](https://dshs.texas.gov/) data. Powered by [D3.js](https://d3js.org/). Hosted on [GitHub Pages](https://pages.github.com/).
 
 https://covid-texas.csullender.com/vaccine/
