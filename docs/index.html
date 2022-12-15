@@ -72,7 +72,8 @@
 
         h2#subtitle {
             font-size: 1em;
-            color: #D95F02;
+            color: #999;
+            font-weight: normal;
             margin-top: 5px;
             min-height: 22px;
         }
@@ -346,14 +347,13 @@
             DOI:<a href="https://doi.org/10.5281/zenodo.5501307">10.5281/zenodo.5501307</a>
         </p>
         <p id="data-desc">
-            Hospital data <a href="https://txdshs.maps.arcgis.com/apps/opsdashboard/index.html#/0d8bdf9be927459d9cb11b9eaef6101f" title="View Texas DSHS COVID-19 Test and Hospital Dashboard">reported daily</a> by the Texas Department of Health State Services are used for all metrics. 
+            Hospital data <a href="https://www.dshs.state.tx.us/coronavirus/cases.aspx" title="View Texas DSHS COVID-19 Test and Hospital Dashboard">reported weekly</a> by the Texas Department of Health State Services are used for all metrics. 
             Raw historical data are <a href="https://github.com/shiruken/covid-texas-data/" title="View my Texas COVID-19 data archive">aggregated here</a>.
             Average staffed community hospital bed occupancy rate for Texas as reported by the National Center for Health Statistics</a> in <a href="https://www.cdc.gov/nchs/hus/contents2017.htm#Table_091" title="View Table 91 from report"><em>Health, United States, 2017</em></a>.
             The "Statewide Total" is manually calculated by aggregating values from all available <a href="https://www.dshs.texas.gov/emstraumasystems/etrarac.shtm" title="Link to Regional Advisory Council website">trauma service areas</a> (TSAs). 
             This aggregation is incomplete for bed counts prior to May 29, 2020, because of fragmented reporting from TSA-F (Paris) and TSA-R (Galveston). 
             All data is incomplete between July 23 to July 28, 2020, <a href="https://www.kxan.com/news/coronavirus/hospitalizations/18-of-texas-hospitals-arent-reporting-complete-data-dshs-says/" title="KXAN article about hospital reporting issues">due to a transition in hospital reporting</a> to comply with new federal requirements. 
-            This page is no longer being regularly updated as of August 24, 2022, following Texas DSHS ending its daily data releases.
-            Manual record requests may be used to intermittently update the data.
+            This page is updated weekly on Wednesdays following a reduction in Texas DSHS data release frequency.
             Manual curation was performed as necessary to avoid extreme graph values and are documented in the <a href="https://github.com/shiruken/covid-texas/blob/master/fetch.py" title="View fetch.py on GitHub">update script</a>.
         </p>
     </footer>
@@ -479,10 +479,7 @@
             
             // Update subtitle
             let N = data[TSA].length - 1;
-            d3.select("#subtitle").html("" +
-                "<p>Texas DSHS ended regular data releases on August 24, 2022</p>" +
-                "<p>Records requested through " + formatDate(data[TSA][N].date) + "</p>"
-            );
+            d3.select("#subtitle").text("Trauma Service Area (TSA) data updated on " + formatDate(data[TSA][N].date));
 
             // Populate select menu and select default TSA
             d3.select("#tsaSelect")

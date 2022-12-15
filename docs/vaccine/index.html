@@ -63,7 +63,8 @@
 
         h2#subtitle {
             font-size: 1em;
-            color: #D95F02;
+            color: #999;
+            font-weight: normal;
             margin-top: 5px;
             min-height: 22px;
         }
@@ -374,14 +375,14 @@
             DOI:<a href="https://doi.org/10.5281/zenodo.5501307">10.5281/zenodo.5501307</a>
         </p>
         <p id="data-desc">
-            Vaccination data <a href="https://tabexternal.dshs.texas.gov/t/THD/views/COVID-19VaccineinTexasDashboard/Summary" title="View Texas DSHS COVID-19 Vaccination Dashboard">reported daily</a> by the <a href="https://dshs.texas.gov/" title="Visit the Texas DSHS website">Texas Department of Health State Services</a> are used for all metrics.
+            Vaccination data <a href="https://tabexternal.dshs.texas.gov/t/THD/views/COVID-19VaccineinTexasDashboard/Summary" title="View Texas DSHS COVID-19 Vaccination Dashboard">reported weekly</a> by the <a href="https://dshs.texas.gov/" title="Visit the Texas DSHS website">Texas Department of Health State Services</a> are used for all metrics.
             Raw historical data are <a href="https://github.com/shiruken/covid-texas-data/" title="View my Texas COVID-19 data archive">aggregated here</a>.
             The number of vaccine doses administered, number of people vaccinated with at least one dose, number of people fully vaccinated, and number of people with booster doses are aggregated by the <em>recipient's county of residence</em>.            
             Weekly allocations/shipments to each county were stopped on the week of May 3, 2021, due to there being a sufficient supply of vaccine. These metrics have been removed from the tracker.
             Health care providers have 24 hours after a dose is administered to enter information into the Texas Immunization Registry (ImmTrac2).
             The daily data comes from vaccination records submitted by health care providers as of 11:59 PM the previous night.
             Population numbers are based on 2019 estimates from the <a href="https://www.census.gov/data/tables/time-series/demo/popest/2010s-counties-detail.html" title="Visit the U.S. Census Bureau website">U.S. Census Bureau</a> and <a href="https://demographics.texas.gov/Data/TPEPP/Estimates/" title="Visit the Texas Demographic Center website">Texas Demographic Center</a>.
-            This page is no longer being regularly updated as of December 1, 2022, following Texas DSHS ending vaccination updates.
+            This page is updated weekly on Wednesdays following a reduction in Texas DSHS data release frequency.
         </p>
     </footer>
 
@@ -432,6 +433,11 @@
             if (county === null || !countyNames.includes(county))
                 county = "Statewide"; // Default to Statewide
 
+            // Update subtitle
+            let N = data[county].length - 1;
+            d3.select("#subtitle").text("Data updated on "
+                + formatDate(data[county][N].date));
+
             // Populate select menu and select default county
             d3.select("#countySelect")
                 .selectAll('options')
@@ -443,7 +449,6 @@
                 .property("selected", function(d){ return d === county; });
 
              // Initial display of charts
-             let N = data[county].length - 1;
              updateChart(data[county], 0);
              updateDetails(data[county][N]);
 
