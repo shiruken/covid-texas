@@ -81,7 +81,7 @@ def map_county_to_tsa(county):
 
 
 # Load combined hospital data
-url = 'https://www.dshs.texas.gov/sites/default/files/chs/data/Combined%20Hospital%20Data%20over%20Time%20by%20TSA%20Region.xlsx'
+url = 'https://www.dshs.texas.gov/sites/default/files/chs/data/COVID/Combined%20Hospital%20Data%20over%20Time%20by%20TSA%20Region.xlsx'
 df = pd.read_excel(url, sheet_name=None, header=2, index_col=[0, 1], nrows=23)
 
 # Parse total available beds
@@ -129,7 +129,7 @@ df_covid_icu_inpatients.rename(columns = {0: 'covid_icu_inpatients'}, inplace=Tr
 fix_date_index(df_covid_icu_inpatients)
 
 # Load and parse total case count data
-url = 'https://www.dshs.texas.gov/sites/default/files/chs/data/Texas%20COVID-19%20Cumulative%20Confirmed%20Cases%20by%20County.xlsx'
+url = 'https://www.dshs.texas.gov/sites/default/files/chs/data/COVID/Texas%20COVID-19%20Cumulative%20Confirmed%20Cases%20by%20County.xlsx'
 df = pd.read_excel(url, sheet_name=None, index_col=[0], header=2, nrows=256)
 df = pd.concat(df, axis=1).droplevel(0, axis=1)
 df.drop(columns=["Unknown Date", "2020 Total"], inplace=True)
@@ -145,7 +145,7 @@ df_cases = pd.DataFrame(df.stack())
 df_cases.rename(columns = {0: 'cases'}, inplace=True)
 
 # Load and parse daily case count data
-url = 'https://www.dshs.texas.gov/sites/default/files/chs/data/Texas%20COVID-19%20New%20Confirmed%20Cases%20by%20County.xlsx'
+url = 'https://www.dshs.texas.gov/sites/default/files/chs/data/COVID/Texas%20COVID-19%20New%20Confirmed%20Cases%20by%20County.xlsx'
 df = pd.read_excel(url, sheet_name=None, index_col=[0], header=2, nrows=256)
 df = pd.concat(df, axis=1).droplevel(0, axis=1)
 df.drop(columns=["Unknown Date", "Total"], inplace=True)
@@ -159,7 +159,7 @@ df_cases_new = pd.DataFrame(df.stack())
 df_cases_new.rename(columns = {0: 'cases_new'}, inplace=True)
 
 # Load and parse total death data
-url = 'https://www.dshs.texas.gov/sites/default/files/chs/data/Texas%20COVID-19%20Fatality%20Count%20Data%20by%20County.xlsx'
+url = 'https://www.dshs.texas.gov/sites/default/files/chs/data/COVID/Texas%20COVID-19%20Fatality%20Count%20Data%20by%20County.xlsx'
 df = pd.read_excel(url, sheet_name=None, index_col=[0], header=2, nrows=256)
 df = pd.concat(df, axis=1).droplevel(0, axis=1)
 new_date_range = generate_date_range(df.columns)

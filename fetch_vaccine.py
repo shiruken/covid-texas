@@ -2,7 +2,7 @@ import pandas as pd
 from datetime import date
 
 # Load new data from Texas DSHS
-url = "https://www.dshs.texas.gov/sites/default/files/LIDS-Immunize-COVID19/COVID%20Dashboard/COVID-19%20Vaccine%20Data%20by%20County.xlsx"
+url = "https://www.dshs.texas.gov/sites/default/files/LIDS-Immunize-COVID19/COVID%20Dashboard/County%20Dashboard/COVID-19%20Vaccine%20Data%20by%20County.xlsx"
 df = pd.read_excel(url, sheet_name="By County", index_col=[0], engine='openpyxl')
 df.drop('Federal Long-Term Care Vaccination Program', inplace=True) # Drop the federal data
 df.drop('Federal Pharmacy Retail Vaccination Program', inplace=True)
