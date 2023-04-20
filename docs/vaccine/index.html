@@ -314,7 +314,7 @@
 
 <body>
 
-    <a id="badge" href="../">Texas Hospital Tracker</a>
+    <a id="badge" href="../" data-umami-event="texas-button-click">Texas Hospital Tracker</a>
 
     <header>
         <h1 id="title">Texas COVID-19 Vaccine Tracker</h1>
@@ -431,6 +431,10 @@
             if (county === null || !countyNames.includes(county))
                 county = "Statewide"; // Default to Statewide
 
+            // Update page title
+            if (county != "Statewide")
+                document.title = county + " County | Texas COVID-19 Vaccine Tracker";
+
             // Update subtitle
             let N = data[county].length - 1;
             d3.select("#subtitle").text("Data updated on "
@@ -453,14 +457,19 @@
             // Update charts when different county is selected
             d3.select("#countySelect").on("change", function(d) {
                 county = d3.select(this).property("value");
-                if (county === "Statewide")
+                if (county === "Statewide") {
                     window.history.replaceState(null, null, window.location.pathname);
-                else
+                    document.title = "Texas COVID-19 Vaccine Tracker";
+                } else {
                     window.history.replaceState(null, null, "?county=" + county);
+                    document.title = county + " County | Texas COVID-19 Vaccine Tracker";
+                }
 
                 // Update chart and details
                 updateChart(data[county], 500);
                 updateDetails(data[county][data[county].length - 1]);
+
+                umami.track("county-select", { county: county })
             });
 
         });

@@ -303,8 +303,8 @@
 
 <body>
 
-    <a class="badge" id="badge-one" href="https://covid.csullender.com/">COVID-19 Tracker Map</a>
-    <a class="badge" id="badge-two" href="vaccine/">Texas Vaccine Tracker</a>
+    <a class="badge" id="badge-one" href="https://covid.csullender.com/" data-umami-event="covid-button-click">COVID-19 Tracker Map</a>
+    <a class="badge" id="badge-two" href="vaccine/" data-umami-event="vaccine-button-click">Texas Vaccine Tracker</a>
 
     <header>
         <h1 id="title">Texas COVID-19 Hospital Resource Usage</h1>
@@ -477,6 +477,10 @@
             if (TSA === null || !tsaIDs.includes(TSA))
                 TSA = "Total"; // Default to Statewide Total
             
+            // Update page title
+            if (TSA != "Total")
+                document.title = "TSA-" + TSA + " | Texas COVID-19 Hospital Resource Usage";
+
             // Update subtitle
             let N = data[TSA].length - 1;
             d3.select("#subtitle").text("Trauma Service Area (TSA) data updated on " + formatDate(data[TSA][N].date));
@@ -513,10 +517,13 @@
             // Update charts when different TSA is selected
             d3.select("#tsaSelect").on("change", function(d) {
                 TSA = d3.select(this).property("value");
-                if (TSA === "Total")
+                if (TSA === "Total") {
                     window.history.replaceState(null, null, window.location.pathname);
-                else
+                    document.title ="Texas COVID-19 Hospital Resource Usage";
+                } else {
                     window.history.replaceState(null, null, "?tsa=" + TSA);
+                    document.title = "TSA-" + TSA + " | Texas COVID-19 Hospital Resource Usage";
+                }
 
                 // Update charts
                 updateCaseChart(data[TSA], 500);
@@ -533,6 +540,7 @@
                 updateTotalDetails(data[TSA][N]);
                 updateICUDetails(data[TSA][N]);
 
+                umami.track("tsa-select", { tsa: TSA });
             });
 
         });
@@ -1619,7 +1627,7 @@
     
     <script defer data-domain="covid-texas.csullender.com,/csullender.com" src="https://p.csullender.com/js/script.outbound-links.js"></script>
 
-    <script async defer data-website-id="22757bb6-8de1-4f47-bc04-6d691ba0ed7d" src="https://u.csullender.com/u.js"></script>
+    <script async defer src="https://u.csullender.com/u.js" data-website-id="22757bb6-8de1-4f47-bc04-6d691ba0ed7d" data-domain="covid-texas.csullender.com"></script>
 
 </body>
 </html>
