@@ -31,44 +31,44 @@ def generate_date_range(index):
 
 
 tsa_county_map = {
-    'A.': ['Armstrong', 'Briscoe', 'Carson', 'Childress', 'Collingsworth', 'Dallam', 'Deaf Smith', 
+    'A': ['Armstrong', 'Briscoe', 'Carson', 'Childress', 'Collingsworth', 'Dallam', 'Deaf Smith', 
           'Donley', 'Gray', 'Hall', 'Hansford', 'Hartley', 'Hemphill', 'Hutchinson', 'Lipscomb', 
           'Moore', 'Ochiltree', 'Oldham', 'Parmer', 'Potter', 'Randall', 'Roberts', 'Sherman', 
           'Swisher', 'Wheeler'],
-    'B.': ['Bailey', 'Borden', 'Castro', 'Cochran', 'Cottle', 'Crosby', 'Dawson', 'Dickens', 'Floyd', 
+    'B': ['Bailey', 'Borden', 'Castro', 'Cochran', 'Cottle', 'Crosby', 'Dawson', 'Dickens', 'Floyd', 
           'Gaines', 'Garza', 'Hale', 'Hockley', 'Kent', 'King', 'Lamb', 'Lubbock', 'Lynn', 'Motley', 
           'Scurry', 'Terry', 'Yoakum'],
-    'C.': ['Archer', 'Baylor', 'Clay', 'Foard', 'Hardeman', 'Jack', 'Montague', 'Wichita', 'Wilbarger', 'Young'],
-    'D.': ['Brown', 'Callahan', 'Coleman', 'Comanche', 'Eastland', 'Fisher', 'Haskell', 'Jones', 
+    'C': ['Archer', 'Baylor', 'Clay', 'Foard', 'Hardeman', 'Jack', 'Montague', 'Wichita', 'Wilbarger', 'Young'],
+    'D': ['Brown', 'Callahan', 'Coleman', 'Comanche', 'Eastland', 'Fisher', 'Haskell', 'Jones', 
           'Knox', 'Mitchell', 'Nolan', 'Shackelford', 'Stephens', 'Stonewall', 'Taylor', 'Throckmorton'],
-    'E.': ['Collin', 'Cooke', 'Dallas', 'Denton', 'Ellis', 'Erath', 'Fannin', 'Grayson', 'Hood', 
+    'E': ['Collin', 'Cooke', 'Dallas', 'Denton', 'Ellis', 'Erath', 'Fannin', 'Grayson', 'Hood', 
           'Hunt', 'Johnson', 'Kaufman', 'Navarro', 'Palo Pinto', 'Parker', 'Rockwall', 
           'Somervell', 'Tarrant', 'Wise'],
-    'F.': ['Bowie', 'Cass', 'Delta', 'Hopkins', 'Lamar', 'Morris', 'Red River', 'Titus'],
-    'G.': ['Anderson', 'Camp', 'Cherokee', 'Franklin', 'Freestone', 'Gregg', 'Harrison', 'Henderson', 
+    'F': ['Bowie', 'Cass', 'Delta', 'Hopkins', 'Lamar', 'Morris', 'Red River', 'Titus'],
+    'G': ['Anderson', 'Camp', 'Cherokee', 'Franklin', 'Freestone', 'Gregg', 'Harrison', 'Henderson', 
           'Houston', 'Marion', 'Panola', 'Rains', 'Rusk', 'Shelby', 'Smith', 'Trinity', 'Upshur', 
           'Van Zandt', 'Wood'],
-    'H.': ['Angelina', 'Nacogdoches', 'Polk', 'Sabine', 'San Augustine', 'San Jacinto', 'Tyler'],
-    'I.': ['Culberson', 'El Paso', 'Hudspeth'],
-    'J.': ['Andrews', 'Brewster', 'Crane', 'Ector', 'Glasscock', 'Howard', 'Jeff Davis', 'Loving', 
+    'H': ['Angelina', 'Nacogdoches', 'Polk', 'Sabine', 'San Augustine', 'San Jacinto', 'Tyler'],
+    'I': ['Culberson', 'El Paso', 'Hudspeth'],
+    'J': ['Andrews', 'Brewster', 'Crane', 'Ector', 'Glasscock', 'Howard', 'Jeff Davis', 'Loving', 
           'Martin', 'Midland', 'Pecos', 'Presidio', 'Reeves', 'Terrell', 'Upton', 'Ward', 'Winkler'],
-    'K.': ['Coke', 'Concho', 'Crockett', 'Irion', 'Kimble', 'Mason', 'Mcculloch', 'Menard', 'Reagan', 
+    'K': ['Coke', 'Concho', 'Crockett', 'Irion', 'Kimble', 'Mason', 'Mcculloch', 'Menard', 'Reagan', 
           'Runnels', 'Schleicher', 'Sterling', 'Sutton', 'Tom Green'],
-    'L.': ['Bell', 'Coryell', 'Hamilton', 'Lampasas', 'Milam', 'Mills'],
-    'M.': ['Bosque', 'Falls', 'Hill', 'Limestone', 'Mclennan'],
-    'N.': ['Brazos', 'Burleson', 'Grimes', 'Leon', 'Madison', 'Robertson', 'Washington'],
-    'O.': ['Bastrop', 'Blanco' ,'Burnet' ,'Caldwell', 'Fayette', 'Hays', 'Lee', 'Llano', 'San Saba', 
+    'L': ['Bell', 'Coryell', 'Hamilton', 'Lampasas', 'Milam', 'Mills'],
+    'M': ['Bosque', 'Falls', 'Hill', 'Limestone', 'Mclennan'],
+    'N': ['Brazos', 'Burleson', 'Grimes', 'Leon', 'Madison', 'Robertson', 'Washington'],
+    'O': ['Bastrop', 'Blanco' ,'Burnet' ,'Caldwell', 'Fayette', 'Hays', 'Lee', 'Llano', 'San Saba', 
           'Travis', 'Williamson'],
-    'P.': ['Atascosa', 'Bandera', 'Bexar', 'Comal', 'Dimmit', 'Edwards', 'Frio', 'Gillespie', 
+    'P': ['Atascosa', 'Bandera', 'Bexar', 'Comal', 'Dimmit', 'Edwards', 'Frio', 'Gillespie', 
           'Gonzales', 'Guadalupe', 'Karnes', 'Kendall', 'Kerr', 'Kinney', 'La Salle', 'Maverick', 
           'Medina', 'Real', 'Uvalde', 'Val Verde', 'Wilson', 'Zavala'],
-    'Q.': ['Austin', 'Colorado', 'Fort Bend', 'Harris', 'Matagorda', 'Montgomery', 'Walker', 'Waller', 'Wharton'],
-    'R.': ['Brazoria', 'Chambers', 'Galveston', 'Hardin', 'Jasper', 'Jefferson', 'Liberty', 'Newton', 'Orange'],
-    'S.': ['Calhoun', 'Dewitt', 'De Witt', 'Goliad', 'Jackson', 'Lavaca', 'Victoria'],
-    'T.': ['Jim Hogg', 'Webb', 'Zapata'],
-    'U.': ['Aransas', 'Bee', 'Brooks', 'Duval', 'Jim Wells', 'Kenedy', 'Kleberg', 'Live Oak', 
+    'Q': ['Austin', 'Colorado', 'Fort Bend', 'Harris', 'Matagorda', 'Montgomery', 'Walker', 'Waller', 'Wharton'],
+    'R': ['Brazoria', 'Chambers', 'Galveston', 'Hardin', 'Jasper', 'Jefferson', 'Liberty', 'Newton', 'Orange'],
+    'S': ['Calhoun', 'Dewitt', 'De Witt', 'Goliad', 'Jackson', 'Lavaca', 'Victoria'],
+    'T': ['Jim Hogg', 'Webb', 'Zapata'],
+    'U': ['Aransas', 'Bee', 'Brooks', 'Duval', 'Jim Wells', 'Kenedy', 'Kleberg', 'Live Oak', 
           'Mcmullen', 'Nueces', 'Refugio', 'San Patricio'],
-    'V.': ['Cameron', 'Hidalgo', 'Starr', 'Willacy'],
+    'V': ['Cameron', 'Hidalgo', 'Starr', 'Willacy'],
     'Total': ['Total', 'Grand Total']
 }
 
@@ -132,7 +132,7 @@ fix_date_index(df_covid_icu_inpatients)
 url = 'https://www.dshs.texas.gov/sites/default/files/chs/data/COVID/Texas%20COVID-19%20Cumulative%20Confirmed%20Cases%20by%20County.xlsx'
 df = pd.read_excel(url, sheet_name=None, index_col=[0], header=2, nrows=256)
 df = pd.concat(df, axis=1).droplevel(0, axis=1)
-df.drop(columns=["Unknown Date", "2020 Total"], inplace=True)
+df.drop(columns=["Unknown Date", "Total", "2020 Total"], inplace=True)
 df.columns = generate_date_range(df.columns)
 df = df.loc[:, df.columns > '2020-04-11']
 df.insert(0, 'TSA ID', [map_county_to_tsa(county) for county in df.index])
@@ -148,7 +148,7 @@ df_cases.rename(columns = {0: 'cases'}, inplace=True)
 url = 'https://www.dshs.texas.gov/sites/default/files/chs/data/COVID/Texas%20COVID-19%20New%20Confirmed%20Cases%20by%20County.xlsx'
 df = pd.read_excel(url, sheet_name=None, index_col=[0], header=2, nrows=256)
 df = pd.concat(df, axis=1).droplevel(0, axis=1)
-df.drop(columns=["Unknown Date", "Total"], inplace=True)
+df.drop(columns=["Unknown Date", "Total", "Total 2021"], inplace=True)
 df.columns = generate_date_range(df.columns)
 df = df.loc[:, df.columns > '2020-04-11']
 df.insert(0, 'TSA ID', [map_county_to_tsa(county) for county in df.index])
