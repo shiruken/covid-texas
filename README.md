@@ -2,6 +2,8 @@
 
 # Texas COVID-19 Hospital Resource Usage
 
+## _This website is no longer being updated after Texas DSHS ended data releases on May 10, 2023_
+
 Regional COVID-19 hospital resource usage in Texas based on [Department of State Health Services](https://dshs.texas.gov/) data. Powered by [D3.js](https://d3js.org/). Hosted on [GitHub Pages](https://pages.github.com/).
 
 https://covid-texas.csullender.com/
@@ -19,8 +21,9 @@ The unmodified daily data is available in [`data.csv`](data.csv). A cleaned vers
 
 The "average annual occupancy rate" shown on the Statewide Hospital Bed Usage chart is based on the annual [_Health, United States_](https://www.cdc.gov/nchs/hus/index.htm) report by the [National Center for Health Statistics](https://www.cdc.gov/nchs/index.htm) (NCHS). [Table 91](https://www.cdc.gov/nchs/hus/contents2017.htm#Table_091) details the average annual occupancy rate in community hospitals for each state, with Texas reporting 60% occupancy in 2015. This number was further validated with the [Acute Care Hospitals report](https://dshs.texas.gov/chs/hosp/hosp5/) from the [Texas DSHS Center for Health Statistics](https://www.dshs.state.tx.us/chs/), which reported 60.4% staffed bed occupancy in 2016.
 
-
 # Texas COVID-19 Vaccine Tracker
+
+## _This website is no longer being updated after Texas DSHS ended data releases on May 10, 2023_
 
 Texas COVID-19 vaccine distribution tracker based on [Department of State Health Services](https://dshs.texas.gov/) data. Powered by [D3.js](https://d3js.org/). Hosted on [GitHub Pages](https://pages.github.com/).
 

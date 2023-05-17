@@ -72,8 +72,7 @@
 
         h2#subtitle {
             font-size: 1em;
-            color: #999;
-            font-weight: normal;
+            color: #D95F02;
             margin-top: 5px;
             min-height: 22px;
         }
@@ -308,7 +307,7 @@
 
     <header>
         <h1 id="title">Texas COVID-19 Hospital Resource Usage</h1>
-        <h2 id="subtitle"></h2>
+        <h2 id="subtitle">Texas DSHS ended data releases on May 10, 2023</h2>
     </header>
 
     <div id="control">
@@ -353,7 +352,7 @@
             The "Statewide Total" is manually calculated by aggregating values from all available <a href="https://www.dshs.texas.gov/emstraumasystems/etrarac.shtm" title="Link to Regional Advisory Council website">trauma service areas</a> (TSAs). 
             This aggregation is incomplete for bed counts prior to May 29, 2020, because of fragmented reporting from TSA-F (Paris) and TSA-R (Galveston). 
             All data is incomplete between July 23 to July 28, 2020, <a href="https://www.kxan.com/news/coronavirus/hospitalizations/18-of-texas-hospitals-arent-reporting-complete-data-dshs-says/" title="KXAN article about hospital reporting issues">due to a transition in hospital reporting</a> to comply with new federal requirements. 
-            This page is updated weekly on Wednesdays following a reduction in Texas DSHS data release frequency.
+            This website is no longer being updated after Texas DSHS ended data releases on May 10, 2023.
             Manual curation was performed as necessary to avoid extreme graph values and are documented in the <a href="https://github.com/shiruken/covid-texas/blob/master/fetch.py" title="View fetch.py on GitHub">update script</a>.
         </p>
     </footer>
@@ -481,10 +480,6 @@
             if (TSA != "Total")
                 document.title = "TSA-" + TSA + " | Texas COVID-19 Hospital Resource Usage";
 
-            // Update subtitle
-            let N = data[TSA].length - 1;
-            d3.select("#subtitle").text("Trauma Service Area (TSA) data updated on " + formatDate(data[TSA][N].date));
-
             // Populate select menu and select default TSA
             d3.select("#tsaSelect")
                 .selectAll('options')
@@ -508,6 +503,7 @@
             updateICUBedChart(data[TSA], 0);   
 
             // Populate details sections
+            let N = data[TSA].length - 1;
             updateCaseDetails(data[TSA][N]);
             updateCOVIDDetails(data[TSA][N]);
             updateCountDetails(data[TSA][N]);
@@ -1454,14 +1450,14 @@
         function moveTotalBedLegend(TSA,duration) {
             let tform = "translate(600, 165)";              
 
-            if (["C", "D", "F", "H", "J", "K", "M"].includes(TSA))
+            if (["C", "D", "F", "H", "J", "K"].includes(TSA))
                 tform = "translate(20, 10)";
 
-            if (["A", "B", "Total"].includes(TSA))
+            if (["A", "B", "S", "Total"].includes(TSA))
                 tform = "translate(600, 165)";
 
             if (TSA == "S")
-                tform = "translate(600, 10)";
+                tform = "translate(600, 242)";
 
             d3.select("#chart-hospital-beds g.legend")
                 .transition()
@@ -1473,23 +1469,11 @@
         function moveICULegend(TSA,duration) {
             let tform = "translate(560, 165)";
 
-            if (["E", "I", "O", "Q", "V", "Total"].includes(TSA))
-                tform = "translate(560, 85)";
+            if (["K"].includes(TSA))
+                tform = "translate(560, 10)";
 
-            if (["A", "C", "S"].includes(TSA))
-                tform = "translate(430, 320)";
-
-            if (TSA == "F")
-                tform = "translate(50, 320)";
-
-            if (TSA == "J")
-                tform = "translate(20, 10)";
-
-            if (TSA == "K")
-                tform = "translate(150, 10)";
-
-            if (TSA == "T")
-                tform = "translate(75, 320)";
+            if (["F", "J", "M", "S"].includes(TSA))
+                tform = "translate(560, 242)";
 
             d3.select("#chart-icu-beds g.legend")
                 .transition()
@@ -1509,6 +1493,9 @@
             if (["A", "N", "O", "U"].includes(TSA))
                 tform1 = "translate(20, 145)";
 
+            if (TSA == "T")
+                tform1 = "translate(20, 15)";
+
             d3.select("#chart-bed-count .stacked-top .legend")
                 .transition()
                 .duration(duration)
@@ -1517,17 +1504,20 @@
             // Legend 2
             let tform2 = "translate(20, 378)";
 
-            if (["B", "E", "L", "R", "S", "Total"].includes(TSA))
+            if (["B", "E", "G", "R", "Total"].includes(TSA))
                 tform2 = "translate(20, 372)";                
 
-            if (["C", "G", "H", "J", "N", "V"].includes(TSA))
+            if (["C", "N"].includes(TSA))
                 tform2 = "translate(20, 385)";
 
-            if (TSA == "D")
-                tform2 = "translate(20, 240)";
-                
-            if (TSA == "U")
-                tform2 = "translate(20, 390)";
+            if (["D", "H", "V"].includes(TSA))
+                tform2 = "translate(600, 240)";
+
+            if (["F", "I", "J", "K"].includes(TSA))
+                tform2 = "translate(600, 248)";
+
+            if (["L", "M", "S", "U"].includes(TSA))
+                tform2 = "translate(600, 254)";
 
             d3.select("#chart-bed-count .stacked-bottom .legend")
                 .transition()
@@ -1537,22 +1527,19 @@
 
         // Position COVID-19 chart legend based on currently selected TSA
         function moveCOVIDLegend(TSA,duration) {
-            let tform = "translate(20, 20)";
+            let tform = "translate(600, 20)";
 
-            if (["D", "E", "F", "G", "M", "V"].includes(TSA))
-                tform = "translate(20, 10)";
+            if (["A", "B", "D", "E", "F", "G", "M"].includes(TSA))
+                tform = "translate(600, 10)";
 
             if (["T", "U", "Total"].includes(TSA))
-                tform = "translate(20, 30)";
-
-            if (["A", "B", "S"].includes(TSA))
-                tform = "translate(600, 10)";
+                tform = "translate(600, 30)";
                 
             if (TSA == "I")
                 tform = "translate(600, 2)";
 
             if (TSA == "K")
-                tform = "translate(20, 2)";
+                tform = "translate(600, 2)";
 
             d3.select("#chart-covid g.legend")
                 .transition()
@@ -1564,16 +1551,16 @@
         function moveCaseLegend(TSA,duration) {
 
             // Legend 1
-            let tform1 = "translate(20, 5)";
+            let tform1 = "translate(590, 5)";
 
-            if (["A", "B", "J", "M", "N", "O", "P"].includes(TSA))
-                tform1 = "translate(20, 15)";
+            if (["A", "B", "E", "J", "N", "O", "P", "T"].includes(TSA))
+                tform1 = "translate(590, 15)";
 
             if (["H", "K", "S", "V"].includes(TSA))
-                tform1 = "translate(20, 20)";
+                tform1 = "translate(590, 20)";
 
-            if (["C", "D"].includes(TSA))
-                tform1 = "translate(20, 25)";
+            if (["D"].includes(TSA))
+                tform1 = "translate(590, 25)";
 
             d3.select("#chart-case .stacked-top .legend")
                 .transition()
@@ -1581,16 +1568,13 @@
                 .attr("transform", tform1);
 
             // Legend 2
-            let tform2 = "translate(20, 240)";               
+            let tform2 = "translate(590, 240)";               
 
-            if (["C", "E", "H", "L", "N", "O", "P", "T"].includes(TSA))
-                tform2 = "translate(20, 248)";
+            if (["C", "E", "H", "L", "N", "O", "P", "R", "T"].includes(TSA))
+                tform2 = "translate(590, 248)";
 
             if (["B", "F", "I", "S", "U"].includes(TSA))
-                tform2 = "translate(20, 254)";
-
-            if (TSA == "R")
-                tform2 = "translate(20, 250)";
+                tform2 = "translate(590, 254)";
 
             d3.select("#chart-case .stacked-bottom .legend")
                 .transition()
